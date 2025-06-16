@@ -1,0 +1,216 @@
+.post-card {
+  background-color: var(--background-card);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow-medium);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid var(--border-primary);
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-heavy);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  &__author {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__avatar-link {
+    text-decoration: none;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+
+  &__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    font-size: 16px;
+  }
+
+  &__author-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__author-link {
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: var(--primary);
+    }
+  }
+
+  &__author-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: var(--primary);
+    }
+  }
+
+  &__time {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  &__sport-badge {
+    background: linear-gradient(135deg, var(--secondary), var(--accent));
+    color: var(--text-primary);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  &__content {
+    margin-bottom: 20px;
+  }
+
+  &__title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 8px 0;
+  }
+
+  &__description {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0 0 16px 0;
+  }
+
+  &__tags {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  &__tags-icon {
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+
+  &__tag {
+    background-color: var(--background-tertiary);
+    color: var(--primary);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid var(--border-primary);
+  }
+
+  &__details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding: 16px;
+    background-color: var(--background-secondary);
+    border-radius: 12px;
+    border: 1px solid var(--border-primary);
+  }
+
+  &__detail {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  &__detail-icon {
+    color: var(--primary);
+    font-size: 12px;
+    min-width: 12px;
+  }
+
+  &__location-name {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  &__distance {
+    color: var(--text-tertiary);
+    font-size: 12px;
+    margin-left: 4px;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-primary);
+  }
+
+  &__interested {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+
+  &__heart {
+    color: var(--primary);
+  }
+
+  &__interest-btn {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: var(--text-primary);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    min-width: 120px;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+    }
+
+    &--interested {
+      background: var(--success);
+      cursor: default;
+
+      &:hover {
+        transform: none;
+        box-shadow: none;
+      }
+    }
+
+    &:disabled {
+      opacity: 0.8;
+      cursor: not-allowed;
+      transform: none;
+    }
+  }
+}

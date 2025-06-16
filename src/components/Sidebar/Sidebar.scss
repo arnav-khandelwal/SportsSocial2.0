@@ -1,0 +1,131 @@
+.sidebar {
+  position: fixed;
+  top: 70px;
+  left: 0;
+  width: 280px;
+  height: calc(100vh - 70px);
+  background-color: var(--background-secondary);
+  border-right: 1px solid var(--border-primary);
+  padding: 24px 0;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  z-index: 90;
+  overflow-y: auto;
+
+  @media (min-width: 769px) {
+    transform: translateX(0);
+    position: fixed;
+  }
+
+  &--open {
+    transform: translateX(0);
+  }
+
+  &__overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 80;
+
+    @media (min-width: 769px) {
+      display: none;
+    }
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px 24px;
+    border-bottom: 1px solid var(--border-primary);
+
+    @media (min-width: 769px) {
+      justify-content: center;
+    }
+  }
+
+  &__title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  &__close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px;
+
+    @media (min-width: 769px) {
+      display: none;
+    }
+  }
+
+  &__nav {
+    padding: 24px 0;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 24px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    position: relative;
+
+    &:hover {
+      background-color: var(--background-hover);
+      color: var(--primary);
+    }
+
+    &--active {
+      background-color: var(--background-tertiary);
+      color: var(--primary);
+      font-weight: 700;
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background-color: var(--primary);
+      }
+    }
+  }
+
+  &__icon {
+    font-size: 20px;
+    min-width: 20px;
+  }
+
+  &__label {
+    font-size: 16px;
+    flex: 1;
+  }
+
+  &__badge {
+    background-color: var(--primary);
+    color: var(--text-primary);
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin-left: auto;
+  }
+}
