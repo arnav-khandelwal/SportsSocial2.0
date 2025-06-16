@@ -1,6 +1,5 @@
 # Sports Social - Connect Through Sports
-
-A social platform for sports enthusiasts to connect, find local games, and build their sports community.
+## (Made with bolt for the World's Largest Hackathon) <br> A social platform for sports and gaming enthusiasts to connect, find local games, and build around their community.
 
 ## Features
 
