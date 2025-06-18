@@ -1,4 +1,4 @@
-# Sports Social - 
+# Sports Social - Connect through sports 
 ## (Made with bolt for the World's Largest Hackathon) <br> A social platform for sports and gaming enthusiasts to connect, find local games, and build around their community.
 
 ## Features
