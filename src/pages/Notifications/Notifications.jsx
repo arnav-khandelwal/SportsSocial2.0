@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaBell, FaUser, FaHeart, FaMapMarkerAlt, FaComment, FaCog } from 'react-icons/fa';
+import { FaBell, FaCog } from 'react-icons/fa';
 import axios from 'axios';
 import { useSocket } from '../../context/SocketContext';
 import { formatRelativeTime } from '../../utils/dateUtils';
@@ -82,35 +82,6 @@ const Notifications = () => {
     }
   };
 
-  const getFilteredNotifications = () => {
-    switch (filter) {
-      case 'unread':
-        return notifications.filter(n => !n.is_read);
-      case 'follow':
-      case 'interest':
-      case 'nearby_post':
-      case 'message':
-        return notifications.filter(n => n.type === filter);
-      default:
-        return notifications;
-    }
-  };
-
-  const getNotificationIcon = (type) => {
-    switch (type) {
-      case 'follow':
-        return <FaUser className="notifications__icon notifications__icon--follow" />;
-      case 'interest':
-        return <FaHeart className="notifications__icon notifications__icon--interest" />;
-      case 'nearby_post':
-        return <FaMapMarkerAlt className="notifications__icon notifications__icon--nearby" />;
-      case 'message':
-        return <FaComment className="notifications__icon notifications__icon--message" />;
-      default:
-        return <FaBell className="notifications__icon" />;
-    }
-  };
-
   const getNotificationLink = (notification) => {
     const { type, data } = notification;
     
@@ -126,6 +97,27 @@ const Notifications = () => {
       default:
         return '#';
     }
+  };
+
+  const getFilteredNotifications = () => {
+    switch (filter) {
+      case 'unread':
+        return notifications.filter(n => !n.is_read);
+      case 'follow':
+      case 'interest':
+      case 'nearby_post':
+      case 'message':
+        return notifications.filter(n => n.type === filter);
+      default:
+        return notifications;
+    }
+  };
+
+  const formatNotificationMessage = (notification) => {
+    const timeAgo = formatRelativeTime(notification.created_at);
+    
+    // Add the time to the message
+    return `${notification.message} (${timeAgo})`;
   };
 
   const filteredNotifications = getFilteredNotifications();
@@ -228,13 +220,10 @@ const Notifications = () => {
                 }`}
                 onClick={() => handleNotificationClick(notification)}
               >
-                {getNotificationIcon(notification.type)}
                 <div className="notifications__item-content">
-                  <h4>{notification.title}</h4>
-                  <p>{notification.message}</p>
-                  <span className="notifications__time">
-                    {formatRelativeTime(notification.created_at)}
-                  </span>
+                  <p className="notifications__message">
+                    {formatNotificationMessage(notification)}
+                  </p>
                 </div>
                 {!notification.is_read && (
                   <div className="notifications__unread-dot"></div>
