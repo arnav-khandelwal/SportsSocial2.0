@@ -13,6 +13,8 @@ import Profile from './pages/Profile/Profile';
 import CreatePost from './pages/CreatePost/CreatePost';
 import PastPosts from './pages/PastPosts/PastPosts';
 import Notifications from './pages/Notifications/Notifications';
+import Reviews from './pages/Reviews/Reviews';
+import CreateReview from './pages/CreateReview/CreateReview';
 
 // Context
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -55,6 +57,8 @@ function AppRoutes() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/search" element={<Search />} />
+            <Route path="/reviews" element={<Reviews />} />
+            <Route path="/create-review" element={<CreateReview />} />
             <Route path="/messages" element={<Messages />} />
             <Route path="/profile/:userId?" element={<Profile />} />
             <Route path="/create-post" element={<CreatePost />} />

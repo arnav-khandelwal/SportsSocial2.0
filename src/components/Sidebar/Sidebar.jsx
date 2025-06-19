@@ -8,7 +8,8 @@ import {
   FaInfoCircle, 
   FaCog,
   FaTimes,
-  FaUser
+  FaUser,
+  FaStar
 } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
@@ -63,6 +64,7 @@ const Sidebar = ({ isOpen, onClose }) => {
   const menuItems = [
     { path: '/', icon: FaHome, label: 'Home', exact: true },
     { path: '/search', icon: FaSearch, label: 'Search People' },
+    { path: '/reviews', icon: FaStar, label: 'Reviews' },
     { path: '/past-posts', icon: FaHistory, label: 'My Posts' },
     { path: '/events', icon: FaCalendarAlt, label: 'Events' },
     { 
@@ -87,6 +89,12 @@ const Sidebar = ({ isOpen, onClose }) => {
     <>
       {isOpen && <div className="sidebar__overlay" onClick={onClose} />}
       <aside className={`sidebar ${isOpen ? 'sidebar--open' : ''}`}>
+        <div className="sidebar__header">
+          <h2 className="sidebar__title">Navigation</h2>
+          <button className="sidebar__close" onClick={onClose}>
+            <FaTimes />
+          </button>
+        </div>
 
         <nav className="sidebar__nav">
           {menuItems.map((item) => (
