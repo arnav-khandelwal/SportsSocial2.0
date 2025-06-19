@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { formatRelativeTime, formatDateTime } from '../../utils/dateUtils';
+import FollowersModal from '../../components/FollowersModal/FollowersModal';
 import './Profile.scss';
 
 const Profile = () => {
@@ -18,6 +19,8 @@ const Profile = () => {
   const [isOwnProfile, setIsOwnProfile] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
+  const [showFollowersModal, setShowFollowersModal] = useState(false);
+  const [followersModalTab, setFollowersModalTab] = useState('followers');
 
   useEffect(() => {
     const profileId = userId || currentUser?.id;
@@ -95,6 +98,16 @@ const Profile = () => {
     // Note: In a real implementation, you might want to automatically select this user's conversation
   };
 
+  const handleFollowersClick = () => {
+    setFollowersModalTab('followers');
+    setShowFollowersModal(true);
+  };
+
+  const handleFollowingClick = () => {
+    setFollowersModalTab('following');
+    setShowFollowersModal(true);
+  };
+
   const getPostStatus = (eventTime) => {
     const now = new Date();
     const eventDate = new Date(eventTime);
@@ -142,14 +155,20 @@ const Profile = () => {
           )}
           
           <div className="profile__stats">
-            <div className="profile__stat">
+            <button 
+              className="profile__stat profile__stat--clickable"
+              onClick={handleFollowersClick}
+            >
               <FaUsers />
               <span>{profile.followers?.length || 0} Followers</span>
-            </div>
-            <div className="profile__stat">
+            </button>
+            <button 
+              className="profile__stat profile__stat--clickable"
+              onClick={handleFollowingClick}
+            >
               <FaUsers />
               <span>{profile.following?.length || 0} Following</span>
-            </div>
+            </button>
           </div>
         </div>
 
@@ -303,6 +322,13 @@ const Profile = () => {
           </div>
         )}
       </div>
+
+      <FollowersModal
+        isOpen={showFollowersModal}
+        onClose={() => setShowFollowersModal(false)}
+        userId={profile?.id}
+        initialTab={followersModalTab}
+      />
     </div>
   );
 };
