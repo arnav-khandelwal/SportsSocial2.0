@@ -87,11 +87,6 @@ const Sidebar = ({ isOpen, onClose }) => {
     <>
       {isOpen && <div className="sidebar__overlay" onClick={onClose} />}
       <aside className={`sidebar ${isOpen ? 'sidebar--open' : ''}`}>
-        <div className="sidebar__header">
-          <button className="sidebar__close" onClick={onClose}>
-            <FaTimes />
-          </button>
-        </div>
 
         <nav className="sidebar__nav">
           {menuItems.map((item) => (
