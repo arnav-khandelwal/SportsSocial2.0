@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { FaBell, FaTimes, FaUser, FaHeart, FaMapMarkerAlt, FaComment } from 'react-icons/fa';
+import { FaBell, FaTimes } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useSocket } from '../../context/SocketContext';
@@ -101,21 +101,6 @@ const NotificationDropdown = () => {
     setIsOpen(false);
   };
 
-  const getNotificationIcon = (type) => {
-    switch (type) {
-      case 'follow':
-        return <FaUser className="notification-dropdown__icon notification-dropdown__icon--follow" />;
-      case 'interest':
-        return <FaHeart className="notification-dropdown__icon notification-dropdown__icon--interest" />;
-      case 'nearby_post':
-        return <FaMapMarkerAlt className="notification-dropdown__icon notification-dropdown__icon--nearby" />;
-      case 'message':
-        return <FaComment className="notification-dropdown__icon notification-dropdown__icon--message" />;
-      default:
-        return <FaBell className="notification-dropdown__icon" />;
-    }
-  };
-
   const getNotificationLink = (notification) => {
     const { type, data } = notification;
     
@@ -131,6 +116,11 @@ const NotificationDropdown = () => {
       default:
         return '#';
     }
+  };
+
+  const formatNotificationMessage = (notification) => {
+    // Use the message directly from the database which already has the proper format
+    return notification.message;
   };
 
   return (
@@ -179,10 +169,10 @@ const NotificationDropdown = () => {
                   }`}
                   onClick={() => handleNotificationClick(notification)}
                 >
-                  {getNotificationIcon(notification.type)}
                   <div className="notification-dropdown__item-content">
-                    <h4>{notification.title}</h4>
-                    <p>{notification.message}</p>
+                    <p className="notification-dropdown__message">
+                      {formatNotificationMessage(notification)}
+                    </p>
                     <span className="notification-dropdown__time">
                       {formatRelativeTime(notification.created_at)}
                     </span>

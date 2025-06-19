@@ -150,55 +150,21 @@
     }
   }
 
-  &__icon {
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-    margin-top: 2px;
-
-    &--follow {
-      color: var(--primary);
-    }
-
-    &--interest {
-      color: var(--error);
-    }
-
-    &--nearby {
-      color: var(--success);
-    }
-
-    &--message {
-      color: var(--secondary);
-    }
-  }
-
   &__item-content {
     flex: 1;
     min-width: 0;
+  }
 
-    h4 {
-      margin: 0 0 4px 0;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-primary);
-      line-height: 1.3;
-    }
-
-    p {
-      margin: 0 0 6px 0;
-      font-size: 13px;
-      color: var(--text-secondary);
-      line-height: 1.4;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
+  &__message {
+    margin: 0 0 6px 0;
+    font-size: 14px;
+    color: var(--text-primary);
+    line-height: 1.4;
+    font-weight: 500;
   }
 
   &__time {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--text-tertiary);
     font-weight: 500;
   }

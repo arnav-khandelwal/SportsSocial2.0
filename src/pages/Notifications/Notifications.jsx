@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaBell, FaUser, FaHeart, FaMapMarkerAlt, FaComment, FaCog } from 'react-icons/fa';
+import { FaBell, FaCog } from 'react-icons/fa';
 import axios from 'axios';
 import { useSocket } from '../../context/SocketContext';
 import { formatRelativeTime } from '../../utils/dateUtils';
@@ -96,21 +96,6 @@ const Notifications = () => {
     }
   };
 
-  const getNotificationIcon = (type) => {
-    switch (type) {
-      case 'follow':
-        return <FaUser className="notifications__icon notifications__icon--follow" />;
-      case 'interest':
-        return <FaHeart className="notifications__icon notifications__icon--interest" />;
-      case 'nearby_post':
-        return <FaMapMarkerAlt className="notifications__icon notifications__icon--nearby" />;
-      case 'message':
-        return <FaComment className="notifications__icon notifications__icon--message" />;
-      default:
-        return <FaBell className="notifications__icon" />;
-    }
-  };
-
   const getNotificationLink = (notification) => {
     const { type, data } = notification;
     
@@ -126,6 +111,11 @@ const Notifications = () => {
       default:
         return '#';
     }
+  };
+
+  const formatNotificationMessage = (notification) => {
+    // Use the message directly from the database which already has the proper format
+    return notification.message;
   };
 
   const filteredNotifications = getFilteredNotifications();
@@ -228,10 +218,10 @@ const Notifications = () => {
                 }`}
                 onClick={() => handleNotificationClick(notification)}
               >
-                {getNotificationIcon(notification.type)}
                 <div className="notifications__item-content">
-                  <h4>{notification.title}</h4>
-                  <p>{notification.message}</p>
+                  <p className="notifications__message">
+                    {formatNotificationMessage(notification)}
+                  </p>
                   <span className="notifications__time">
                     {formatRelativeTime(notification.created_at)}
                   </span>
