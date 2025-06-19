@@ -88,7 +88,8 @@ const Sidebar = ({ isOpen, onClose }) => {
   return (
     <>
       {isOpen && <div className="sidebar__overlay" onClick={onClose} />}
-      
+      <aside className={`sidebar ${isOpen ? 'sidebar--open' : ''}`}>
+        
 
         <nav className="sidebar__nav">
           {menuItems.map((item) => (
