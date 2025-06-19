@@ -82,20 +82,6 @@ const Notifications = () => {
     }
   };
 
-  const getFilteredNotifications = () => {
-    switch (filter) {
-      case 'unread':
-        return notifications.filter(n => !n.is_read);
-      case 'follow':
-      case 'interest':
-      case 'nearby_post':
-      case 'message':
-        return notifications.filter(n => n.type === filter);
-      default:
-        return notifications;
-    }
-  };
-
   const getNotificationLink = (notification) => {
     const { type, data } = notification;
     
@@ -113,9 +99,25 @@ const Notifications = () => {
     }
   };
 
+  const getFilteredNotifications = () => {
+    switch (filter) {
+      case 'unread':
+        return notifications.filter(n => !n.is_read);
+      case 'follow':
+      case 'interest':
+      case 'nearby_post':
+      case 'message':
+        return notifications.filter(n => n.type === filter);
+      default:
+        return notifications;
+    }
+  };
+
   const formatNotificationMessage = (notification) => {
-    // Use the message directly from the database which already has the proper format
-    return notification.message;
+    const timeAgo = formatRelativeTime(notification.created_at);
+    
+    // Add the time to the message
+    return `${notification.message} (${timeAgo})`;
   };
 
   const filteredNotifications = getFilteredNotifications();
@@ -222,9 +224,6 @@ const Notifications = () => {
                   <p className="notifications__message">
                     {formatNotificationMessage(notification)}
                   </p>
-                  <span className="notifications__time">
-                    {formatRelativeTime(notification.created_at)}
-                  </span>
                 </div>
                 {!notification.is_read && (
                   <div className="notifications__unread-dot"></div>

@@ -119,8 +119,10 @@ const NotificationDropdown = () => {
   };
 
   const formatNotificationMessage = (notification) => {
-    // Use the message directly from the database which already has the proper format
-    return notification.message;
+    const timeAgo = formatRelativeTime(notification.created_at);
+    
+    // Add the time to the message
+    return `${notification.message} (${timeAgo})`;
   };
 
   return (
@@ -173,9 +175,6 @@ const NotificationDropdown = () => {
                     <p className="notification-dropdown__message">
                       {formatNotificationMessage(notification)}
                     </p>
-                    <span className="notification-dropdown__time">
-                      {formatRelativeTime(notification.created_at)}
-                    </span>
                   </div>
                   {!notification.is_read && (
                     <div className="notification-dropdown__unread-dot"></div>
