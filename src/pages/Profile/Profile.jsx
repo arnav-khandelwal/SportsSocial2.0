@@ -44,6 +44,7 @@ const Profile = () => {
   const [editingField, setEditingField] = useState(null);
   const [editValues, setEditValues] = useState({});
   const [saveLoading, setSaveLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const sportOptions = [
     'Football', 'Basketball', 'Tennis', 'Soccer', 'Baseball', 
@@ -226,29 +227,40 @@ const Profile = () => {
       }
 
       try {
-        setSaveLoading(true);
+        setUploadingImage(true);
         
-        // Create a FormData object to send the file
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('type', type);
-
-        // In a real implementation, you would upload to a file storage service
-        // For now, we'll create a local URL and simulate the upload
-        const imageUrl = URL.createObjectURL(file);
+        // Convert file to base64 for storage (in a real app, you'd upload to a cloud service)
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+          try {
+            const base64String = event.target.result;
+            
+            // Update settings with the new image URL
+            const updateField = type === 'profile_picture' ? 'profile_picture_url' : 'cover_photo_url';
+            await axios.put('/settings', { [updateField]: base64String });
+            
+            setSettings(prev => ({ ...prev, [updateField]: base64String }));
+            
+            alert(`${type === 'profile_picture' ? 'Profile picture' : 'Cover photo'} updated successfully!`);
+          } catch (error) {
+            console.error('Failed to save image:', error);
+            alert('Failed to save image. Please try again.');
+          } finally {
+            setUploadingImage(false);
+          }
+        };
         
-        // Update settings with the new image URL
-        const updateField = type === 'profile_picture' ? 'profile_picture_url' : 'cover_photo_url';
-        await axios.put('/settings', { [updateField]: imageUrl });
+        reader.onerror = () => {
+          alert('Failed to read image file.');
+          setUploadingImage(false);
+        };
         
-        setSettings(prev => ({ ...prev, [updateField]: imageUrl }));
+        reader.readAsDataURL(file);
         
-        alert(`${type === 'profile_picture' ? 'Profile picture' : 'Cover photo'} updated successfully!`);
       } catch (error) {
         console.error('Failed to upload image:', error);
         alert('Failed to upload image. Please try again.');
-      } finally {
-        setSaveLoading(false);
+        setUploadingImage(false);
       }
     };
 
@@ -507,26 +519,28 @@ const Profile = () => {
           <button 
             className="profile__banner-edit"
             onClick={() => handleImageUpload('cover_photo')}
-            disabled={saveLoading}
+            disabled={uploadingImage}
           >
             <FaCamera />
-            {saveLoading ? 'Uploading...' : 'Change Cover'}
+            {uploadingImage ? 'Uploading...' : 'Change Cover'}
           </button>
         )}
       </div>
 
       <div className="profile__header">
-        <div className="profile__avatar">
-          {settings?.profile_picture_url ? (
-            <img src={settings.profile_picture_url} alt="Profile" />
-          ) : (
-            <FaUser />
-          )}
+        <div className="profile__avatar-container">
+          <div className="profile__avatar">
+            {settings?.profile_picture_url ? (
+              <img src={settings.profile_picture_url} alt="Profile" />
+            ) : (
+              <FaUser />
+            )}
+          </div>
           {isOwnProfile && (
             <button 
               className="profile__avatar-edit"
               onClick={() => handleImageUpload('profile_picture')}
-              disabled={saveLoading}
+              disabled={uploadingImage}
             >
               <FaCamera />
             </button>
