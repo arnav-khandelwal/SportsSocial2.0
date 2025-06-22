@@ -486,6 +486,11 @@
     }
   }
 
+  // Posts Section Styles
+  &__posts {
+    animation: slideDown 0.3s ease;
+  }
+
   &__posts-loading {
     display: flex;
     flex-direction: column;
@@ -527,7 +532,7 @@
     }
   }
 
-  &__posts {
+  &__posts-list {
     display: flex;
     flex-direction: column;
     gap: 16px;
