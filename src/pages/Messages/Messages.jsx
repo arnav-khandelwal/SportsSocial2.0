@@ -16,7 +16,6 @@ const Messages = () => {
   });
   const [activeChat, setActiveChat] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showUserSearch, setShowUserSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
@@ -107,7 +106,11 @@ const Messages = () => {
       type: 'direct',
       user: user
     });
-    setShowUserSearch(false);
+    setSearchQuery('');
+    setSearchResults([]);
+  };
+
+  const clearSearch = () => {
     setSearchQuery('');
     setSearchResults([]);
   };
@@ -178,76 +181,61 @@ const Messages = () => {
             {getTotalUnreadCount() > 0 && (
               <span className="messages__total-unread">{getTotalUnreadCount()}</span>
             )}
-            <button
-              className="messages__new-message-btn"
-              onClick={() => setShowUserSearch(!showUserSearch)}
-              title="Start new conversation"
-            >
-              <FaPlus />
-            </button>
           </div>
         </div>
 
-        {showUserSearch && (
-          <div className="messages__user-search">
-            <div className="messages__search-header">
-              <h3>Start New Conversation</h3>
+        <div className="messages__search">
+          <div className="messages__search-input-container">
+            <FaSearch className="messages__search-icon" />
+            <input
+              type="text"
+              placeholder="Search users to message..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="messages__search-input"
+            />
+            {searchQuery && (
               <button
-                className="messages__search-close"
-                onClick={() => {
-                  setShowUserSearch(false);
-                  setSearchQuery('');
-                  setSearchResults([]);
-                }}
+                className="messages__search-clear"
+                onClick={clearSearch}
               >
                 <FaTimes />
               </button>
-            </div>
-            <div className="messages__search-input-container">
-              <FaSearch className="messages__search-icon" />
-              <input
-                type="text"
-                placeholder="Search users to message..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="messages__search-input"
-                autoFocus
-              />
-            </div>
-            
-            {searchLoading && (
-              <div className="messages__search-loading">
-                <div className="loader"></div>
-              </div>
-            )}
-            
-            {searchResults.length > 0 && (
-              <div className="messages__search-results">
-                {searchResults.map((user) => (
-                  <div
-                    key={user.id}
-                    className="messages__search-result"
-                    onClick={() => startConversationWithUser(user)}
-                  >
-                    <div className="messages__search-result-avatar">
-                      <FaUser />
-                    </div>
-                    <div className="messages__search-result-info">
-                      <h4>{user.username}</h4>
-                      {user.bio && <p>{user.bio}</p>}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-            
-            {searchQuery && searchResults.length === 0 && !searchLoading && (
-              <div className="messages__search-empty">
-                <p>No users found</p>
-              </div>
             )}
           </div>
-        )}
+          
+          {searchLoading && (
+            <div className="messages__search-loading">
+              <div className="loader"></div>
+            </div>
+          )}
+          
+          {searchResults.length > 0 && (
+            <div className="messages__search-results">
+              {searchResults.map((user) => (
+                <div
+                  key={user.id}
+                  className="messages__search-result"
+                  onClick={() => startConversationWithUser(user)}
+                >
+                  <div className="messages__search-result-avatar">
+                    <FaUser />
+                  </div>
+                  <div className="messages__search-result-info">
+                    <h4>{user.username}</h4>
+                    {user.bio && <p>{user.bio}</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {searchQuery && searchResults.length === 0 && !searchLoading && (
+            <div className="messages__search-empty">
+              <p>No users found</p>
+            </div>
+          )}
+        </div>
 
         <div className="messages__conversations">
           <div className="messages__section">
@@ -355,14 +343,7 @@ const Messages = () => {
           <div className="messages__welcome">
             <FaComment className="messages__welcome-icon" />
             <h3>Select a conversation</h3>
-            <p>Choose a conversation from the sidebar to start messaging</p>
-            <button
-              className="messages__welcome-start-btn"
-              onClick={() => setShowUserSearch(true)}
-            >
-              <FaPlus />
-              Start New Conversation
-            </button>
+            <p>Choose a conversation from the sidebar or search for users to start messaging</p>
           </div>
         )}
       </div>
