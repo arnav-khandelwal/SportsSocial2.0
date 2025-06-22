@@ -206,6 +206,7 @@
     font-size: 16px;
     transition: all 0.2s ease;
     box-shadow: var(--shadow-medium);
+    font-size:0px;
 
     &:hover:not(:disabled) {
       background-color: var(--primary-light);
