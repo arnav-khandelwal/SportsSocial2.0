@@ -5,6 +5,9 @@
   justify-content: center;
   background: linear-gradient(135deg, var(--background-primary), var(--background-secondary));
   padding: 20px;
+  overflow-y: auto; // Enables vertical scroll
+  max-height: 100vh; // Limits to full screen height
+
 
   &__container {
     background-color: var(--background-card);

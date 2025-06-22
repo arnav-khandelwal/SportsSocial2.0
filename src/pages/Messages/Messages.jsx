@@ -18,10 +18,12 @@ const Messages = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
+  const [openedGroupChats, setOpenedGroupChats] = useState(new Set());
   const { socket } = useSocket();
 
   useEffect(() => {
     fetchConversations();
+    loadOpenedGroupChats();
     
     // Check if we need to start a conversation from navigation state
     if (location.state?.startConversation) {
@@ -70,6 +72,34 @@ const Messages = () => {
       setSearchResults([]);
     }
   }, [searchQuery]);
+
+  const loadOpenedGroupChats = () => {
+    try {
+      const saved = localStorage.getItem(`openedGroupChats_${currentUser?.id}`);
+      if (saved) {
+        setOpenedGroupChats(new Set(JSON.parse(saved)));
+      }
+    } catch (error) {
+      console.error('Failed to load opened group chats:', error);
+    }
+  };
+
+  const saveOpenedGroupChats = (groupChatIds) => {
+    try {
+      localStorage.setItem(`openedGroupChats_${currentUser?.id}`, JSON.stringify([...groupChatIds]));
+    } catch (error) {
+      console.error('Failed to save opened group chats:', error);
+    }
+  };
+
+  const markGroupChatAsOpened = (groupChatId) => {
+    setOpenedGroupChats(prev => {
+      const newSet = new Set(prev);
+      newSet.add(groupChatId);
+      saveOpenedGroupChats(newSet);
+      return newSet;
+    });
+  };
 
   const fetchConversations = async () => {
     try {
@@ -159,10 +189,32 @@ const Messages = () => {
     const directUnread = directConversations.reduce((total, conv) => 
       total + (conv.unread_count || 0), 0
     );
-    const groupUnread = groupConversations.reduce((total, group) => 
-      total + (group.unread_count || 0), 0
-    );
+    
+    // Only count unread messages from group chats that have been opened by the user
+    const groupUnread = groupConversations.reduce((total, group) => {
+      if (openedGroupChats.has(group.id)) {
+        return total + (group.unread_count || 0);
+      }
+      return total;
+    }, 0);
+    
     return directUnread + groupUnread;
+  };
+
+  const handleGroupChatClick = (group) => {
+    // Mark this group chat as opened when user clicks on it
+    markGroupChatAsOpened(group.id);
+    
+    setActiveChat({ 
+      id: group.id, 
+      type: 'group', 
+      name: group.name 
+    });
+  };
+
+  const shouldShowGroupUnreadBadge = (group) => {
+    // Only show unread badge if the user has opened this group chat before AND there are unread messages
+    return openedGroupChats.has(group.id) && group.unread_count > 0;
   };
 
   if (loading) {
@@ -315,8 +367,8 @@ const Messages = () => {
                     activeChat?.id === group.id && activeChat?.type === 'group' 
                       ? 'messages__conversation--active' 
                       : ''
-                  } ${group.unread_count > 0 ? 'messages__conversation--unread' : ''}`}
-                  onClick={() => setActiveChat({ id: group.id, type: 'group', name: group.name })}
+                  } ${shouldShowGroupUnreadBadge(group) ? 'messages__conversation--unread' : ''}`}
+                  onClick={() => handleGroupChatClick(group)}
                 >
                   <div className="messages__avatar messages__avatar--group">
                     <FaUsers />
@@ -329,7 +381,7 @@ const Messages = () => {
                     <div className="messages__conversation-time">
                       {formatMessageTime(group.last_message?.created_at)}
                     </div>
-                    {group.unread_count > 0 && (
+                    {shouldShowGroupUnreadBadge(group) && (
                       <span className="messages__unread-badge">{group.unread_count}</span>
                     )}
                   </div>
