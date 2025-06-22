@@ -213,7 +213,7 @@ const Messages = () => {
   };
 
   const shouldShowGroupUnreadBadge = (group) => {
-    // Only show unread badge if the user has opened this group chat before
+    // Only show unread badge if the user has opened this group chat before AND there are unread messages
     return openedGroupChats.has(group.id) && group.unread_count > 0;
   };
 
