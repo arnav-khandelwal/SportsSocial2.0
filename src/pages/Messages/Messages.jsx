@@ -5,15 +5,14 @@ import axios from 'axios';
 import { useSocket } from '../../context/SocketContext';
 import { useAuth } from '../../context/AuthContext';
 import MessageThread from '../../components/MessageThread/MessageThread';
+import DirectMessageThread from '../../components/DirectMessageThread/DirectMessageThread';
 import './Messages.scss';
 
 const Messages = () => {
   const location = useLocation();
   const { user: currentUser } = useAuth();
-  const [conversations, setConversations] = useState({
-    directMessages: [],
-    groupChats: []
-  });
+  const [directConversations, setDirectConversations] = useState([]);
+  const [groupConversations, setGroupConversations] = useState([]);
   const [activeChat, setActiveChat] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -29,7 +28,7 @@ const Messages = () => {
       const { startConversation } = location.state;
       setActiveChat({
         id: startConversation.id,
-        type: startConversation.type,
+        type: 'direct',
         user: startConversation
       });
       
@@ -48,18 +47,18 @@ const Messages = () => {
         fetchConversations();
       };
 
-      const handleMessageDelivered = (message) => {
+      const handleDirectMessageDelivered = (message) => {
         fetchConversations();
       };
 
       socket.on('newDirectMessage', handleNewDirectMessage);
       socket.on('newGroupMessage', handleNewGroupMessage);
-      socket.on('messageDelivered', handleMessageDelivered);
+      socket.on('directMessageDelivered', handleDirectMessageDelivered);
 
       return () => {
         socket.off('newDirectMessage', handleNewDirectMessage);
         socket.off('newGroupMessage', handleNewGroupMessage);
-        socket.off('messageDelivered', handleMessageDelivered);
+        socket.off('directMessageDelivered', handleDirectMessageDelivered);
       };
     }
   }, [socket]);
@@ -74,8 +73,13 @@ const Messages = () => {
 
   const fetchConversations = async () => {
     try {
-      const response = await axios.get('/messages/conversations');
-      setConversations(response.data);
+      // Fetch direct conversations
+      const directResponse = await axios.get('/direct-messages/conversations');
+      setDirectConversations(directResponse.data);
+
+      // Fetch group conversations (existing system)
+      const groupResponse = await axios.get('/messages/conversations');
+      setGroupConversations(groupResponse.data.groupChats || []);
     } catch (error) {
       console.error('Failed to fetch conversations:', error);
     } finally {
@@ -117,9 +121,9 @@ const Messages = () => {
 
   const formatLastMessage = (message) => {
     if (!message) return 'No messages yet';
-    return message.content && message.content.length > 50 
-      ? message.content.substring(0, 50) + '...'
-      : message.content || 'No messages yet';
+    return message.length > 50 
+      ? message.substring(0, 50) + '...'
+      : message || 'No messages yet';
   };
 
   const formatMessageTime = (dateString) => {
@@ -152,10 +156,10 @@ const Messages = () => {
   };
 
   const getTotalUnreadCount = () => {
-    const directUnread = conversations.directMessages.reduce((total, conv) => 
+    const directUnread = directConversations.reduce((total, conv) => 
       total + (conv.unread_count || 0), 0
     );
-    const groupUnread = conversations.groupChats.reduce((total, group) => 
+    const groupUnread = groupConversations.reduce((total, group) => 
       total + (group.unread_count || 0), 0
     );
     return directUnread + groupUnread;
@@ -242,21 +246,28 @@ const Messages = () => {
             <h3 className="messages__section-title">
               <FaComment /> Direct Messages
             </h3>
-            {conversations.directMessages.length === 0 ? (
+            {directConversations.length === 0 ? (
               <p className="messages__empty">No direct messages</p>
             ) : (
-              conversations.directMessages.map((conv) => (
+              directConversations.map((conv) => (
                 <div
-                  key={`direct-${conv.id}`}
+                  key={`direct-${conv.conversation_id}`}
                   className={`messages__conversation ${
-                    activeChat?.id === conv.id && activeChat?.type === 'direct' 
+                    activeChat?.id === conv.other_user_id && activeChat?.type === 'direct' 
                       ? 'messages__conversation--active' 
                       : ''
                   } ${conv.unread_count > 0 ? 'messages__conversation--unread' : ''}`}
-                  onClick={() => setActiveChat({ id: conv.id, type: 'direct', user: conv })}
+                  onClick={() => setActiveChat({ 
+                    id: conv.other_user_id, 
+                    type: 'direct', 
+                    user: { 
+                      id: conv.other_user_id, 
+                      username: conv.other_user_username 
+                    } 
+                  })}
                 >
                   <Link 
-                    to={`/profile/${conv.id}`}
+                    to={`/profile/${conv.other_user_id}`}
                     className="messages__avatar-link"
                     onClick={(e) => e.stopPropagation()}
                   >
@@ -266,13 +277,13 @@ const Messages = () => {
                   </Link>
                   <div className="messages__conversation-info">
                     <Link 
-                      to={`/profile/${conv.id}`}
+                      to={`/profile/${conv.other_user_id}`}
                       className="messages__username-link"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <h4>{conv.username || 'Unknown User'}</h4>
+                      <h4>{conv.other_user_username || 'Unknown User'}</h4>
                     </Link>
-                    <p>{formatLastMessage({ content: conv.last_message_content })}</p>
+                    <p>{formatLastMessage(conv.last_message_content)}</p>
                   </div>
                   <div className="messages__conversation-meta">
                     <div className="messages__conversation-time">
@@ -282,7 +293,7 @@ const Messages = () => {
                       <span className="messages__unread-badge">{conv.unread_count}</span>
                     )}
                   </div>
-                  {conv.is_online && (
+                  {conv.other_user_is_online && (
                     <div className="messages__online-indicator"></div>
                   )}
                 </div>
@@ -294,10 +305,10 @@ const Messages = () => {
             <h3 className="messages__section-title">
               <FaUsers /> Group Chats
             </h3>
-            {conversations.groupChats.length === 0 ? (
+            {groupConversations.length === 0 ? (
               <p className="messages__empty">No group chats</p>
             ) : (
-              conversations.groupChats.map((group) => (
+              groupConversations.map((group) => (
                 <div
                   key={`group-${group.id}`}
                   className={`messages__conversation ${
@@ -312,7 +323,7 @@ const Messages = () => {
                   </div>
                   <div className="messages__conversation-info">
                     <h4>{group.name}</h4>
-                    <p>{formatLastMessage(group.last_message)}</p>
+                    <p>{formatLastMessage(group.last_message?.content)}</p>
                   </div>
                   <div className="messages__conversation-meta">
                     <div className="messages__conversation-time">
@@ -334,11 +345,18 @@ const Messages = () => {
 
       <div className="messages__main">
         {activeChat ? (
-          <MessageThread
-            chatId={activeChat.id}
-            chatType={activeChat.type}
-            chatName={activeChat.type === 'direct' ? activeChat.user.username : activeChat.name}
-          />
+          activeChat.type === 'direct' ? (
+            <DirectMessageThread
+              otherUserId={activeChat.id}
+              otherUserName={activeChat.user.username}
+            />
+          ) : (
+            <MessageThread
+              chatId={activeChat.id}
+              chatType={activeChat.type}
+              chatName={activeChat.name}
+            />
+          )
         ) : (
           <div className="messages__welcome">
             <FaComment className="messages__welcome-icon" />

@@ -38,9 +38,9 @@ export const SocketProvider = ({ children }) => {
     }
   }, [user]);
 
-  const sendDirectMessage = (recipient, content) => {
+  const sendDirectMessage = (recipientId, content) => {
     if (socket) {
-      socket.emit('sendDirectMessage', { recipient, content });
+      socket.emit('sendDirectMessage', { recipientId, content });
     }
   };
 
@@ -62,9 +62,15 @@ export const SocketProvider = ({ children }) => {
     }
   };
 
-  const sendTypingIndicator = (data) => {
+  const sendDirectTypingIndicator = (recipientId, isTyping) => {
     if (socket) {
-      socket.emit('typing', data);
+      socket.emit('directTyping', { recipientId, isTyping });
+    }
+  };
+
+  const sendGroupTypingIndicator = (groupChatId, isTyping) => {
+    if (socket) {
+      socket.emit('groupTyping', { groupChatId, isTyping });
     }
   };
 
@@ -75,7 +81,8 @@ export const SocketProvider = ({ children }) => {
     sendGroupMessage,
     joinGroupChat,
     leaveGroupChat,
-    sendTypingIndicator
+    sendDirectTypingIndicator,
+    sendGroupTypingIndicator
   };
 
   return (

@@ -74,8 +74,8 @@ const Sidebar = ({ isOpen, onClose }) => {
       badge: unreadCount > 0 ? unreadCount : null
     },
     { path: `/profile/${user?.id}`, icon: FaUser, label: 'My Profile' },
-    { path: '/about', icon: FaInfoCircle, label: 'About Us' },
-    { path: '/settings', icon: FaCog, label: 'Settings' }
+    { path: '/settings', icon: FaCog, label: 'Settings' },
+    { path: '/about', icon: FaInfoCircle, label: 'About Us' }
   ];
 
   const isActive = (path, exact = false) => {

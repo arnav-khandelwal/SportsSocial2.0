@@ -1,4 +1,5 @@
 import { Message } from '../models/Message.js';
+import { DirectMessage } from '../models/DirectMessage.js';
 import { Notification } from '../models/Notification.js';
 import { User } from '../models/User.js';
 
@@ -14,28 +15,29 @@ export const handleSocketConnection = (socket, io) => {
     socket.userId = userId;
   });
 
-  // Handle direct messages
+  // Handle direct messages (new system)
   socket.on('sendDirectMessage', async (data) => {
     try {
-      const { recipient, content } = data;
+      const { recipientId, content } = data;
       
-      const message = await Message.create({
-        sender_id: socket.userId,
-        recipient_id: recipient,
-        content,
-        message_type: 'direct'
-      });
+      const message = await DirectMessage.sendMessage(socket.userId, recipientId, content);
 
       // Send to recipient
-      io.to(recipient).emit('newDirectMessage', message);
+      io.to(recipientId).emit('newDirectMessage', {
+        ...message,
+        conversationId: message.conversation_id
+      });
       
       // Send back to sender for confirmation
-      socket.emit('messageDelivered', message);
+      socket.emit('directMessageDelivered', {
+        ...message,
+        conversationId: message.conversation_id
+      });
 
       // Create notification for recipient
       const sender = await User.findById(socket.userId);
       await Notification.create({
-        user_id: recipient,
+        user_id: recipientId,
         type: 'message',
         title: 'New message',
         message: `${sender.username} sent you a message: "${content.substring(0, 50)}${content.length > 50 ? '...' : ''}"`,
@@ -47,7 +49,7 @@ export const handleSocketConnection = (socket, io) => {
       });
 
       // Send notification to recipient
-      io.to(recipient).emit('notification', {
+      io.to(recipientId).emit('notification', {
         type: 'message',
         title: 'New message',
         message: `${sender.username} sent you a message`,
@@ -60,7 +62,7 @@ export const handleSocketConnection = (socket, io) => {
     }
   });
 
-  // Handle group messages
+  // Handle group messages (existing system)
   socket.on('sendGroupMessage', async (data) => {
     try {
       const { groupChat, content } = data;
@@ -94,19 +96,22 @@ export const handleSocketConnection = (socket, io) => {
     socket.leave(groupChatId);
   });
 
-  // Handle typing indicators
-  socket.on('typing', (data) => {
-    if (data.type === 'direct') {
-      io.to(data.recipient).emit('userTyping', {
-        userId: socket.userId,
-        isTyping: data.isTyping
-      });
-    } else if (data.type === 'group') {
-      socket.to(data.groupChat).emit('userTyping', {
-        userId: socket.userId,
-        isTyping: data.isTyping
-      });
-    }
+  // Handle typing indicators for direct messages
+  socket.on('directTyping', (data) => {
+    const { recipientId, isTyping } = data;
+    io.to(recipientId).emit('userDirectTyping', {
+      userId: socket.userId,
+      isTyping: isTyping
+    });
+  });
+
+  // Handle typing indicators for group messages
+  socket.on('groupTyping', (data) => {
+    const { groupChatId, isTyping } = data;
+    socket.to(groupChatId).emit('userGroupTyping', {
+      userId: socket.userId,
+      isTyping: isTyping
+    });
   });
 
   // Handle notification events
