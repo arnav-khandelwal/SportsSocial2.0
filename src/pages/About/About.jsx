@@ -1,0 +1,220 @@
+import { Link } from 'react-router-dom';
+import { FaUsers, FaMapMarkerAlt, FaComment, FaHeart, FaRunning, FaDumbbell, FaFutbol, FaEnvelope, FaGithub, FaLinkedin } from 'react-icons/fa';
+import './About.scss';
+
+const About = () => {
+  return (
+    <div className="about">
+      <div className="about__hero">
+        <div className="about__hero-content">
+          <h1 className="about__title">Welcome to Sports Social! 🏃‍♂️⚽</h1>
+          <p className="about__subtitle">
+            Where fitness meets friendship, and every workout becomes an adventure with new people.
+          </p>
+        </div>
+      </div>
+
+      <div className="about__content">
+        {/* Mission Section */}
+        <section className="about__section">
+          <div className="about__section-header">
+            <FaHeart className="about__section-icon" />
+            <h2>Our Mission</h2>
+          </div>
+          <div className="about__mission">
+            <p>
+              We believe that <strong>fitness should never be a solo journey</strong>. Sports Social exists to break down the barriers 
+              that keep people from staying active by making it ridiculously easy to find workout buddies, 
+              sports partners, and fitness communities right in your neighborhood.
+            </p>
+            <p>
+              Whether you're a seasoned athlete looking for competitive teammates or someone just starting their 
+              fitness journey who needs that extra motivation, we're here to connect you with like-minded people 
+              who share your passion for staying active.
+            </p>
+          </div>
+        </section>
+
+        {/* Origin Story */}
+        <section className="about__section">
+          <div className="about__section-header">
+            <FaUsers className="about__section-icon" />
+            <h2>How It All Started</h2>
+          </div>
+          <div className="about__story">
+            <p>
+              Picture this: Two college friends, Alex and Jordan, sitting in their dorm room after yet another 
+              failed attempt to find people to play basketball with. The campus courts were empty, the gym felt 
+              intimidating alone, and their usual workout buddies were either busy or had graduated.
+            </p>
+            <p>
+              "There has to be a better way," Alex said, scrolling through generic social media posts. 
+              "Why isn't there a place where we can just say 'Hey, I want to play tennis at 3 PM' and 
+              actually find people who are down?"
+            </p>
+            <p>
+              That lightbulb moment led to countless late-night coding sessions, way too much coffee, and 
+              eventually... Sports Social! We built the platform we wished existed – a place where 
+              <strong> "Want to work out?" </strong> gets answered with <strong>"Yes! When and where?"</strong>
+            </p>
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="about__section">
+          <div className="about__section-header">
+            <FaMapMarkerAlt className="about__section-icon" />
+            <h2>What You Can Do Here</h2>
+          </div>
+          <div className="about__features">
+            <div className="about__feature">
+              <div className="about__feature-icon">
+                <FaFutbol />
+              </div>
+              <h3>Find Your Sport, Find Your People</h3>
+              <p>
+                Post activities for any sport or fitness activity – from pickup basketball and morning runs 
+                to yoga sessions and rock climbing adventures. Set your location, time, and skill level, 
+                and watch the community respond!
+              </p>
+            </div>
+
+            <div className="about__feature">
+              <div className="about__feature-icon">
+                <FaUsers />
+              </div>
+              <h3>Connect & Build Your Crew</h3>
+              <p>
+                Follow other active people in your area, build your fitness network, and never work out 
+                alone again. Our smart location-based matching helps you discover activities happening 
+                right around the corner.
+              </p>
+            </div>
+
+            <div className="about__feature">
+              <div className="about__feature-icon">
+                <FaComment />
+              </div>
+              <h3>Chat & Coordinate</h3>
+              <p>
+                Jump into group chats when you show interest in an activity. Plan meetups, share tips, 
+                coordinate carpools, or just chat about your favorite teams. Real-time messaging keeps 
+                everyone in the loop.
+              </p>
+            </div>
+
+            <div className="about__feature">
+              <div className="about__feature-icon">
+                <FaDumbbell />
+              </div>
+              <h3>Share Your Experiences</h3>
+              <p>
+                Write reviews about gyms, sports venues, equipment, or events. Help the community discover 
+                the best places to stay active and avoid the not-so-great ones. Your insights matter!
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Personal Note */}
+        <section className="about__section about__section--personal">
+          <div className="about__section-header">
+            <FaRunning className="about__section-icon" />
+            <h2>A Personal Note from the Founders</h2>
+          </div>
+          <div className="about__personal">
+            <p>
+              Hey there! 👋 We're Alex and Jordan, the two slightly obsessed college students who built this thing.
+            </p>
+            <p>
+              We know what it's like to want to stay active but struggle with motivation, schedules, or just 
+              not knowing where to start. We've been the awkward person showing up to a pickup game alone, 
+              the one who bought a gym membership and used it twice, and definitely the ones who said 
+              "we should work out together" but never actually made it happen.
+            </p>
+            <p>
+              Sports Social isn't just our project – it's our solution to a problem we lived every day. 
+              We wanted to create something that would have helped us (and hopefully helps you!) turn 
+              <strong> "I should exercise more" </strong> into <strong>"I can't wait for tomorrow's game!"</strong>
+            </p>
+            <p>
+              Every feature we build, every bug we fix, and every late-night coding session is driven by 
+              one simple goal: making it easier for people to stay active together. Because honestly? 
+              Everything's more fun with friends.
+            </p>
+          </div>
+        </section>
+
+        {/* Call to Action */}
+        <section className="about__section about__section--cta">
+          <div className="about__cta">
+            <h2>Ready to Get Moving? 🚀</h2>
+            <p>
+              Join thousands of people who've already discovered that fitness is way more fun when you're 
+              not doing it alone. Whether you're looking to try something new or get back into an old favorite, 
+              your next workout buddy is just a post away.
+            </p>
+            <div className="about__cta-buttons">
+              <Link to="/create-post" className="about__cta-btn about__cta-btn--primary">
+                Create Your First Activity
+              </Link>
+              <Link to="/search" className="about__cta-btn about__cta-btn--secondary">
+                Find People Near You
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Contact Section */}
+        <section className="about__section about__section--contact">
+          <div className="about__section-header">
+            <FaEnvelope className="about__section-icon" />
+            <h2>Let's Stay Connected</h2>
+          </div>
+          <div className="about__contact">
+            <p>
+              Got questions? Ideas for new features? Just want to say hi? We'd love to hear from you! 
+              We're always looking for ways to make Sports Social better for our community.
+            </p>
+            
+            <div className="about__contact-methods">
+              <div className="about__contact-method">
+                <FaEnvelope />
+                <div>
+                  <h4>Email Us</h4>
+                  <p>hello@sportssocial.com</p>
+                </div>
+              </div>
+              
+              <div className="about__contact-method">
+                <FaComment />
+                <div>
+                  <h4>Join Our Community</h4>
+                  <p>Follow us and share your Sports Social stories!</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="about__social-links">
+              <a href="#" className="about__social-link" aria-label="GitHub">
+                <FaGithub />
+              </a>
+              <a href="#" className="about__social-link" aria-label="LinkedIn">
+                <FaLinkedin />
+              </a>
+            </div>
+
+            <div className="about__final-note">
+              <p>
+                <strong>P.S.</strong> If you see us around campus, feel free to say hi! We're probably the ones 
+                frantically testing new features on our phones while walking to class. ☕📱
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+};
+
+export default About;
