@@ -318,7 +318,7 @@ const Profile = () => {
               className="profile__edit-btn profile__edit-btn--small"
               onClick={() => startEditing(field, value)}
             >
-              <FaEdit />
+<FaEdit color="white" />
             </button>
           )}
         </div>
