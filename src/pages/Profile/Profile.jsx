@@ -202,6 +202,60 @@ const Profile = () => {
     }
   };
 
+  const handleImageUpload = async (type) => {
+    // Create a file input element
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      // Validate file size (max 5MB for profile, 10MB for cover)
+      const maxSize = type === 'profile_picture' ? 5 * 1024 * 1024 : 10 * 1024 * 1024;
+      if (file.size > maxSize) {
+        alert(`File size too large. Maximum ${type === 'profile_picture' ? '5MB' : '10MB'} allowed.`);
+        return;
+      }
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file.');
+        return;
+      }
+
+      try {
+        setSaveLoading(true);
+        
+        // Create a FormData object to send the file
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('type', type);
+
+        // In a real implementation, you would upload to a file storage service
+        // For now, we'll create a local URL and simulate the upload
+        const imageUrl = URL.createObjectURL(file);
+        
+        // Update settings with the new image URL
+        const updateField = type === 'profile_picture' ? 'profile_picture_url' : 'cover_photo_url';
+        await axios.put('/settings', { [updateField]: imageUrl });
+        
+        setSettings(prev => ({ ...prev, [updateField]: imageUrl }));
+        
+        alert(`${type === 'profile_picture' ? 'Profile picture' : 'Cover photo'} updated successfully!`);
+      } catch (error) {
+        console.error('Failed to upload image:', error);
+        alert('Failed to upload image. Please try again.');
+      } finally {
+        setSaveLoading(false);
+      }
+    };
+
+    // Trigger the file picker
+    input.click();
+  };
+
   const addSkill = () => {
     const currentSkills = editValues.skills || skills;
     setEditValues({
@@ -437,6 +491,30 @@ const Profile = () => {
 
   return (
     <div className="profile">
+      {/* Cover Photo Banner */}
+      <div className="profile__banner">
+        {settings?.cover_photo_url ? (
+          <img src={settings.cover_photo_url} alt="Cover" className="profile__banner-image" />
+        ) : (
+          <div className="profile__banner-placeholder">
+            <div className="profile__banner-text">
+              <h2>{profile.username}'s Profile</h2>
+              <p>Sports enthusiast and community member</p>
+            </div>
+          </div>
+        )}
+        {isOwnProfile && (
+          <button 
+            className="profile__banner-edit"
+            onClick={() => handleImageUpload('cover_photo')}
+            disabled={saveLoading}
+          >
+            <FaCamera />
+            {saveLoading ? 'Uploading...' : 'Change Cover'}
+          </button>
+        )}
+      </div>
+
       <div className="profile__header">
         <div className="profile__avatar">
           {settings?.profile_picture_url ? (
@@ -445,7 +523,11 @@ const Profile = () => {
             <FaUser />
           )}
           {isOwnProfile && (
-            <button className="profile__avatar-edit">
+            <button 
+              className="profile__avatar-edit"
+              onClick={() => handleImageUpload('profile_picture')}
+              disabled={saveLoading}
+            >
               <FaCamera />
             </button>
           )}

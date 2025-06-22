@@ -21,7 +21,7 @@ import './Settings.scss';
 
 const Settings = () => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('profile');
+  const [activeTab, setActiveTab] = useState('security');
   const [loading, setLoading] = useState(false);
   const [settings, setSettings] = useState(null);
   const [skills, setSkills] = useState([]);
@@ -33,7 +33,6 @@ const Settings = () => {
   });
 
   const tabs = [
-    { id: 'profile', label: 'Profile', icon: FaUser },
     { id: 'security', label: 'Security', icon: FaLock },
     { id: 'notifications', label: 'Notifications', icon: FaBell },
     { id: 'privacy', label: 'Privacy', icon: FaEye },
@@ -193,225 +192,6 @@ const Settings = () => {
     const newAvailability = availability.filter((_, i) => i !== index);
     setAvailability(newAvailability);
   };
-
-  const renderProfileTab = () => (
-    <div className="settings__tab-content">
-      <div className="settings__section">
-        <h3>Profile Pictures</h3>
-        <div className="settings__media-upload">
-          <div className="settings__media-item">
-            <div className="settings__avatar-preview">
-              {settings?.profile_picture_url ? (
-                <img src={settings.profile_picture_url} alt="Profile" />
-              ) : (
-                <FaUser />
-              )}
-            </div>
-            <div className="settings__media-controls">
-              <button className="settings__btn settings__btn--secondary">
-                <FaCamera />
-                Change Profile Picture
-              </button>
-              <p>Recommended: 400x400px, max 5MB</p>
-            </div>
-          </div>
-          
-          <div className="settings__media-item">
-            <div className="settings__cover-preview">
-              {settings?.cover_photo_url ? (
-                <img src={settings.cover_photo_url} alt="Cover" />
-              ) : (
-                <div className="settings__cover-placeholder">Cover Photo</div>
-              )}
-            </div>
-            <div className="settings__media-controls">
-              <button className="settings__btn settings__btn--secondary">
-                <FaCamera />
-                Change Cover Photo
-              </button>
-              <p>Recommended: 1200x400px, max 10MB</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="settings__section">
-        <h3>Basic Information</h3>
-        <div className="settings__form-group">
-          <label>Bio/Description (About Me)</label>
-          <textarea
-            value={settings?.bio || ''}
-            onChange={(e) => updateSettings({ bio: e.target.value })}
-            placeholder="Tell others about your sports interests..."
-            rows="4"
-          />
-        </div>
-        
-        <div className="settings__form-group">
-          <label>
-            <FaMapMarkerAlt />
-            Home City
-          </label>
-          <input
-            type="text"
-            value={settings?.location_city || ''}
-            onChange={(e) => updateSettings({ location_city: e.target.value })}
-            placeholder="Enter your city"
-          />
-        </div>
-        
-        <div className="settings__form-group">
-          <label>Activity Radius (km)</label>
-          <select
-            value={settings?.activity_radius || 25000}
-            onChange={(e) => updateSettings({ activity_radius: parseInt(e.target.value) })}
-          >
-            <option value={5000}>5 km</option>
-            <option value={10000}>10 km</option>
-            <option value={25000}>25 km</option>
-            <option value={50000}>50 km</option>
-            <option value={100000}>100 km</option>
-          </select>
-        </div>
-        
-        <div className="settings__form-group">
-          <label>Phone Number</label>
-          <input
-            type="tel"
-            value={settings?.phone_number || ''}
-            onChange={(e) => updateSettings({ phone_number: e.target.value })}
-            placeholder="Enter your phone number"
-          />
-          {settings?.phone_verified && (
-            <span className="settings__verified">✓ Verified</span>
-          )}
-        </div>
-      </div>
-
-      <div className="settings__section">
-        <h3>
-          <FaTags />
-          Sports & Skills
-        </h3>
-        <div className="settings__skills-list">
-          {skills.map((skill, index) => (
-            <div key={index} className="settings__skill-item">
-              <select
-                value={skill.sport}
-                onChange={(e) => updateSkill(index, 'sport', e.target.value)}
-              >
-                <option value="">Select Sport</option>
-                {sportOptions.map(sport => (
-                  <option key={sport} value={sport}>{sport}</option>
-                ))}
-              </select>
-              
-              <select
-                value={skill.skill_level}
-                onChange={(e) => updateSkill(index, 'skill_level', e.target.value)}
-              >
-                {skillLevels.map(level => (
-                  <option key={level.value} value={level.value}>
-                    {level.label}
-                  </option>
-                ))}
-              </select>
-              
-              <button
-                className="settings__btn settings__btn--danger"
-                onClick={() => removeSkill(index)}
-              >
-                <FaTrash />
-              </button>
-            </div>
-          ))}
-          
-          <button
-            className="settings__btn settings__btn--secondary"
-            onClick={addSkill}
-          >
-            Add Sport
-          </button>
-          
-          <button
-            className="settings__btn settings__btn--primary"
-            onClick={() => updateSkills(skills)}
-            disabled={loading}
-          >
-            <FaSave />
-            Save Skills
-          </button>
-        </div>
-      </div>
-
-      <div className="settings__section">
-        <h3>
-          <FaClock />
-          Availability Schedule
-        </h3>
-        <div className="settings__availability-list">
-          {availability.map((slot, index) => (
-            <div key={index} className="settings__availability-item">
-              <select
-                value={slot.day_of_week}
-                onChange={(e) => updateAvailabilitySlot(index, 'day_of_week', parseInt(e.target.value))}
-              >
-                {daysOfWeek.map((day, dayIndex) => (
-                  <option key={dayIndex} value={dayIndex}>{day}</option>
-                ))}
-              </select>
-              
-              <input
-                type="time"
-                value={slot.start_time}
-                onChange={(e) => updateAvailabilitySlot(index, 'start_time', e.target.value)}
-              />
-              
-              <span>to</span>
-              
-              <input
-                type="time"
-                value={slot.end_time}
-                onChange={(e) => updateAvailabilitySlot(index, 'end_time', e.target.value)}
-              />
-              
-              <label className="settings__checkbox">
-                <input
-                  type="checkbox"
-                  checked={slot.is_available}
-                  onChange={(e) => updateAvailabilitySlot(index, 'is_available', e.target.checked)}
-                />
-                Available
-              </label>
-              
-              <button
-                className="settings__btn settings__btn--danger"
-                onClick={() => removeAvailabilitySlot(index)}
-              >
-                <FaTrash />
-              </button>
-            </div>
-          ))}
-          
-          <button
-            className="settings__btn settings__btn--secondary"
-            onClick={addAvailabilitySlot}
-          >
-            Add Time Slot
-          </button>
-          
-          <button
-            className="settings__btn settings__btn--primary"
-            onClick={() => updateAvailability(availability)}
-            disabled={loading}
-          >
-            <FaSave />
-            Save Schedule
-          </button>
-        </div>
-      </div>
-    </div>
-  );
 
   const renderSecurityTab = () => (
     <div className="settings__tab-content">
@@ -732,7 +512,6 @@ const Settings = () => {
         </div>
 
         <div className="settings__content">
-          {activeTab === 'profile' && renderProfileTab()}
           {activeTab === 'security' && renderSecurityTab()}
           {activeTab === 'notifications' && renderNotificationsTab()}
           {activeTab === 'privacy' && renderPrivacyTab()}
