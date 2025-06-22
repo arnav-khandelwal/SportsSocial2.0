@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaSearch, FaUser, FaUserPlus, FaUserCheck } from 'react-icons/fa';
+import { FaSearch, FaUser, FaUserPlus, FaUserCheck, FaComment } from 'react-icons/fa';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import './Search.scss';
 
 const Search = () => {
   const { user: currentUser } = useAuth();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -85,8 +87,25 @@ const Search = () => {
     }
   };
 
+  const handleMessage = (user) => {
+    navigate('/messages', {
+      state: {
+        startConversation: {
+          id: user.id,
+          username: user.username,
+          type: 'direct'
+        }
+      }
+    });
+  };
+
   const isFollowing = (userId) => {
     return followedUsers.has(userId);
+  };
+
+  const canMessage = (user) => {
+    // Can message if current user follows them or they follow current user
+    return isFollowing(user.id);
   };
 
   return (
@@ -170,6 +189,16 @@ const Search = () => {
                 >
                   <FaUserPlus />
                   Follow
+                </button>
+              )}
+              
+              {canMessage(user) && (
+                <button
+                  className="search__message-btn"
+                  onClick={() => handleMessage(user)}
+                >
+                  <FaComment />
+                  Message
                 </button>
               )}
             </div>

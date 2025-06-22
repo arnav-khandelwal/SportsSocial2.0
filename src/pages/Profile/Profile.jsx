@@ -21,6 +21,7 @@ const Profile = () => {
   const [followLoading, setFollowLoading] = useState(false);
   const [showFollowersModal, setShowFollowersModal] = useState(false);
   const [followersModalTab, setFollowersModalTab] = useState('followers');
+  const [canMessage, setCanMessage] = useState(false);
 
   useEffect(() => {
     const profileId = userId || currentUser?.id;
@@ -43,6 +44,19 @@ const Profile = () => {
           follower => follower.id === currentUser?.id
         );
         setIsFollowing(isCurrentlyFollowing);
+      }
+
+      // Check if messaging is allowed (mutual follow or current user follows them)
+      if (!isOwnProfile && currentUser) {
+        const userFollowsProfile = response.data.followers?.some(
+          follower => follower.id === currentUser.id
+        );
+        const profileFollowsUser = response.data.following?.some(
+          following => following.id === currentUser.id
+        );
+        
+        // Can message if: user follows profile OR they follow each other
+        setCanMessage(userFollowsProfile || profileFollowsUser);
       }
     } catch (error) {
       console.error('Failed to fetch profile:', error);
@@ -83,7 +97,7 @@ const Profile = () => {
         await axios.post(`/users/${profile.id}/follow`);
         setIsFollowing(true);
       }
-      // Refresh profile to get updated follower count
+      // Refresh profile to get updated follower count and messaging permissions
       fetchProfile(profile.id);
     } catch (error) {
       console.error('Follow/unfollow error:', error);
@@ -93,9 +107,16 @@ const Profile = () => {
   };
 
   const handleMessage = async () => {
-    // Navigate to messages page and start a conversation with this user
-    navigate('/messages');
-    // Note: In a real implementation, you might want to automatically select this user's conversation
+    // Navigate to messages page with this user's conversation
+    navigate('/messages', { 
+      state: { 
+        startConversation: {
+          id: profile.id,
+          username: profile.username,
+          type: 'direct'
+        }
+      }
+    });
   };
 
   const handleFollowersClick = () => {
@@ -199,13 +220,15 @@ const Profile = () => {
                   </>
                 )}
               </button>
-              <button
-                className="profile__message-btn"
-                onClick={handleMessage}
-              >
-                <FaComment />
-                Message
-              </button>
+              {canMessage && (
+                <button
+                  className="profile__message-btn"
+                  onClick={handleMessage}
+                >
+                  <FaComment />
+                  Message
+                </button>
+              )}
             </div>
           )}
         </div>
