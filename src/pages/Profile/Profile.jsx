@@ -374,14 +374,14 @@ const Profile = () => {
           )}
         </div>
 
-        {/* Posts Section - Now shows for all users */}
+        {/* Posts Section - Simplified title */}
         <div className="profile__section">
           <button 
             className="profile__section-title profile__section-title--collapsible"
             onClick={() => setPostsExpanded(!postsExpanded)}
           >
             <FaCalendarAlt />
-            {isOwnProfile ? 'My Posts' : `${profile.username}'s Posts`} ({posts.length})
+            Posts ({posts.length})
             {postsExpanded ? <FaChevronUp /> : <FaChevronDown />}
           </button>
           
