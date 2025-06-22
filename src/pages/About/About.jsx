@@ -43,7 +43,7 @@ const About = () => {
           </div>
           <div className="about__story">
             <p>
-              Picture this: Two college friends, Alex and Jordan, sitting in their dorm room after yet another 
+              Picture this: Two college friends, Arnav and Rudra, sitting in their dorm room after yet another 
               failed attempt to find people to play basketball with. The campus courts were empty, the gym felt 
               intimidating alone, and their usual workout buddies were either busy or had graduated.
             </p>
