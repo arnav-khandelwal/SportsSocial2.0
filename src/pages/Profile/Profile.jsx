@@ -79,9 +79,9 @@ const Profile = () => {
       setProfile(response.data);
       
       // Check if current user is following this profile
-      if (!isOwnProfile && response.data.followers) {
+      if (!isOwnProfile && response.data.followers && currentUser) {
         const isCurrentlyFollowing = response.data.followers.some(
-          follower => follower.id === currentUser?.id
+          follower => follower.id === currentUser.id
         );
         setIsFollowing(isCurrentlyFollowing);
       }
@@ -152,9 +152,16 @@ const Profile = () => {
   };
 
   const handleMessage = async () => {
-    // Navigate to messages page and start a conversation with this user
-    navigate('/messages');
-    // Note: In a real implementation, you might want to automatically select this user's conversation
+    // Navigate to messages page with this user's conversation
+    navigate('/messages', { 
+      state: { 
+        startConversation: {
+          id: profile.id,
+          username: profile.username,
+          type: 'direct'
+        }
+      }
+    });
   };
 
   const handleFollowersClick = () => {
@@ -598,13 +605,16 @@ const Profile = () => {
                   </>
                 )}
               </button>
-              <button
-                className="profile__message-btn"
-                onClick={handleMessage}
-              >
-                <FaComment />
-                Message
-              </button>
+              
+              {isFollowing && (
+                <button
+                  className="profile__message-btn"
+                  onClick={handleMessage}
+                >
+                  <FaComment />
+                  Message
+                </button>
+              )}
             </div>
           )}
         </div>

@@ -1,23 +1,42 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { FaComment, FaUsers, FaSearch, FaUser } from 'react-icons/fa';
+import { Link, useLocation } from 'react-router-dom';
+import { FaComment, FaUsers, FaSearch, FaUser, FaTimes, FaPlus } from 'react-icons/fa';
 import axios from 'axios';
 import { useSocket } from '../../context/SocketContext';
+import { useAuth } from '../../context/AuthContext';
 import MessageThread from '../../components/MessageThread/MessageThread';
 import './Messages.scss';
 
 const Messages = () => {
+  const location = useLocation();
+  const { user: currentUser } = useAuth();
   const [conversations, setConversations] = useState({
     directMessages: [],
     groupChats: []
   });
   const [activeChat, setActiveChat] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
   const { socket } = useSocket();
 
   useEffect(() => {
     fetchConversations();
-  }, []);
+    
+    // Check if we need to start a conversation from navigation state
+    if (location.state?.startConversation) {
+      const { startConversation } = location.state;
+      setActiveChat({
+        id: startConversation.id,
+        type: startConversation.type,
+        user: startConversation
+      });
+      
+      // Clear the navigation state
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     if (socket) {
@@ -45,6 +64,14 @@ const Messages = () => {
     }
   }, [socket]);
 
+  useEffect(() => {
+    if (searchQuery.trim()) {
+      searchUsers();
+    } else {
+      setSearchResults([]);
+    }
+  }, [searchQuery]);
+
   const fetchConversations = async () => {
     try {
       const response = await axios.get('/messages/conversations');
@@ -54,6 +81,38 @@ const Messages = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const searchUsers = async () => {
+    try {
+      setSearchLoading(true);
+      const response = await axios.get('/users/search', {
+        params: { q: searchQuery }
+      });
+      
+      // Filter out current user and get users that can be messaged
+      const filteredUsers = response.data.filter(user => user.id !== currentUser?.id);
+      setSearchResults(filteredUsers);
+    } catch (error) {
+      console.error('Search error:', error);
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+  const startConversationWithUser = (user) => {
+    setActiveChat({
+      id: user.id,
+      type: 'direct',
+      user: user
+    });
+    setSearchQuery('');
+    setSearchResults([]);
+  };
+
+  const clearSearch = () => {
+    setSearchQuery('');
+    setSearchResults([]);
   };
 
   const formatLastMessage = (message) => {
@@ -118,18 +177,64 @@ const Messages = () => {
       <div className="messages__sidebar">
         <div className="messages__header">
           <h2>Messages</h2>
-          {getTotalUnreadCount() > 0 && (
-            <span className="messages__total-unread">{getTotalUnreadCount()}</span>
-          )}
+          <div className="messages__header-actions">
+            {getTotalUnreadCount() > 0 && (
+              <span className="messages__total-unread">{getTotalUnreadCount()}</span>
+            )}
+          </div>
         </div>
 
         <div className="messages__search">
-          <FaSearch className="messages__search-icon" />
-          <input
-            type="text"
-            placeholder="Search conversations..."
-            className="messages__search-input"
-          />
+          <div className="messages__search-input-container">
+            <FaSearch className="messages__search-icon" />
+            <input
+              type="text"
+              placeholder="Search users to message..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="messages__search-input"
+            />
+            {searchQuery && (
+              <button
+                className="messages__search-clear"
+                onClick={clearSearch}
+              >
+                <FaTimes />
+              </button>
+            )}
+          </div>
+          
+          {searchLoading && (
+            <div className="messages__search-loading">
+              <div className="loader"></div>
+            </div>
+          )}
+          
+          {searchResults.length > 0 && (
+            <div className="messages__search-results">
+              {searchResults.map((user) => (
+                <div
+                  key={user.id}
+                  className="messages__search-result"
+                  onClick={() => startConversationWithUser(user)}
+                >
+                  <div className="messages__search-result-avatar">
+                    <FaUser />
+                  </div>
+                  <div className="messages__search-result-info">
+                    <h4>{user.username}</h4>
+                    {user.bio && <p>{user.bio}</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {searchQuery && searchResults.length === 0 && !searchLoading && (
+            <div className="messages__search-empty">
+              <p>No users found</p>
+            </div>
+          )}
         </div>
 
         <div className="messages__conversations">
@@ -238,7 +343,7 @@ const Messages = () => {
           <div className="messages__welcome">
             <FaComment className="messages__welcome-icon" />
             <h3>Select a conversation</h3>
-            <p>Choose a conversation from the sidebar to start messaging</p>
+            <p>Choose a conversation from the sidebar or search for users to start messaging</p>
           </div>
         )}
       </div>
