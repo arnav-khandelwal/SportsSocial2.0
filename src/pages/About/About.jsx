@@ -48,7 +48,7 @@ const About = () => {
               intimidating alone, and their usual workout buddies were either busy or had graduated.
             </p>
             <p>
-              "There has to be a better way," Rudra said, scrolling through generic social media posts. 
+              "There has to be a better way," Arnav said, scrolling through generic social media posts. 
               "Why isn't there a place where we can just say 'Hey, I want to play tennis at 3 PM' and 
               actually find people who are down?"
             </p>
