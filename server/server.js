@@ -14,6 +14,7 @@ import postRoutes from './routes/posts.js';
 import messageRoutes from './routes/messages.js';
 import notificationRoutes from './routes/notifications.js';
 import reviewRoutes from './routes/reviews.js';
+import settingsRoutes from './routes/settings.js';
 
 // Import socket handlers
 import { handleSocketConnection } from './socket/socketHandlers.js';
@@ -69,6 +70,7 @@ app.use('/api/posts', postRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/settings', settingsRoutes);
 
 // Socket.io connection handling
 io.on('connection', (socket) => {
