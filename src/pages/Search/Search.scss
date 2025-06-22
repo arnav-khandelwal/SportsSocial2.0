@@ -200,6 +200,7 @@
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     min-width: 120px;
     justify-content: center;
+    position: relative;
 
     &:hover {
       transform: translateY(-2px);
@@ -221,12 +222,22 @@
         background: var(--error);
         box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
         
-        &::after {
+        &::before {
           content: 'Unfollow';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: var(--error);
+          border-radius: 25px;
         }
         
-        span:last-child {
-          display: none;
+        > * {
+          opacity: 0;
         }
       }
     }
