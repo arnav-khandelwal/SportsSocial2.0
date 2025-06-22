@@ -4,7 +4,7 @@ import {
   FaLock, 
   FaBell, 
   FaEye, 
-  FaShield, 
+  FaShieldAlt, 
   FaCog,
   FaCamera,
   FaMapMarkerAlt,
