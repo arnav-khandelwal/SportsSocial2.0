@@ -542,7 +542,7 @@ const Profile = () => {
               onClick={() => handleImageUpload('profile_picture')}
               disabled={uploadingImage}
             >
-      <FaEdit style={{ fontSize: 20 }} />
+          <FaEdit style={{ fontSize: 20 }} />
             </button>
           )}
         </div>
