@@ -1,9 +1,27 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { FaUser, FaUsers, FaEdit, FaMapMarkerAlt, FaTags, FaUserPlus, FaUserCheck, FaComment, FaCalendarAlt, FaClock, FaHeart } from 'react-icons/fa';
+import { useParams, useNavigate } from 'react-router-dom';
+import { 
+  FaUser, 
+  FaUsers, 
+  FaEdit, 
+  FaMapMarkerAlt, 
+  FaTags, 
+  FaUserPlus, 
+  FaUserCheck, 
+  FaComment, 
+  FaCalendarAlt, 
+  FaClock, 
+  FaHeart,
+  FaPhone,
+  FaHome,
+  FaSave,
+  FaTimes,
+  FaCamera,
+  FaCog
+} from 'react-icons/fa';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate as useNav } from 'react-router-dom';
 import { formatRelativeTime, formatDateTime } from '../../utils/dateUtils';
 import FollowersModal from '../../components/FollowersModal/FollowersModal';
 import './Profile.scss';
@@ -13,6 +31,8 @@ const Profile = () => {
   const { user: currentUser } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
+  const [settings, setSettings] = useState(null);
+  const [skills, setSkills] = useState([]);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [postsLoading, setPostsLoading] = useState(false);
@@ -21,6 +41,22 @@ const Profile = () => {
   const [followLoading, setFollowLoading] = useState(false);
   const [showFollowersModal, setShowFollowersModal] = useState(false);
   const [followersModalTab, setFollowersModalTab] = useState('followers');
+  const [editingField, setEditingField] = useState(null);
+  const [editValues, setEditValues] = useState({});
+  const [saveLoading, setSaveLoading] = useState(false);
+
+  const sportOptions = [
+    'Football', 'Basketball', 'Tennis', 'Soccer', 'Baseball', 
+    'Volleyball', 'Swimming', 'Running', 'Cycling', 'Golf',
+    'Hockey', 'Cricket', 'Rugby', 'Badminton', 'Table Tennis'
+  ];
+
+  const skillLevels = [
+    { value: 'beginner', label: 'Beginner' },
+    { value: 'intermediate', label: 'Intermediate' },
+    { value: 'advanced', label: 'Advanced' },
+    { value: 'expert', label: 'Expert' }
+  ];
 
   useEffect(() => {
     const profileId = userId || currentUser?.id;
@@ -29,6 +65,10 @@ const Profile = () => {
     if (profileId) {
       fetchProfile(profileId);
       fetchUserPosts(profileId);
+      if (!userId || userId === currentUser?.id) {
+        fetchSettings();
+        fetchSkills();
+      }
     }
   }, [userId, currentUser]);
 
@@ -48,6 +88,24 @@ const Profile = () => {
       console.error('Failed to fetch profile:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchSettings = async () => {
+    try {
+      const response = await axios.get('/settings');
+      setSettings(response.data || {});
+    } catch (error) {
+      console.error('Failed to fetch settings:', error);
+    }
+  };
+
+  const fetchSkills = async () => {
+    try {
+      const response = await axios.get('/settings/skills');
+      setSkills(response.data || []);
+    } catch (error) {
+      console.error('Failed to fetch skills:', error);
     }
   };
 
@@ -108,6 +166,68 @@ const Profile = () => {
     setShowFollowersModal(true);
   };
 
+  const startEditing = (field, currentValue) => {
+    setEditingField(field);
+    setEditValues({ [field]: currentValue || '' });
+  };
+
+  const cancelEditing = () => {
+    setEditingField(null);
+    setEditValues({});
+  };
+
+  const saveField = async (field) => {
+    setSaveLoading(true);
+    try {
+      if (field === 'bio') {
+        // Update user bio directly
+        await axios.put('/settings', { bio: editValues[field] });
+        setProfile(prev => ({ ...prev, bio: editValues[field] }));
+      } else if (field === 'skills') {
+        await axios.put('/settings/skills', { skills: editValues[field] });
+        setSkills(editValues[field]);
+      } else {
+        // Update settings
+        await axios.put('/settings', { [field]: editValues[field] });
+        setSettings(prev => ({ ...prev, [field]: editValues[field] }));
+      }
+      
+      setEditingField(null);
+      setEditValues({});
+    } catch (error) {
+      console.error('Failed to save field:', error);
+      alert('Failed to save changes');
+    } finally {
+      setSaveLoading(false);
+    }
+  };
+
+  const addSkill = () => {
+    const currentSkills = editValues.skills || skills;
+    setEditValues({
+      ...editValues,
+      skills: [...currentSkills, { sport: '', skill_level: 'beginner' }]
+    });
+  };
+
+  const updateSkill = (index, field, value) => {
+    const currentSkills = [...(editValues.skills || skills)];
+    currentSkills[index][field] = value;
+    setEditValues({
+      ...editValues,
+      skills: currentSkills
+    });
+  };
+
+  const removeSkill = (index) => {
+    const currentSkills = [...(editValues.skills || skills)];
+    currentSkills.splice(index, 1);
+    setEditValues({
+      ...editValues,
+      skills: currentSkills
+    });
+  };
+
   const getPostStatus = (eventTime) => {
     const now = new Date();
     const eventDate = new Date(eventTime);
@@ -117,6 +237,180 @@ const Profile = () => {
     } else {
       return { status: 'past', label: 'Past Event', className: 'past' };
     }
+  };
+
+  const renderEditableField = (field, label, value, type = 'text', options = null) => {
+    const isEditing = editingField === field;
+    const displayValue = value || 'Not set';
+
+    return (
+      <div className="profile__editable-field">
+        <div className="profile__field-header">
+          <label className="profile__field-label">{label}</label>
+          {!isEditing && (
+            <button
+              className="profile__edit-btn profile__edit-btn--small"
+              onClick={() => startEditing(field, value)}
+            >
+              <FaEdit />
+            </button>
+          )}
+        </div>
+        
+        {isEditing ? (
+          <div className="profile__field-edit">
+            {type === 'textarea' ? (
+              <textarea
+                value={editValues[field] || ''}
+                onChange={(e) => setEditValues({ ...editValues, [field]: e.target.value })}
+                rows="4"
+                className="profile__field-input"
+              />
+            ) : type === 'select' ? (
+              <select
+                value={editValues[field] || ''}
+                onChange={(e) => setEditValues({ ...editValues, [field]: parseInt(e.target.value) })}
+                className="profile__field-input"
+              >
+                {options.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type={type}
+                value={editValues[field] || ''}
+                onChange={(e) => setEditValues({ ...editValues, [field]: e.target.value })}
+                className="profile__field-input"
+              />
+            )}
+            
+            <div className="profile__field-actions">
+              <button
+                className="profile__save-btn"
+                onClick={() => saveField(field)}
+                disabled={saveLoading}
+              >
+                <FaSave />
+                {saveLoading ? 'Saving...' : 'Save'}
+              </button>
+              <button
+                className="profile__cancel-btn"
+                onClick={cancelEditing}
+              >
+                <FaTimes />
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="profile__field-value">
+            {displayValue}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderSkillsEdit = () => {
+    const isEditing = editingField === 'skills';
+    const currentSkills = isEditing ? (editValues.skills || skills) : skills;
+
+    return (
+      <div className="profile__editable-field">
+        <div className="profile__field-header">
+          <label className="profile__field-label">Sports & Skills</label>
+          {!isEditing && (
+            <button
+              className="profile__edit-btn profile__edit-btn--small"
+              onClick={() => startEditing('skills', skills)}
+            >
+              <FaEdit />
+            </button>
+          )}
+        </div>
+        
+        {isEditing ? (
+          <div className="profile__field-edit">
+            <div className="profile__skills-edit">
+              {currentSkills.map((skill, index) => (
+                <div key={index} className="profile__skill-edit-item">
+                  <select
+                    value={skill.sport}
+                    onChange={(e) => updateSkill(index, 'sport', e.target.value)}
+                    className="profile__skill-select"
+                  >
+                    <option value="">Select Sport</option>
+                    {sportOptions.map(sport => (
+                      <option key={sport} value={sport}>{sport}</option>
+                    ))}
+                  </select>
+                  
+                  <select
+                    value={skill.skill_level}
+                    onChange={(e) => updateSkill(index, 'skill_level', e.target.value)}
+                    className="profile__skill-select"
+                  >
+                    {skillLevels.map(level => (
+                      <option key={level.value} value={level.value}>
+                        {level.label}
+                      </option>
+                    ))}
+                  </select>
+                  
+                  <button
+                    className="profile__remove-skill-btn"
+                    onClick={() => removeSkill(index)}
+                  >
+                    <FaTimes />
+                  </button>
+                </div>
+              ))}
+              
+              <button
+                className="profile__add-skill-btn"
+                onClick={addSkill}
+              >
+                Add Sport
+              </button>
+            </div>
+            
+            <div className="profile__field-actions">
+              <button
+                className="profile__save-btn"
+                onClick={() => saveField('skills')}
+                disabled={saveLoading}
+              >
+                <FaSave />
+                {saveLoading ? 'Saving...' : 'Save Skills'}
+              </button>
+              <button
+                className="profile__cancel-btn"
+                onClick={cancelEditing}
+              >
+                <FaTimes />
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="profile__skills-display">
+            {currentSkills.length === 0 ? (
+              <p className="profile__no-skills">No skills added yet</p>
+            ) : (
+              currentSkills.map((skill, index) => (
+                <div key={index} className="profile__skill-item">
+                  <span className="profile__skill-sport">{skill.sport}</span>
+                  <span className="profile__skill-level">{skill.skill_level}</span>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+      </div>
+    );
   };
 
   if (loading) {
@@ -145,14 +439,20 @@ const Profile = () => {
     <div className="profile">
       <div className="profile__header">
         <div className="profile__avatar">
-          <FaUser />
+          {settings?.profile_picture_url ? (
+            <img src={settings.profile_picture_url} alt="Profile" />
+          ) : (
+            <FaUser />
+          )}
+          {isOwnProfile && (
+            <button className="profile__avatar-edit">
+              <FaCamera />
+            </button>
+          )}
         </div>
         
         <div className="profile__info">
           <h1 className="profile__name">{profile.username}</h1>
-          {profile.bio && (
-            <p className="profile__bio">{profile.bio}</p>
-          )}
           
           <div className="profile__stats">
             <button 
@@ -174,9 +474,12 @@ const Profile = () => {
 
         <div className="profile__actions">
           {isOwnProfile ? (
-            <button className="profile__edit-btn">
-              <FaEdit />
-              Edit Profile
+            <button 
+              className="profile__edit-btn"
+              onClick={() => navigate('/settings')}
+            >
+              <FaCog />
+              Settings
             </button>
           ) : (
             <div className="profile__user-actions">
@@ -212,22 +515,72 @@ const Profile = () => {
       </div>
 
       <div className="profile__content">
-        {profile.sports && profile.sports.length > 0 && (
+        {/* About Me Section */}
+        <div className="profile__section">
+          <h3 className="profile__section-title">About Me</h3>
+          {isOwnProfile ? (
+            renderEditableField('bio', 'Bio', profile.bio || settings?.bio, 'textarea')
+          ) : (
+            <p className="profile__bio">{profile.bio || 'No bio available'}</p>
+          )}
+        </div>
+
+        {/* Contact Information */}
+        {isOwnProfile && (
           <div className="profile__section">
-            <h3 className="profile__section-title">
-              <FaMapMarkerAlt />
-              Sports
-            </h3>
-            <div className="profile__sports">
-              {profile.sports.map((sport, index) => (
-                <span key={index} className="profile__sport">
-                  {sport}
-                </span>
-              ))}
+            <h3 className="profile__section-title">Contact Information</h3>
+            <div className="profile__contact-grid">
+              {renderEditableField('phone_number', 'Phone Number', settings?.phone_number, 'tel')}
+              {renderEditableField('location_city', 'Home City', settings?.location_city)}
             </div>
           </div>
         )}
 
+        {/* Display contact info for own profile (read-only for others) */}
+        {!isOwnProfile && (settings?.phone_number || settings?.location_city) && (
+          <div className="profile__section">
+            <h3 className="profile__section-title">Contact Information</h3>
+            <div className="profile__contact-display">
+              {settings?.phone_number && (
+                <div className="profile__contact-item">
+                  <FaPhone />
+                  <span>{settings.phone_number}</span>
+                </div>
+              )}
+              {settings?.location_city && (
+                <div className="profile__contact-item">
+                  <FaHome />
+                  <span>{settings.location_city}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Sports & Skills */}
+        <div className="profile__section">
+          <h3 className="profile__section-title">
+            <FaTags />
+            Sports & Skills
+          </h3>
+          {isOwnProfile ? (
+            renderSkillsEdit()
+          ) : (
+            <div className="profile__skills-display">
+              {profile.sports && profile.sports.length > 0 ? (
+                profile.sports.map((sport, index) => (
+                  <span key={index} className="profile__sport">
+                    {sport}
+                  </span>
+                ))
+              ) : (
+                <p>No sports listed</p>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Interests/Tags */}
         {profile.tags && profile.tags.length > 0 && (
           <div className="profile__section">
             <h3 className="profile__section-title">
@@ -244,6 +597,7 @@ const Profile = () => {
           </div>
         )}
 
+        {/* My Posts Section */}
         {isOwnProfile && (
           <div className="profile__section">
             <h3 className="profile__section-title">My Posts</h3>

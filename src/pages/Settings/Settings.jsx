@@ -12,7 +12,8 @@ import {
   FaClock,
   FaSave,
   FaEdit,
-  FaTrash
+  FaTrash,
+  FaTimes
 } from 'react-icons/fa';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
@@ -237,7 +238,7 @@ const Settings = () => {
       <div className="settings__section">
         <h3>Basic Information</h3>
         <div className="settings__form-group">
-          <label>Bio/Description</label>
+          <label>Bio/Description (About Me)</label>
           <textarea
             value={settings?.bio || ''}
             onChange={(e) => updateSettings({ bio: e.target.value })}
