@@ -111,6 +111,18 @@ router.get('/my-posts', authenticateToken, async (req, res) => {
   }
 });
 
+// Get posts by specific user (for viewing other users' profiles)
+router.get('/user/:userId', authenticateToken, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const posts = await Post.findByAuthor(userId);
+    res.json(posts);
+  } catch (error) {
+    console.error('Get user posts by ID error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Update post
 router.put('/:postId', authenticateToken, async (req, res) => {
   try {

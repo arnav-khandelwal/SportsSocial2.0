@@ -59,15 +59,17 @@ const Profile = () => {
   const fetchUserPosts = async (profileId) => {
     try {
       setPostsLoading(true);
+      let response;
+      
       // If it's the current user's profile, use my-posts endpoint
       if (profileId === currentUser?.id) {
-        const response = await axios.get('/posts/my-posts');
-        setPosts(response.data);
+        response = await axios.get('/posts/my-posts');
       } else {
-        // For other users, we'll need to fetch their posts differently
-        // For now, we'll show empty since we don't have a public posts endpoint
-        setPosts([]);
+        // For other users, use the new user-specific endpoint
+        response = await axios.get(`/posts/user/${profileId}`);
       }
+      
+      setPosts(response.data);
     } catch (error) {
       console.error('Failed to fetch user posts:', error);
       setPosts([]);
@@ -372,96 +374,106 @@ const Profile = () => {
           )}
         </div>
 
-        {/* Posts Section - Now Collapsible */}
-        {isOwnProfile && (
-          <div className="profile__section">
-            <button 
-              className="profile__section-title profile__section-title--collapsible"
-              onClick={() => setPostsExpanded(!postsExpanded)}
-            >
-              <FaCalendarAlt />
-              My Posts ({posts.length})
-              {postsExpanded ? <FaChevronUp /> : <FaChevronDown />}
-            </button>
-            
-            {postsExpanded && (
-              <div className="profile__posts">
-                {postsLoading ? (
-                  <div className="profile__posts-loading">
-                    <div className="loader"></div>
-                    <p>Loading posts...</p>
-                  </div>
-                ) : posts.length === 0 ? (
-                  <div className="profile__empty">
-                    <p>You haven't created any posts yet.</p>
+        {/* Posts Section - Now shows for all users */}
+        <div className="profile__section">
+          <button 
+            className="profile__section-title profile__section-title--collapsible"
+            onClick={() => setPostsExpanded(!postsExpanded)}
+          >
+            <FaCalendarAlt />
+            {isOwnProfile ? 'My Posts' : `${profile.username}'s Posts`} ({posts.length})
+            {postsExpanded ? <FaChevronUp /> : <FaChevronDown />}
+          </button>
+          
+          {postsExpanded && (
+            <div className="profile__posts">
+              {postsLoading ? (
+                <div className="profile__posts-loading">
+                  <div className="loader"></div>
+                  <p>Loading posts...</p>
+                </div>
+              ) : posts.length === 0 ? (
+                <div className="profile__empty">
+                  <p>
+                    {isOwnProfile 
+                      ? "You haven't created any posts yet."
+                      : `${profile.username} hasn't created any posts yet.`
+                    }
+                  </p>
+                  {isOwnProfile && (
                     <button 
                       className="profile__create-post-btn"
                       onClick={() => navigate('/create-post')}
                     >
                       Create Your First Post
                     </button>
-                  </div>
-                ) : (
-                  <div className="profile__posts-list">
-                    {posts.slice(0, 3).map((post) => {
-                      const postStatus = getPostStatus(post.event_time);
-                      return (
-                        <div key={post.id} className="profile__post">
-                          <div className="profile__post-header">
-                            <h4>{post.heading}</h4>
-                            <div className="profile__post-badges">
-                              <span className="profile__post-sport">{post.sport}</span>
-                              <span className={`profile__post-status profile__post-status--${postStatus.className}`}>
-                                {postStatus.label}
-                              </span>
-                            </div>
-                          </div>
-                          <p className="profile__post-description">{post.description}</p>
-                          
-                          <div className="profile__post-details">
-                            <div className="profile__post-detail">
-                              <FaMapMarkerAlt />
-                              <span>{post.location_name}</span>
-                            </div>
-                            <div className="profile__post-detail">
-                              <FaCalendarAlt />
-                              <span>{formatDateTime(post.event_time)}</span>
-                            </div>
-                            <div className="profile__post-detail">
-                              <FaUsers />
-                              <span>{post.players_needed} players needed</span>
-                            </div>
-                          </div>
-
-                          <div className="profile__post-meta">
-                            <div className="profile__post-interest">
-                              <FaHeart />
-                              <span>{(post.interested_users || []).length} interested</span>
-                            </div>
-                            <span className="profile__post-created">
-                              Created {formatRelativeTime(post.created_at)}
+                  )}
+                </div>
+              ) : (
+                <div className="profile__posts-list">
+                  {posts.slice(0, 3).map((post) => {
+                    const postStatus = getPostStatus(post.event_time);
+                    return (
+                      <div key={post.id} className="profile__post">
+                        <div className="profile__post-header">
+                          <h4>{post.heading}</h4>
+                          <div className="profile__post-badges">
+                            <span className="profile__post-sport">{post.sport}</span>
+                            <span className={`profile__post-status profile__post-status--${postStatus.className}`}>
+                              {postStatus.label}
                             </span>
                           </div>
                         </div>
-                      );
-                    })}
-                    
-                    {posts.length > 3 && (
-                      <div className="profile__view-all">
-                        <button 
-                          className="profile__view-all-btn"
-                          onClick={() => navigate('/past-posts')}
-                        >
-                          View All Posts ({posts.length})
-                        </button>
+                        <p className="profile__post-description">{post.description}</p>
+                        
+                        <div className="profile__post-details">
+                          <div className="profile__post-detail">
+                            <FaMapMarkerAlt />
+                            <span>{post.location_name}</span>
+                          </div>
+                          <div className="profile__post-detail">
+                            <FaCalendarAlt />
+                            <span>{formatDateTime(post.event_time)}</span>
+                          </div>
+                          <div className="profile__post-detail">
+                            <FaUsers />
+                            <span>{post.players_needed} players needed</span>
+                          </div>
+                        </div>
+
+                        <div className="profile__post-meta">
+                          <div className="profile__post-interest">
+                            <FaHeart />
+                            <span>{(post.interested_users || []).length} interested</span>
+                          </div>
+                          <span className="profile__post-created">
+                            Created {formatRelativeTime(post.created_at)}
+                          </span>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
+                    );
+                  })}
+                  
+                  {posts.length > 3 && (
+                    <div className="profile__view-all">
+                      <button 
+                        className="profile__view-all-btn"
+                        onClick={() => isOwnProfile ? navigate('/past-posts') : null}
+                        disabled={!isOwnProfile}
+                        style={{ 
+                          opacity: isOwnProfile ? 1 : 0.6,
+                          cursor: isOwnProfile ? 'pointer' : 'not-allowed'
+                        }}
+                      >
+                        {isOwnProfile ? `View All Posts (${posts.length})` : `${posts.length} total posts`}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       <FollowersModal
