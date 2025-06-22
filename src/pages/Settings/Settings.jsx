@@ -36,7 +36,7 @@ const Settings = () => {
     { id: 'security', label: 'Security', icon: FaLock },
     { id: 'notifications', label: 'Notifications', icon: FaBell },
     { id: 'privacy', label: 'Privacy', icon: FaEye },
-    { id: 'content', label: 'Content', icon: FaShield }
+    { id: 'content', label: 'Content', icon: FaShieldAlt }
   ];
 
   const sportOptions = [
