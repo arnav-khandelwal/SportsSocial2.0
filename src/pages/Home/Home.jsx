@@ -31,19 +31,17 @@ const Home = () => {
         radius: filters.radius
       };
 
-      // Only add location params if location is set and radius is not -1
       if (filters.location && filters.radius !== -1) {
         params.lat = filters.location.coordinates[1]; // latitude
         params.lng = filters.location.coordinates[0]; // longitude
       }
 
       const response = await axios.get('/posts', { params });
-      
-      // Filter out the current user's own posts
-      const filteredPosts = response.data.filter(post => 
-        post.author_id !== user?.id
+
+      const filteredPosts = response.data.filter(
+        (post) => post.author_id !== user?.id
       );
-      
+
       setPosts(filteredPosts);
     } catch (error) {
       console.error('Failed to fetch posts:', error);
@@ -59,26 +57,18 @@ const Home = () => {
   const handleInterest = async (postId) => {
     try {
       const response = await axios.post(`/posts/${postId}/interest`);
-      
-      // Update the specific post in the state instead of refetching all posts
-      setPosts(prevPosts => 
-        prevPosts.map(post => {
-          if (post.id === postId) {
-            // Add the current user to the interested_users array
-            const updatedInterestedUsers = [...(post.interested_users || [])];
-            // Note: We don't have the full user object here, but the PostCard component
-            // will handle the state correctly based on the response
-            return {
-              ...post,
-              interested_users: updatedInterestedUsers
-            };
-          }
-          return post;
-        })
+
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.id === postId
+            ? {
+                ...post,
+                interested_users: [...(post.interested_users || [])]
+              }
+            : post
+        )
       );
 
-      // Optionally refresh posts to get the most up-to-date data
-      // This ensures we have the correct interested_users data
       setTimeout(() => {
         fetchPosts();
       }, 500);
@@ -92,11 +82,18 @@ const Home = () => {
 
   const getSubtitle = () => {
     if (filters.location && filters.radius !== -1) {
-      const distance = filters.radius === 100000 ? '100km' : 
-                     filters.radius === 50000 ? '50km' :
-                     filters.radius === 25000 ? '25km' :
-                     filters.radius === 10000 ? '10km' :
-                     filters.radius === 5000 ? '5km' : '1km';
+      const distance =
+        filters.radius === 100000
+          ? '100km'
+          : filters.radius === 50000
+          ? '50km'
+          : filters.radius === 25000
+          ? '25km'
+          : filters.radius === 10000
+          ? '10km'
+          : filters.radius === 5000
+          ? '5km'
+          : '1km';
       return `Showing events within ${distance} of ${filters.location.name}`;
     }
     return 'Discover sports activities from other users';
@@ -120,28 +117,33 @@ const Home = () => {
         <p className="home__subtitle">{getSubtitle()}</p>
       </div>
 
-      <PostFilters filters={filters} onFilterChange={handleFilterChange} />
+      <div className="home__content">
+        {/* Posts */}
+        <div className="home__posts">
+          {posts.length === 0 ? (
+            <div className="home__empty">
+              <h3>No posts found</h3>
+              <p>
+                {filters.location
+                  ? `No events found near ${filters.location.name}. Try expanding your search radius or clearing location filters.`
+                  : 'No posts from other users match your current filters. Try adjusting your search criteria or create a new post!'}
+              </p>
+            </div>
+          ) : (
+            posts.map((post) => (
+              <PostCard
+                key={post.id}
+                post={post}
+                onInterest={handleInterest}
+              />
+            ))
+          )}
+        </div>
 
-      <div className="home__posts">
-        {posts.length === 0 ? (
-          <div className="home__empty">
-            <h3>No posts found</h3>
-            <p>
-              {filters.location 
-                ? `No events found near ${filters.location.name}. Try expanding your search radius or clearing location filters.`
-                : 'No posts from other users match your current filters. Try adjusting your search criteria or create a new post!'
-              }
-            </p>
-          </div>
-        ) : (
-          posts.map((post) => (
-            <PostCard
-              key={post.id}
-              post={post}
-              onInterest={handleInterest}
-            />
-          ))
-        )}
+        {/* Filter Sidebar */}
+        <div className="home__filters">
+          <PostFilters filters={filters} onFilterChange={handleFilterChange} />
+        </div>
       </div>
     </div>
   );
