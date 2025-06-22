@@ -1,4 +1,8 @@
 import { useState, useEffect } from 'react';
+
+import { useParams } from 'react-router-dom';
+import { FaUser, FaUsers, FaEdit, FaMapMarkerAlt, FaTags, FaUserPlus, FaUserCheck, FaComment, FaCalendarAlt, FaClock, FaHeart, FaStar, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   FaUser, 
@@ -19,6 +23,7 @@ import {
   FaCamera,
   FaCog
 } from 'react-icons/fa';
+
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate as useNav } from 'react-router-dom';
@@ -34,13 +39,19 @@ const Profile = () => {
   const [settings, setSettings] = useState(null);
   const [skills, setSkills] = useState([]);
   const [posts, setPosts] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [postsLoading, setPostsLoading] = useState(false);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
   const [isOwnProfile, setIsOwnProfile] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
   const [showFollowersModal, setShowFollowersModal] = useState(false);
   const [followersModalTab, setFollowersModalTab] = useState('followers');
+
+  const [reviewsExpanded, setReviewsExpanded] = useState(false);
+  const [postsExpanded, setPostsExpanded] = useState(false);
+
   const [editingField, setEditingField] = useState(null);
   const [editValues, setEditValues] = useState({});
   const [saveLoading, setSaveLoading] = useState(false);
@@ -59,6 +70,7 @@ const Profile = () => {
     { value: 'expert', label: 'Expert' }
   ];
 
+
   useEffect(() => {
     const profileId = userId || currentUser?.id;
     setIsOwnProfile(!userId || userId === currentUser?.id);
@@ -66,10 +78,14 @@ const Profile = () => {
     if (profileId) {
       fetchProfile(profileId);
       fetchUserPosts(profileId);
+
+      fetchUserReviews(profileId);
+
       if (!userId || userId === currentUser?.id) {
         fetchSettings();
         fetchSkills();
       }
+
     }
   }, [userId, currentUser]);
 
@@ -113,20 +129,44 @@ const Profile = () => {
   const fetchUserPosts = async (profileId) => {
     try {
       setPostsLoading(true);
+      let response;
+      
       // If it's the current user's profile, use my-posts endpoint
       if (profileId === currentUser?.id) {
-        const response = await axios.get('/posts/my-posts');
-        setPosts(response.data);
+        response = await axios.get('/posts/my-posts');
       } else {
-        // For other users, we'll need to fetch their posts differently
-        // For now, we'll show empty since we don't have a public posts endpoint
-        setPosts([]);
+        // For other users, use the new user-specific endpoint
+        response = await axios.get(`/posts/user/${profileId}`);
       }
+      
+      setPosts(response.data);
     } catch (error) {
       console.error('Failed to fetch user posts:', error);
       setPosts([]);
     } finally {
       setPostsLoading(false);
+    }
+  };
+
+  const fetchUserReviews = async (profileId) => {
+    try {
+      setReviewsLoading(true);
+      // If it's the current user's profile, use my-reviews endpoint
+      if (profileId === currentUser?.id) {
+        const response = await axios.get('/reviews/my-reviews');
+        setReviews(response.data);
+      } else {
+        // For other users, we can show their public reviews
+        // We'll need to filter by author_id on the frontend since we don't have a specific endpoint
+        const response = await axios.get('/reviews');
+        const userReviews = response.data.filter(review => review.author_id === profileId);
+        setReviews(userReviews);
+      }
+    } catch (error) {
+      console.error('Failed to fetch user reviews:', error);
+      setReviews([]);
+    } finally {
+      setReviewsLoading(false);
     }
   };
 
@@ -312,6 +352,15 @@ const Profile = () => {
     }
   };
 
+
+  const renderStars = (rating) => {
+    return Array.from({ length: 5 }, (_, index) => (
+      <FaStar
+        key={index}
+        className={`profile__review-star ${index < rating ? 'profile__review-star--filled' : ''}`}
+      />
+    ));
+
   const renderEditableField = (field, label, value, type = 'text', options = null) => {
     const isEditing = editingField === field;
     const displayValue = value || 'Not set';
@@ -484,6 +533,7 @@ const Profile = () => {
         )}
       </div>
     );
+
   };
 
   if (loading) {
@@ -703,6 +753,53 @@ const Profile = () => {
           </div>
         )}
 
+
+        {/* Reviews Section */}
+        <div className="profile__section">
+          <button 
+            className="profile__section-title profile__section-title--collapsible"
+            onClick={() => setReviewsExpanded(!reviewsExpanded)}
+          >
+            <FaStar />
+            Reviews ({reviews.length})
+            {reviewsExpanded ? <FaChevronUp /> : <FaChevronDown />}
+          </button>
+          
+          {reviewsExpanded && (
+            <div className="profile__reviews">
+              {reviewsLoading ? (
+                <div className="profile__reviews-loading">
+                  <div className="loader"></div>
+                  <p>Loading reviews...</p>
+                </div>
+              ) : reviews.length === 0 ? (
+                <div className="profile__reviews-empty">
+                  <p>
+                    {isOwnProfile 
+                      ? "You haven't written any reviews yet."
+                      : `${profile.username} hasn't written any reviews yet.`
+                    }
+                  </p>
+                  {isOwnProfile && (
+                    <button 
+                      className="profile__create-review-btn"
+                      onClick={() => navigate('/create-review')}
+                    >
+                      Write Your First Review
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="profile__reviews-list">
+                  {reviews.slice(0, 3).map((review) => (
+                    <div key={review.id} className="profile__review">
+                      <div className="profile__review-header">
+                        <div className="profile__review-meta">
+                          <span className="profile__review-category">{review.category}</span>
+                          <div className="profile__review-rating">
+                            {renderStars(review.rating)}
+                          </div>
+
         {/* My Posts Section */}
         {isOwnProfile && (
           <div className="profile__section">
@@ -735,52 +832,144 @@ const Profile = () => {
                           <span className={`profile__post-status profile__post-status--${postStatus.className}`}>
                             {postStatus.label}
                           </span>
-                        </div>
-                      </div>
-                      <p className="profile__post-description">{post.description}</p>
-                      
-                      <div className="profile__post-details">
-                        <div className="profile__post-detail">
-                          <FaMapMarkerAlt />
-                          <span>{post.location_name}</span>
-                        </div>
-                        <div className="profile__post-detail">
-                          <FaCalendarAlt />
-                          <span>{formatDateTime(post.event_time)}</span>
-                        </div>
-                        <div className="profile__post-detail">
-                          <FaUsers />
-                          <span>{post.players_needed} players needed</span>
-                        </div>
-                      </div>
 
-                      <div className="profile__post-meta">
-                        <div className="profile__post-interest">
-                          <FaHeart />
-                          <span>{(post.interested_users || []).length} interested</span>
                         </div>
-                        <span className="profile__post-created">
-                          Created {formatRelativeTime(post.created_at)}
+                        <span className="profile__review-date">
+                          {formatRelativeTime(review.created_at)}
                         </span>
                       </div>
+                      
+                      <h4 className="profile__review-title">{review.title}</h4>
+                      <p className="profile__review-content">{review.content}</p>
+                      
+                      {review.tags && review.tags.length > 0 && (
+                        <div className="profile__review-tags">
+                          {review.tags.map((tag, index) => (
+                            <span key={index} className="profile__review-tag">
+                              #{tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  );
-                })}
-                
-                {posts.length > 3 && (
-                  <div className="profile__view-all">
+                  ))}
+                  
+                  {reviews.length > 3 && (
+                    <div className="profile__view-all-reviews">
+                      <button 
+                        className="profile__view-all-reviews-btn"
+                        onClick={() => navigate('/reviews')}
+                      >
+                        View All Reviews ({reviews.length})
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Posts Section - Simplified title */}
+        <div className="profile__section">
+          <button 
+            className="profile__section-title profile__section-title--collapsible"
+            onClick={() => setPostsExpanded(!postsExpanded)}
+          >
+            <FaCalendarAlt />
+            Posts ({posts.length})
+            {postsExpanded ? <FaChevronUp /> : <FaChevronDown />}
+          </button>
+          
+          {postsExpanded && (
+            <div className="profile__posts">
+              {postsLoading ? (
+                <div className="profile__posts-loading">
+                  <div className="loader"></div>
+                  <p>Loading posts...</p>
+                </div>
+              ) : posts.length === 0 ? (
+                <div className="profile__empty">
+                  <p>
+                    {isOwnProfile 
+                      ? "You haven't created any posts yet."
+                      : `${profile.username} hasn't created any posts yet.`
+                    }
+                  </p>
+                  {isOwnProfile && (
                     <button 
-                      className="profile__view-all-btn"
-                      onClick={() => navigate('/past-posts')}
+                      className="profile__create-post-btn"
+                      onClick={() => navigate('/create-post')}
                     >
-                      View All Posts ({posts.length})
+                      Create Your First Post
                     </button>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
+                  )}
+                </div>
+              ) : (
+                <div className="profile__posts-list">
+                  {posts.slice(0, 3).map((post) => {
+                    const postStatus = getPostStatus(post.event_time);
+                    return (
+                      <div key={post.id} className="profile__post">
+                        <div className="profile__post-header">
+                          <h4>{post.heading}</h4>
+                          <div className="profile__post-badges">
+                            <span className="profile__post-sport">{post.sport}</span>
+                            <span className={`profile__post-status profile__post-status--${postStatus.className}`}>
+                              {postStatus.label}
+                            </span>
+                          </div>
+                        </div>
+                        <p className="profile__post-description">{post.description}</p>
+                        
+                        <div className="profile__post-details">
+                          <div className="profile__post-detail">
+                            <FaMapMarkerAlt />
+                            <span>{post.location_name}</span>
+                          </div>
+                          <div className="profile__post-detail">
+                            <FaCalendarAlt />
+                            <span>{formatDateTime(post.event_time)}</span>
+                          </div>
+                          <div className="profile__post-detail">
+                            <FaUsers />
+                            <span>{post.players_needed} players needed</span>
+                          </div>
+                        </div>
+
+                        <div className="profile__post-meta">
+                          <div className="profile__post-interest">
+                            <FaHeart />
+                            <span>{(post.interested_users || []).length} interested</span>
+                          </div>
+                          <span className="profile__post-created">
+                            Created {formatRelativeTime(post.created_at)}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  
+                  {posts.length > 3 && (
+                    <div className="profile__view-all">
+                      <button 
+                        className="profile__view-all-btn"
+                        onClick={() => isOwnProfile ? navigate('/past-posts') : null}
+                        disabled={!isOwnProfile}
+                        style={{ 
+                          opacity: isOwnProfile ? 1 : 0.6,
+                          cursor: isOwnProfile ? 'pointer' : 'not-allowed'
+                        }}
+                      >
+                        {isOwnProfile ? `View All Posts (${posts.length})` : `${posts.length} total posts`}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       <FollowersModal
