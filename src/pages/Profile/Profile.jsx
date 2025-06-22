@@ -1,8 +1,4 @@
 import { useState, useEffect } from 'react';
-
-import { useParams } from 'react-router-dom';
-import { FaUser, FaUsers, FaEdit, FaMapMarkerAlt, FaTags, FaUserPlus, FaUserCheck, FaComment, FaCalendarAlt, FaClock, FaHeart, FaStar, FaChevronDown, FaChevronUp } from 'react-icons/fa';
-
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   FaUser, 
@@ -21,12 +17,13 @@ import {
   FaSave,
   FaTimes,
   FaCamera,
-  FaCog
+  FaCog,
+  FaStar,
+  FaChevronDown,
+  FaChevronUp
 } from 'react-icons/fa';
-
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
-import { useNavigate as useNav } from 'react-router-dom';
 import { formatRelativeTime, formatDateTime } from '../../utils/dateUtils';
 import FollowersModal from '../../components/FollowersModal/FollowersModal';
 import './Profile.scss';
@@ -70,7 +67,6 @@ const Profile = () => {
     { value: 'expert', label: 'Expert' }
   ];
 
-
   useEffect(() => {
     const profileId = userId || currentUser?.id;
     setIsOwnProfile(!userId || userId === currentUser?.id);
@@ -78,14 +74,12 @@ const Profile = () => {
     if (profileId) {
       fetchProfile(profileId);
       fetchUserPosts(profileId);
-
       fetchUserReviews(profileId);
 
       if (!userId || userId === currentUser?.id) {
         fetchSettings();
         fetchSkills();
       }
-
     }
   }, [userId, currentUser]);
 
@@ -352,7 +346,6 @@ const Profile = () => {
     }
   };
 
-
   const renderStars = (rating) => {
     return Array.from({ length: 5 }, (_, index) => (
       <FaStar
@@ -360,6 +353,7 @@ const Profile = () => {
         className={`profile__review-star ${index < rating ? 'profile__review-star--filled' : ''}`}
       />
     ));
+  };
 
   const renderEditableField = (field, label, value, type = 'text', options = null) => {
     const isEditing = editingField === field;
@@ -374,7 +368,7 @@ const Profile = () => {
               className="profile__edit-btn profile__edit-btn--small"
               onClick={() => startEditing(field, value)}
             >
-<FaEdit color="white" />
+              <FaEdit />
             </button>
           )}
         </div>
@@ -533,7 +527,6 @@ const Profile = () => {
         )}
       </div>
     );
-
   };
 
   if (loading) {
@@ -599,7 +592,7 @@ const Profile = () => {
               onClick={() => handleImageUpload('profile_picture')}
               disabled={uploadingImage}
             >
-          <FaCamera />
+              <FaCamera />
             </button>
           )}
         </div>
@@ -753,7 +746,6 @@ const Profile = () => {
           </div>
         )}
 
-
         {/* Reviews Section */}
         <div className="profile__section">
           <button 
@@ -799,40 +791,6 @@ const Profile = () => {
                           <div className="profile__review-rating">
                             {renderStars(review.rating)}
                           </div>
-
-        {/* My Posts Section */}
-        {isOwnProfile && (
-          <div className="profile__section">
-            <h3 className="profile__section-title">My Posts</h3>
-            {postsLoading ? (
-              <div className="profile__posts-loading">
-                <div className="loader"></div>
-                <p>Loading posts...</p>
-              </div>
-            ) : posts.length === 0 ? (
-              <div className="profile__empty">
-                <p>You haven't created any posts yet.</p>
-                <button 
-                  className="profile__create-post-btn"
-                  onClick={() => navigate('/create-post')}
-                >
-                  Create Your First Post
-                </button>
-              </div>
-            ) : (
-              <div className="profile__posts">
-                {posts.slice(0, 3).map((post) => {
-                  const postStatus = getPostStatus(post.event_time);
-                  return (
-                    <div key={post.id} className="profile__post">
-                      <div className="profile__post-header">
-                        <h4>{post.heading}</h4>
-                        <div className="profile__post-badges">
-                          <span className="profile__post-sport">{post.sport}</span>
-                          <span className={`profile__post-status profile__post-status--${postStatus.className}`}>
-                            {postStatus.label}
-                          </span>
-
                         </div>
                         <span className="profile__review-date">
                           {formatRelativeTime(review.created_at)}
