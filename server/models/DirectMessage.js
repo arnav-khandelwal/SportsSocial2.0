@@ -59,8 +59,10 @@ export class DirectMessage {
   
   static async markMessagesAsRead(conversationId, userId) {
     try {
-      const { error } = await supabase
-        .rpc('mark_direct_messages_as_read', {
+      console.log('Marking messages as read for conversation:', conversationId, 'user:', userId);
+      
+      const { data, error } = await supabase
+        .rpc('mark_conversation_messages_read', {
           conversation_id: conversationId,
           reader_id: userId
         });
@@ -70,7 +72,8 @@ export class DirectMessage {
         throw error;
       }
       
-      return true;
+      console.log('Successfully marked', data, 'messages as read');
+      return data;
     } catch (error) {
       console.error('DirectMessage markMessagesAsRead error:', error);
       throw error;

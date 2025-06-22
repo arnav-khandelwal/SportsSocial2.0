@@ -39,6 +39,11 @@ const DirectMessageThread = ({ otherUserId, otherUserName }) => {
             is_read: message.is_read,
             created_at: message.created_at
           }]);
+          
+          // If message is from other user, mark conversation as read
+          if (message.sender_id === otherUserId && conversationId) {
+            markConversationAsRead();
+          }
         }
       };
 
@@ -72,10 +77,34 @@ const DirectMessageThread = ({ otherUserId, otherUserName }) => {
       const response = await axios.get(`/direct-messages/conversation/${otherUserId}`);
       setMessages(response.data.messages);
       setConversationId(response.data.conversationId);
+      
+      // Mark messages as read when conversation is opened
+      if (response.data.conversationId) {
+        await markConversationAsRead(response.data.conversationId);
+      }
     } catch (error) {
       console.error('Failed to fetch messages:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const markConversationAsRead = async (convId = conversationId) => {
+    if (!convId) return;
+    
+    try {
+      await axios.post(`/direct-messages/mark-read/${convId}`);
+      
+      // Update local state to mark messages as read
+      setMessages(prev => 
+        prev.map(msg => 
+          msg.sender_id !== user.id 
+            ? { ...msg, is_read: true }
+            : msg
+        )
+      );
+    } catch (error) {
+      console.error('Failed to mark messages as read:', error);
     }
   };
 
@@ -188,6 +217,11 @@ const DirectMessageThread = ({ otherUserId, otherUserName }) => {
                 </div>
                 <div className="direct-message-thread__message-time">
                   {formatTime(message.created_at)}
+                  {message.sender_id === user.id && (
+                    <span className={`direct-message-thread__read-status ${message.is_read ? 'read' : 'unread'}`}>
+                      {message.is_read ? ' ✓✓' : ' ✓'}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
