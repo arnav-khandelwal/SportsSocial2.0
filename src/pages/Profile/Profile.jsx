@@ -542,7 +542,7 @@ const Profile = () => {
               onClick={() => handleImageUpload('profile_picture')}
               disabled={uploadingImage}
             >
-              <FaCamera />
+              <FaCamera size={20}"/>
             </button>
           )}
         </div>
