@@ -44,19 +44,9 @@ const Profile = () => {
           follower => follower.id === currentUser?.id
         );
         setIsFollowing(isCurrentlyFollowing);
-      }
-
-      // Check if messaging is allowed (mutual follow or current user follows them)
-      if (!isOwnProfile && currentUser) {
-        const userFollowsProfile = response.data.followers?.some(
-          follower => follower.id === currentUser.id
-        );
-        const profileFollowsUser = response.data.following?.some(
-          following => following.id === currentUser.id
-        );
         
-        // Can message if: user follows profile OR they follow each other
-        setCanMessage(userFollowsProfile || profileFollowsUser);
+        // Can message if current user follows this profile
+        setCanMessage(isCurrentlyFollowing);
       }
     } catch (error) {
       console.error('Failed to fetch profile:', error);
@@ -93,11 +83,13 @@ const Profile = () => {
       if (isFollowing) {
         await axios.post(`/users/${profile.id}/unfollow`);
         setIsFollowing(false);
+        setCanMessage(false);
       } else {
         await axios.post(`/users/${profile.id}/follow`);
         setIsFollowing(true);
+        setCanMessage(true);
       }
-      // Refresh profile to get updated follower count and messaging permissions
+      // Refresh profile to get updated follower count
       fetchProfile(profile.id);
     } catch (error) {
       console.error('Follow/unfollow error:', error);
