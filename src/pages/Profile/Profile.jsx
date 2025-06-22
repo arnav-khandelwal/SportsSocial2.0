@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { FaUser, FaUsers, FaEdit, FaMapMarkerAlt, FaTags, FaUserPlus, FaUserCheck, FaComment, FaCalendarAlt, FaClock, FaHeart } from 'react-icons/fa';
+import { FaUser, FaUsers, FaEdit, FaMapMarkerAlt, FaTags, FaUserPlus, FaUserCheck, FaComment, FaCalendarAlt, FaClock, FaHeart, FaStar, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -14,13 +14,16 @@ const Profile = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [posts, setPosts] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [postsLoading, setPostsLoading] = useState(false);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
   const [isOwnProfile, setIsOwnProfile] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
   const [showFollowersModal, setShowFollowersModal] = useState(false);
   const [followersModalTab, setFollowersModalTab] = useState('followers');
+  const [reviewsExpanded, setReviewsExpanded] = useState(false);
 
   useEffect(() => {
     const profileId = userId || currentUser?.id;
@@ -29,6 +32,7 @@ const Profile = () => {
     if (profileId) {
       fetchProfile(profileId);
       fetchUserPosts(profileId);
+      fetchUserReviews(profileId);
     }
   }, [userId, currentUser]);
 
@@ -68,6 +72,28 @@ const Profile = () => {
       setPosts([]);
     } finally {
       setPostsLoading(false);
+    }
+  };
+
+  const fetchUserReviews = async (profileId) => {
+    try {
+      setReviewsLoading(true);
+      // If it's the current user's profile, use my-reviews endpoint
+      if (profileId === currentUser?.id) {
+        const response = await axios.get('/reviews/my-reviews');
+        setReviews(response.data);
+      } else {
+        // For other users, we can show their public reviews
+        // We'll need to filter by author_id on the frontend since we don't have a specific endpoint
+        const response = await axios.get('/reviews');
+        const userReviews = response.data.filter(review => review.author_id === profileId);
+        setReviews(userReviews);
+      }
+    } catch (error) {
+      console.error('Failed to fetch user reviews:', error);
+      setReviews([]);
+    } finally {
+      setReviewsLoading(false);
     }
   };
 
@@ -124,6 +150,15 @@ const Profile = () => {
     } else {
       return { status: 'past', label: 'Past Event', className: 'past' };
     }
+  };
+
+  const renderStars = (rating) => {
+    return Array.from({ length: 5 }, (_, index) => (
+      <FaStar
+        key={index}
+        className={`profile__review-star ${index < rating ? 'profile__review-star--filled' : ''}`}
+      />
+    ));
   };
 
   if (loading) {
@@ -253,6 +288,88 @@ const Profile = () => {
             </div>
           </div>
         )}
+
+        {/* Reviews Section */}
+        <div className="profile__section">
+          <button 
+            className="profile__section-title profile__section-title--collapsible"
+            onClick={() => setReviewsExpanded(!reviewsExpanded)}
+          >
+            <FaStar />
+            Reviews ({reviews.length})
+            {reviewsExpanded ? <FaChevronUp /> : <FaChevronDown />}
+          </button>
+          
+          {reviewsExpanded && (
+            <div className="profile__reviews">
+              {reviewsLoading ? (
+                <div className="profile__reviews-loading">
+                  <div className="loader"></div>
+                  <p>Loading reviews...</p>
+                </div>
+              ) : reviews.length === 0 ? (
+                <div className="profile__reviews-empty">
+                  <p>
+                    {isOwnProfile 
+                      ? "You haven't written any reviews yet."
+                      : `${profile.username} hasn't written any reviews yet.`
+                    }
+                  </p>
+                  {isOwnProfile && (
+                    <button 
+                      className="profile__create-review-btn"
+                      onClick={() => navigate('/create-review')}
+                    >
+                      Write Your First Review
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="profile__reviews-list">
+                  {reviews.slice(0, 3).map((review) => (
+                    <div key={review.id} className="profile__review">
+                      <div className="profile__review-header">
+                        <div className="profile__review-meta">
+                          <span className="profile__review-category">{review.category}</span>
+                          <div className="profile__review-rating">
+                            {renderStars(review.rating)}
+                          </div>
+                        </div>
+                        <span className="profile__review-date">
+                          {formatRelativeTime(review.created_at)}
+                        </span>
+                      </div>
+                      
+                      <h4 className="profile__review-title">{review.title}</h4>
+                      <p className="profile__review-content">{review.content}</p>
+                      
+                      {review.tags && review.tags.length > 0 && (
+                        <div className="profile__review-tags">
+                          {review.tags.map((tag, index) => (
+                            <span key={index} className="profile__review-tag">
+                              #{tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  
+                  {reviews.length > 3 && (
+                    <div className="profile__view-all-reviews">
+                      <button 
+                        className="profile__view-all-reviews-btn"
+                        onClick={() => navigate('/reviews')}
+                      >
+                        View All Reviews ({reviews.length})
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
 
         {isOwnProfile && (
           <div className="profile__section">
