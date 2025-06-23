@@ -80,7 +80,7 @@ const Profile = () => {
         fetchSettings();
         fetchSkills();
       } else {
-        // For other users, fetch their settings too
+        // For other users, fetch their public settings
         fetchOtherUserSettings(profileId);
       }
     }
@@ -117,7 +117,6 @@ const Profile = () => {
   const fetchOtherUserSettings = async (profileId) => {
     try {
       // For other users, we can only get their public settings
-      // This would need to be implemented on the backend to return only public data
       const response = await axios.get(`/settings/public/${profileId}`);
       setSettings(response.data || {});
     } catch (error) {

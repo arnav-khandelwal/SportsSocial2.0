@@ -63,10 +63,10 @@ const Sidebar = ({ isOpen, onClose }) => {
 
   const menuItems = [
     { path: '/', icon: FaHome, label: 'Home', exact: true },
+    { path: '/events', icon: FaCalendarAlt, label: 'Events' },
     { path: '/search', icon: FaSearch, label: 'Search People' },
     { path: '/reviews', icon: FaStar, label: 'Reviews' },
     { path: '/past-posts', icon: FaHistory, label: 'My Posts' },
-    { path: '/events', icon: FaCalendarAlt, label: 'Events' },
     { 
       path: '/messages', 
       icon: FaComment, 
@@ -89,8 +89,6 @@ const Sidebar = ({ isOpen, onClose }) => {
     <>
       {isOpen && <div className="sidebar__overlay" onClick={onClose} />}
       <aside className={`sidebar ${isOpen ? 'sidebar--open' : ''}`}>
-        
-
         <nav className="sidebar__nav">
           {menuItems.map((item) => (
             <Link

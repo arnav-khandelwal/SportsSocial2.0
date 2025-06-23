@@ -10,7 +10,7 @@ const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [markingAllRead, setMarkingAllRead] = useState(false);
-  const [filter, setFilter] = useState('all'); // 'all', 'unread', 'follow', 'interest', 'nearby_post', 'message'
+  const [filter, setFilter] = useState('all'); // 'all', 'unread', 'follow', 'interest', 'nearby_post'
   const { socket } = useSocket();
 
   useEffect(() => {
@@ -92,8 +92,6 @@ const Notifications = () => {
         return `/past-posts`;
       case 'nearby_post':
         return `/`;
-      case 'message':
-        return `/messages`;
       default:
         return '#';
     }
@@ -106,7 +104,6 @@ const Notifications = () => {
       case 'follow':
       case 'interest':
       case 'nearby_post':
-      case 'message':
         return notifications.filter(n => n.type === filter);
       default:
         return notifications;
@@ -188,12 +185,6 @@ const Notifications = () => {
           onClick={() => setFilter('nearby_post')}
         >
           Nearby ({notifications.filter(n => n.type === 'nearby_post').length})
-        </button>
-        <button
-          className={`notifications__filter ${filter === 'message' ? 'notifications__filter--active' : ''}`}
-          onClick={() => setFilter('message')}
-        >
-          Messages ({notifications.filter(n => n.type === 'message').length})
         </button>
       </div>
 

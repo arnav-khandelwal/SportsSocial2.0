@@ -348,16 +348,6 @@
     justify-content: center;
   }
 
-  &__online-indicator {
-    width: 8px;
-    height: 8px;
-    background-color: var(--success);
-    border-radius: 50%;
-    position: absolute;
-    top: 12px;
-    right: 20px;
-  }
-
   &__member-count {
     background-color: var(--text-secondary);
     color: var(--text-primary);

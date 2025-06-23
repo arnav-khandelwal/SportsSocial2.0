@@ -15,11 +15,9 @@ import PastPosts from './pages/PastPosts/PastPosts';
 import Notifications from './pages/Notifications/Notifications';
 import Reviews from './pages/Reviews/Reviews';
 import CreateReview from './pages/CreateReview/CreateReview';
-
+import Events from './pages/Events/Events';
 import About from './pages/About/About';
-
 import Settings from './pages/Settings/Settings';
-
 
 // Context
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -69,11 +67,9 @@ function AppRoutes() {
             <Route path="/create-post" element={<CreatePost />} />
             <Route path="/past-posts" element={<PastPosts />} />
             <Route path="/notifications" element={<Notifications />} />
-
+            <Route path="/events" element={<Events />} />
             <Route path="/about" element={<About />} />
-
             <Route path="/settings" element={<Settings />} />
-
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </Layout>
