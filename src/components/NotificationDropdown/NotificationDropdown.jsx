@@ -93,6 +93,8 @@ const NotificationDropdown = () => {
   const markAsRead = async (notificationIds) => {
     try {
       await axios.post('/notifications/mark-read', { notificationIds });
+      
+      // Update the read status
       setNotifications(prev => 
         prev.map(notif => 
           notificationIds.includes(notif.id) 
@@ -100,11 +102,13 @@ const NotificationDropdown = () => {
             : notif
         )
       );
+      
+      // Update unread count
       setUnreadCount(prev => Math.max(0, prev - notificationIds.length));
       
-      // Remove read notifications from view
+      // For the dropdown, we only show unread notifications, so always remove them after marking as read
       setNotifications(prev => 
-        prev.filter(notif => !notificationIds.includes(notif.id))
+        prev.filter(notif => !notificationIds.includes(notif.id) || notif.is_read)
       );
     } catch (error) {
       console.error('Failed to mark notifications as read:', error);
@@ -113,8 +117,21 @@ const NotificationDropdown = () => {
 
   const markAllAsRead = async () => {
     try {
-      await axios.post('/notifications/mark-all-read');
-      setNotifications([]);
+      // First, collect all unread notification IDs
+      const unreadIds = notifications
+        .filter(notif => !notif.is_read)
+        .map(notif => notif.id);
+      
+      if (unreadIds.length === 0) return; // No unread notifications
+      
+      // Try to mark specific notifications as read instead of using mark-all endpoint
+      await axios.post('/notifications/mark-read', { 
+        notificationIds: unreadIds 
+      });
+      
+      setNotifications(prev => 
+        prev.filter(notif => notif.is_read)
+      );
       setUnreadCount(0);
       
       // Update last seen ID to prevent duplicates
@@ -125,6 +142,7 @@ const NotificationDropdown = () => {
       }
     } catch (error) {
       console.error('Failed to mark all notifications as read:', error);
+      // Continue showing notifications without clearing them
     }
   };
 

@@ -13,7 +13,11 @@ router.get('/', authenticateToken, async (req, res) => {
     res.json(notifications);
   } catch (error) {
     console.error('Get notifications error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ 
+      message: 'Server error getting notifications', 
+      error: error.message,
+      code: error.code
+    });
   }
 });
 
@@ -36,7 +40,11 @@ router.post('/mark-read', authenticateToken, async (req, res) => {
     res.json({ updatedCount });
   } catch (error) {
     console.error('Mark notifications as read error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ 
+      message: 'Server error marking notifications as read', 
+      error: error.message,
+      code: error.code
+    });
   }
 });
 
@@ -47,7 +55,11 @@ router.post('/mark-all-read', authenticateToken, async (req, res) => {
     res.json({ updatedCount });
   } catch (error) {
     console.error('Mark all notifications as read error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ 
+      message: 'Server error marking all notifications as read', 
+      error: error.message,
+      code: error.code
+    });
   }
 });
 

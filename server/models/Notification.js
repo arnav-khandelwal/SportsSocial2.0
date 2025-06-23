@@ -20,36 +20,60 @@ export class Notification {
   static async getUserNotifications(userId, limit = 20) {
     const { data, error } = await supabase
       .rpc('get_user_notifications', {
-        user_id: userId,
+        uid: userId,
         limit_count: limit
       });
     
-    if (error) throw error;
+    if (error) {
+      console.error('getUserNotifications error:', error);
+      throw error;
+    }
     return data;
   }
   
   static async markAsRead(userId, notificationIds = null) {
     const { data, error } = await supabase
       .rpc('mark_notifications_as_read', {
-        user_id: userId,
+        uid: userId,
         notification_ids: notificationIds
       });
     
-    if (error) throw error;
+    if (error) {
+      console.error('markAsRead error:', error);
+      throw error;
+    }
     return data;
   }
   
   static async getUnreadCount(userId) {
     const { data, error } = await supabase
       .rpc('get_unread_notification_count', {
-        user_id: userId
+        uid: userId
       });
     
-    if (error) throw error;
+    if (error) {
+      console.error('getUnreadCount error:', error);
+      throw error;
+    }
     return data;
   }
   
   static async markAllAsRead(userId) {
-    return await this.markAsRead(userId, null);
+    try {
+      const { data, error } = await supabase
+        .rpc('mark_all_notifications_as_read', {
+          uid: userId
+        });
+      
+      if (error) {
+        console.error('markAllAsRead error:', error);
+        throw error;
+      }
+      return data;
+    } catch (error) {
+      console.error('markAllAsRead error:', error);
+      // Fallback to using the markAsRead method if the dedicated function fails
+      return await this.markAsRead(userId, null);
+    }
   }
 }

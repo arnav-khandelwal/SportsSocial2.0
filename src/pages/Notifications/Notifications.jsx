@@ -61,6 +61,8 @@ const Notifications = () => {
       }
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
+      // Set an empty array as fallback to avoid UI errors
+      setNotifications([]);
     } finally {
       setLoading(false);
     }
@@ -69,6 +71,8 @@ const Notifications = () => {
   const markAsRead = async (notificationIds) => {
     try {
       await axios.post('/notifications/mark-read', { notificationIds });
+      
+      // Update the notifications' read status in the state
       setNotifications(prev => 
         prev.map(notif => 
           notificationIds.includes(notif.id) 
@@ -77,10 +81,12 @@ const Notifications = () => {
         )
       );
       
-      // Remove read notifications from view
-      setNotifications(prev => 
-        prev.filter(notif => !notificationIds.includes(notif.id))
-      );
+      // Only remove the notifications from view if we're in the unread filter
+      if (filter === 'unread') {
+        setNotifications(prev => 
+          prev.filter(notif => !notificationIds.includes(notif.id))
+        );
+      }
     } catch (error) {
       console.error('Failed to mark notifications as read:', error);
     }
@@ -91,10 +97,35 @@ const Notifications = () => {
     
     try {
       setMarkingAllRead(true);
-      await axios.post('/notifications/mark-all-read');
       
-      // Remove all notifications from view since they're marked as read
-      setNotifications([]);
+      // First attempt to mark all as read using the dedicated endpoint
+      try {
+        await axios.post('/notifications/mark-all-read');
+        // Success with the main endpoint
+      } catch (error) {
+        console.warn('Failed to mark all as read, using fallback method:', error);
+        
+        // Fallback: Get all unread notification IDs and mark them read individually
+        const unreadIds = notifications
+          .filter(notif => !notif.is_read)
+          .map(notif => notif.id);
+        
+        if (unreadIds.length > 0) {
+          await axios.post('/notifications/mark-read', { 
+            notificationIds: unreadIds 
+          });
+        }
+      }
+      
+      // Update the read status of all notifications
+      setNotifications(prev => 
+        prev.map(notif => ({ ...notif, is_read: true }))
+      );
+      
+      // If we're in the unread filter, clear the list since there are no more unread notifications
+      if (filter === 'unread') {
+        setNotifications(prev => prev.filter(n => false)); // Empty the array
+      }
       
       // Update last seen ID to prevent duplicates
       if (notifications.length > 0) {
@@ -117,10 +148,21 @@ const Notifications = () => {
       setMarkingIndividual(prev => new Set([...prev, notificationId]));
       await markAsRead([notificationId]);
       
-      // Remove the read notification from view
+      // Update the notification's read status in the state
       setNotifications(prev => 
-        prev.filter(notif => notif.id !== notificationId)
+        prev.map(notif => 
+          notif.id === notificationId 
+            ? { ...notif, is_read: true }
+            : notif
+        )
       );
+      
+      // Only remove the notification from view if we're in the unread filter
+      if (filter === 'unread') {
+        setNotifications(prev => 
+          prev.filter(notif => notif.id !== notificationId)
+        );
+      }
     } catch (error) {
       console.error('Failed to mark notification as read:', error);
     } finally {
@@ -136,6 +178,7 @@ const Notifications = () => {
     if (!notification.is_read) {
       markIndividualAsRead(notification.id);
     }
+    // We don't navigate away here, as that's handled by the Link component
   };
 
   const getNotificationLink = (notification) => {

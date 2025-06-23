@@ -434,8 +434,8 @@
     background: var(--primary);
     color: white;
     border: none;
-    width: 36px;
-    height: 36px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -443,17 +443,22 @@
     cursor: pointer;
     margin-right: 10px;
     transition: background-color 0.2s;
-    font-size: 14px;
+    font-size: 16px;
     overflow: visible;
     padding: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    position: relative;
+    z-index: 1;
 
     svg {
-      width: 16px;
-      height: 16px;
+      width: 20px;
+      height: 20px;
     }
 
     &:hover {
       background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
   }
 
