@@ -17,6 +17,28 @@ router.get('/', authenticateToken, async (req, res) => {
   }
 });
 
+// Get public user settings (for viewing other users' profiles)
+router.get('/public/:userId', authenticateToken, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const settings = await UserSettings.getSettings(userId);
+    
+    // Only return public settings for other users
+    const publicSettings = {
+      profile_picture_url: settings?.profile_picture_url,
+      cover_photo_url: settings?.cover_photo_url,
+      location_city: settings?.location_city,
+      // Only show phone if visibility is public
+      phone_number: settings?.phone_visibility === 'public' ? settings?.phone_number : null,
+    };
+    
+    res.json(publicSettings);
+  } catch (error) {
+    console.error('Get public settings error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Update user settings
 router.put('/', authenticateToken, async (req, res) => {
   try {
