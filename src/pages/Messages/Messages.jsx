@@ -24,6 +24,7 @@ const Messages = () => {
   const [followingSearchQuery, setFollowingSearchQuery] = useState('');
   const [followingSearchResults, setFollowingSearchResults] = useState([]);
   const [loadingFollowing, setLoadingFollowing] = useState(false);
+  const [userProfiles, setUserProfiles] = useState({});
   const { socket } = useSocket();
 
   useEffect(() => {
@@ -133,6 +134,13 @@ const Messages = () => {
         return bTime - aTime; // Sort newest first
       });
       setGroupConversations(sortedGroupConversations);
+      
+      // Fetch profile pictures for all direct conversations
+      sortedDirectConversations.forEach(conv => {
+        if (conv.other_user_id) {
+          fetchUserProfile(conv.other_user_id);
+        }
+      });
     } catch (error) {
       console.error('Failed to fetch conversations:', error);
     } finally {
@@ -167,8 +175,18 @@ const Messages = () => {
   const fetchFollowingUsers = async () => {
     try {
       setLoadingFollowing(true);
-      setFollowingUsers(currentUser?.following || []);
-      setFollowingSearchResults(currentUser?.following || []);
+      
+      // Make API call to get following users or use from context
+      const following = currentUser?.following || [];
+      setFollowingUsers(following);
+      setFollowingSearchResults(following);
+      
+      // Fetch profile pictures for following users
+      following.forEach(user => {
+        if (user.id) {
+          fetchUserProfile(user.id);
+        }
+      });
     } catch (error) {
       console.error('Failed to fetch following users:', error);
       setFollowingUsers([]);
@@ -359,7 +377,15 @@ const Messages = () => {
                       onClick={() => startNewConversation(user)}
                     >
                       <div className="create-direct-message-modal__user-avatar">
-                        <FaUser />
+                        {userProfiles[user.id] ? (
+                          <img 
+                            src={userProfiles[user.id]} 
+                            alt={`${user.username}'s profile`}
+                            className="profile-image__avatar"
+                          />
+                        ) : (
+                          <FaUser />
+                        )}
                       </div>
                       <div className="create-direct-message-modal__user-info">
                         <h4>{user.username}</h4>
@@ -383,6 +409,46 @@ const Messages = () => {
       </div>
     ) : null;
   };
+
+  const fetchUserProfile = async (profileId) => {
+    if (userProfiles[profileId]) return; // Skip if already cached
+
+    try {
+      const response = await axios.get(`/settings/public/${profileId}`);
+      setUserProfiles((prevProfiles) => ({
+        ...prevProfiles,
+        [profileId]: response.data.profile_picture_url,
+      }));
+    } catch (error) {
+      console.error(`Failed to fetch profile for user ${profileId}:`, error);
+    }
+  };
+
+  const fetchConversationsProfiles = async () => {
+    // Fetch profile pictures for direct conversations
+    directConversations.forEach(conv => {
+      if (conv.other_user_id) {
+        fetchUserProfile(conv.other_user_id);
+      }
+    });
+  };
+
+  const fetchFollowingProfiles = async () => {
+    // Fetch profile pictures for following users
+    followingUsers.forEach(user => {
+      if (user.id) {
+        fetchUserProfile(user.id);
+      }
+    });
+  };
+
+  useEffect(() => {
+    fetchConversationsProfiles();
+  }, [directConversations]);
+
+  useEffect(() => {
+    fetchFollowingProfiles();
+  }, [followingUsers]);
 
   if (loading) {
     return (
@@ -453,7 +519,15 @@ const Messages = () => {
                       })}
                     >
                       <div className="messages__search-result-avatar">
-                        <FaUser />
+                        {userProfiles[conv.other_user_id] ? (
+                          <img 
+                            src={userProfiles[conv.other_user_id]} 
+                            alt={`${conv.other_user_username}'s profile`}
+                            className="profile-image__avatar"
+                          />
+                        ) : (
+                          <FaUser />
+                        )}
                       </div>
                       <div className="messages__search-result-info">
                         <h4>{conv.other_user_username}</h4>
@@ -528,7 +602,15 @@ const Messages = () => {
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="messages__avatar">
-                      <FaUser />
+                      {userProfiles[conv.other_user_id] ? (
+                        <img 
+                          src={userProfiles[conv.other_user_id]} 
+                          alt={`${conv.other_user_username}'s profile`}
+                          className="messages__avatar__image"
+                        />
+                      ) : (
+                        <FaUser />
+                      )}
                     </div>
                   </Link>
                   <div className="messages__conversation-info">
