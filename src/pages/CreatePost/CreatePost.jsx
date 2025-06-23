@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaCalendarAlt, FaUsers } from 'react-icons/fa';
+import { FaCalendarAlt, FaUsers, FaGamepad } from 'react-icons/fa';
 import axios from 'axios';
 import LocationPicker from '../../components/LocationPicker/LocationPicker';
 import './CreatePost.scss';
@@ -17,19 +17,28 @@ const CreatePost = () => {
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isESports, setIsESports] = useState(false);
   const navigate = useNavigate();
 
-  const sportOptions = [
-    'Football', 'Basketball', 'Tennis', 'Soccer', 'Baseball', 
-    'Volleyball', 'Swimming', 'Running', 'Cycling', 'Golf',
-    'Hockey', 'Cricket', 'Rugby', 'Badminton', 'Table Tennis'
-  ];
+  const sportOptions = isESports
+    ? [
+        'Valorant', 'BGMI', 'EAFC', 'NBA', 'Other Online Games'
+      ]
+    : [
+        'Football', 'Basketball', 'Tennis', 'Soccer', 'Baseball', 
+        'Volleyball', 'Swimming', 'Running', 'Cycling', 'Golf',
+        'Hockey', 'Cricket', 'Rugby', 'Badminton', 'Table Tennis'
+      ];
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    if (e.target.name === 'isESports') {
+      setIsESports(e.target.checked);
+    } else {
+      setFormData({
+        ...formData,
+        [e.target.name]: e.target.value
+      });
+    }
   };
 
   const handleLocationSelect = (selectedLocation) => {
@@ -82,17 +91,35 @@ const CreatePost = () => {
           <div className="create-post__row">
             <div className="create-post__field">
               <label>Sport *</label>
-              <select
-                name="sport"
-                value={formData.sport}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Select a sport</option>
-                {sportOptions.map(sport => (
-                  <option key={sport} value={sport}>{sport}</option>
-                ))}
-              </select>
+              <div className="create-post__input-with-icon">
+                <FaGamepad className="create-post__input-icon" />
+                <select
+                  name="sport"
+                  value={formData.sport}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select a sport...</option>
+                  {sportOptions.map((sport) => (
+                    <option key={sport} value={sport}>
+                      {sport}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="create-post__field">
+              <label>Is E-Sport?</label>
+              <div className="create-post__input-with-icon">
+                <FaGamepad className="create-post__input-icon" />
+                <input
+                  type="checkbox"
+                  name="isESports"
+                  checked={isESports}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
 
             <div className="create-post__field">
