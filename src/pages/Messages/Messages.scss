@@ -242,23 +242,32 @@
   &__conversation {
     display: flex;
     align-items: center;
-    padding: 12px 20px;
+    padding: 14px 20px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
     position: relative;
+    border: 1px solid var(--border-primary);
+    border-radius: 12px;
+    margin: 4px 0;
+    background-color: var(--background-secondary);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
     &:hover {
       background-color: var(--background-hover);
+      border-color: var(--primary);
+      transform: translateX(4px);
     }
 
     &--active {
       background-color: var(--background-tertiary);
-      border-right: 3px solid var(--primary);
+      border-color: var(--primary);
+      transform: translateX(4px);
     }
 
     &--unread {
       background-color: rgba(255, 107, 53, 0.1);
-      border-left: 3px solid var(--primary);
+      border-color: var(--primary);
+      transform: translateX(4px);
     }
   }
 
@@ -273,16 +282,19 @@
   }
 
   &__avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--secondary), var(--accent));
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--text-primary);
     font-weight: 600;
     flex-shrink: 0;
+    margin-right: 14px;
+    border: 2px solid var(--background-secondary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 
     &--group {
       background: linear-gradient(135deg, var(--secondary), var(--accent));
@@ -292,22 +304,25 @@
   &__conversation-info {
     flex: 1;
     min-width: 0;
+    padding: 8px 0;
 
     h4 {
       margin: 0 0 4px 0;
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 600;
       color: var(--text-primary);
       transition: color 0.2s ease;
+      line-height: 1.4;
     }
 
     p {
       margin: 0;
-      font-size: 12px;
+      font-size: 13px;
       color: var(--text-secondary);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      line-height: 1.4;
     }
   }
 
@@ -326,10 +341,11 @@
     align-items: flex-end;
     gap: 4px;
     margin-left: 8px;
+    padding: 8px 0;
   }
 
   &__conversation-time {
-    font-size: 10px;
+    font-size: 11px;
     color: var(--text-tertiary);
     flex-shrink: 0;
   }
@@ -337,24 +353,35 @@
   &__unread-badge {
     background-color: var(--primary);
     color: var(--text-primary);
-    font-size: 10px;
-    padding: 2px 6px;
-    border-radius: 10px;
-    font-weight: 600;
-    min-width: 16px;
-    height: 16px;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 15px;
+    min-width: 20px;
+    height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-weight: 600;
+    margin-left: auto;
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
   &__member-count {
-    background-color: var(--text-secondary);
-    color: var(--text-primary);
-    font-size: 10px;
+    background-color: var(--background-tertiary);
+    color: var(--text-secondary);
+    font-size: 11px;
     padding: 2px 6px;
-    border-radius: 10px;
-    font-weight: 600;
+    border-radius: 12px;
+    min-width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
     margin-left: 8px;
   }
 

@@ -19,15 +19,23 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (user) {
-      const newSocket = io('http://localhost:5000');
+      const newSocket = io('http://localhost:5001');
       
       newSocket.on('connect', () => {
         console.log('Connected to server');
         newSocket.emit('join', user.id);
       });
 
+      newSocket.on('connect_error', (err) => {
+        console.error('Socket connection error:', err);
+      });
+
       newSocket.on('disconnect', () => {
         console.log('Disconnected from server');
+      });
+
+      newSocket.on('error', (err) => {
+        console.error('Socket error:', err);
       });
 
       setSocket(newSocket);
@@ -39,27 +47,55 @@ export const SocketProvider = ({ children }) => {
   }, [user]);
 
   const sendDirectMessage = (recipientId, content) => {
-    if (socket) {
-      socket.emit('sendDirectMessage', { recipientId, content });
+    if (!socket) {
+      console.error('Socket not connected');
+      return;
     }
+
+    socket.emit('sendDirectMessage', { recipientId, content }, (error) => {
+      if (error) {
+        console.error('Failed to send direct message:', error);
+      }
+    });
   };
 
   const sendGroupMessage = (groupChat, content) => {
-    if (socket) {
-      socket.emit('sendGroupMessage', { groupChat, content });
+    if (!socket) {
+      console.error('Socket not connected');
+      return;
     }
+
+    socket.emit('sendGroupMessage', { groupChat, content }, (error) => {
+      if (error) {
+        console.error('Failed to send group message:', error);
+      }
+    });
   };
 
   const joinGroupChat = (groupChatId) => {
-    if (socket) {
-      socket.emit('joinGroupChat', groupChatId);
+    if (!socket) {
+      console.error('Socket not connected');
+      return;
     }
+
+    socket.emit('joinGroupChat', groupChatId, (error) => {
+      if (error) {
+        console.error('Failed to join group chat:', error);
+      }
+    });
   };
 
   const leaveGroupChat = (groupChatId) => {
-    if (socket) {
-      socket.emit('leaveGroupChat', groupChatId);
+    if (!socket) {
+      console.error('Socket not connected');
+      return;
     }
+
+    socket.emit('leaveGroupChat', groupChatId, (error) => {
+      if (error) {
+        console.error('Failed to leave group chat:', error);
+      }
+    });
   };
 
   const sendDirectTypingIndicator = (recipientId, isTyping) => {

@@ -53,7 +53,7 @@ npm install
 Update `server/.env` with your actual Supabase credentials:
 
 ```env
-PORT=5000
+PORT=5001
 NODE_ENV=development
 
 # Supabase Configuration
@@ -81,7 +81,7 @@ npm run dev
 
 This will start:
 - Frontend on http://localhost:5173
-- Backend on http://localhost:5000
+- Backend on http://localhost:5001
 
 ## Database Schema
 
