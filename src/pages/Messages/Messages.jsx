@@ -167,9 +167,8 @@ const Messages = () => {
   const fetchFollowingUsers = async () => {
     try {
       setLoadingFollowing(true);
-      const response = await axios.get('/users/following');
-      setFollowingUsers(response.data);
-      setFollowingSearchResults(response.data);
+      setFollowingUsers(currentUser?.following || []);
+      setFollowingSearchResults(currentUser?.following || []);
     } catch (error) {
       console.error('Failed to fetch following users:', error);
       setFollowingUsers([]);
