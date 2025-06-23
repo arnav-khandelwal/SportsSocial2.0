@@ -260,8 +260,8 @@
     top: 50%;
     right: 20px;
     transform: translateY(-50%);
-    width: 32px;
-    height: 32px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     background-color: var(--background-tertiary);
     border: 1px solid var(--border-primary);
@@ -269,15 +269,28 @@
     cursor: pointer;
     display: flex;
     align-items: center;
+
     justify-content: center;
     transition: all 0.2s ease;
-    font-size: 12px;
+    font-size: 16px; // Increased font size for better visibility
+    padding: 0; // Remove any padding that might compress the icon
+
+    svg {
+      width: 18px; // Explicitly set width for the icon
+      height: 18px; // Explicitly set height for the icon
+      display: block; // Prevent any layout issues with the icon
+    }
 
     &:hover:not(:disabled) {
       background-color: var(--success);
       color: var(--text-primary);
       border-color: var(--success);
       transform: translateY(-50%) scale(1.1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(-50%) scale(0.95);
     }
 
     &:disabled {

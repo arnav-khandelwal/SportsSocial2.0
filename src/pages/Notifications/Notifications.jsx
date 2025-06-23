@@ -345,6 +345,7 @@ const Notifications = () => {
                     }}
                     disabled={markingIndividual.has(notification.id)}
                     title="Mark as read"
+                    aria-label="Mark notification as read"
                   >
                     <FaCheck />
                   </button>
