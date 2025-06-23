@@ -45,6 +45,15 @@
     }
   }
 
+  &__date-divider{
+    margin: 16px 0;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0.7;
+  }
+
   &__messages {
     flex: 1;
     overflow-y: auto;

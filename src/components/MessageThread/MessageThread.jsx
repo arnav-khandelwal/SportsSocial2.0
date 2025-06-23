@@ -162,53 +162,65 @@ const MessageThread = ({ chatId, chatType, chatName }) => {
     );
   }
 
-  const renderMessage = (message) => (
-    <div
-      key={message.id}
-      className={`message-thread__message ${
-        message.sender_id === user.id
-          ? 'message-thread__message--own'
-          : 'message-thread__message--other'
-      }`}
-    >
-      {message.sender_id !== user.id && (
-        <Link
-          to={`/profile/${message.sender_id}`}
-          className="message-thread__message-avatar-link"
-        >
-          <div className="message-thread__message-avatar">
-            {userProfiles[message.sender_id] ? (
-              <img
-                src={userProfiles[message.sender_id]}
-                alt="User"
-                className="message-thread__message-avatar-img"
-              />
-            ) : (
-              <FaUser />
-            )}
+  const renderMessage = (message, previousMessage) => {
+    const currentDate = new Date(message.created_at).toDateString();
+    const previousDate = previousMessage ? new Date(previousMessage.created_at).toDateString() : null;
+
+    return (
+      <>
+        {currentDate !== previousDate && (
+          <div className="message-thread__date-divider">
+            {currentDate}
           </div>
-        </Link>
-      )}
-      <div className="message-thread__message-content">
-        {message.sender_id !== user.id && message.sender && (
-          <Link
-            to={`/profile/${message.sender_id}`}
-            className="message-thread__message-sender-link"
-          >
-            <div className="message-thread__message-sender">
-              {message.sender.username}
-            </div>
-          </Link>
         )}
-        <div className="message-thread__message-text">
-          {message.content}
+        <div
+          key={message.id}
+          className={`message-thread__message ${
+            message.sender_id === user.id
+              ? 'message-thread__message--own'
+              : 'message-thread__message--other'
+          }`}
+        >
+          {message.sender_id !== user.id && (
+            <Link
+              to={`/profile/${message.sender_id}`}
+              className="message-thread__message-avatar-link"
+            >
+              <div className="message-thread__message-avatar">
+                {userProfiles[message.sender_id] ? (
+                  <img
+                    src={userProfiles[message.sender_id]}
+                    alt="User"
+                    className="message-thread__message-avatar-img"
+                  />
+                ) : (
+                  <FaUser />
+                )}
+              </div>
+            </Link>
+          )}
+          <div className="message-thread__message-content">
+            {message.sender_id !== user.id && message.sender && (
+              <Link
+                to={`/profile/${message.sender_id}`}
+                className="message-thread__message-sender-link"
+              >
+                <div className="message-thread__message-sender">
+                  {message.sender.username}
+                </div>
+              </Link>
+            )}
+            <div className="message-thread__message-text">
+              {message.content}
+            </div>
+            <div className="message-thread__message-time">
+              {formatTime(message.created_at)}
+            </div>
+          </div>
         </div>
-        <div className="message-thread__message-time">
-          {formatTime(message.created_at)}
-        </div>
-      </div>
-    </div>
-  );
+      </>
+    );
+  };
 
   return (
     <div className="message-thread">
@@ -228,7 +240,7 @@ const MessageThread = ({ chatId, chatType, chatName }) => {
             <p>No messages yet. Start the conversation!</p>
           </div>
         ) : (
-          messages.map((message) => renderMessage(message))
+          messages.map((message, index) => renderMessage(message, messages[index - 1]))
         )}
         <div ref={messagesEndRef} />
       </div>

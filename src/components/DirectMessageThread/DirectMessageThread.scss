@@ -51,6 +51,14 @@
     }
   }
 
+  &__date-divider{
+    margin: 0 20px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-align: center;
+    flex-shrink: 0;
+  }
+
   &__info {
     h3 {
       margin: 0 0 4px 0;

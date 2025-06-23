@@ -16,10 +16,14 @@ const Messages = () => {
   const [activeChat, setActiveChat] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState({ direct: [], group: [] });
   const [searchLoading, setSearchLoading] = useState(false);
   const [openedGroupChats, setOpenedGroupChats] = useState(new Set());
-  const [userProfiles, setUserProfiles] = useState({});
+  const [showCreateDirectMessageModal, setShowCreateDirectMessageModal] = useState(false);
+  const [followingUsers, setFollowingUsers] = useState([]);
+  const [followingSearchQuery, setFollowingSearchQuery] = useState('');
+  const [followingSearchResults, setFollowingSearchResults] = useState([]);
+  const [loadingFollowing, setLoadingFollowing] = useState(false);
   const { socket } = useSocket();
 
   useEffect(() => {
@@ -68,11 +72,19 @@ const Messages = () => {
 
   useEffect(() => {
     if (searchQuery.trim()) {
-      searchUsers();
+      filterConversations(searchQuery.trim());
     } else {
-      setSearchResults([]);
+      setSearchResults({ direct: [], group: [] });
     }
   }, [searchQuery]);
+  
+  useEffect(() => {
+    if (followingSearchQuery.trim()) {
+      filterFollowingUsers(followingSearchQuery.trim());
+    } else {
+      setFollowingSearchResults(followingUsers);
+    }
+  }, [followingSearchQuery, followingUsers]);
 
   const loadOpenedGroupChats = () => {
     try {
@@ -127,66 +139,79 @@ const Messages = () => {
       setLoading(false);
     }
   };
-  const fetchUserProfile = async (profileId) => {
-    if (userProfiles[profileId]) return; // Skip if already cached
 
-    try {
-      const response = await axios.get(`/settings/public/${profileId}`);
-      setUserProfiles((prevProfiles) => ({
-        ...prevProfiles,
-        [profileId]: response.data.profile_picture_url,
-      }));
-    } catch (error) {
-      console.error(`Failed to fetch profile for user ${profileId}:`, error);
+  const filterConversations = (query) => {
+    if (!query.trim()) {
+      setSearchResults({ direct: [], group: [] });
+      return;
     }
+
+    const lowerCaseQuery = query.toLowerCase();
+    
+    // Filter direct conversations
+    const filteredDirect = directConversations.filter(conv => 
+      conv.other_user_username?.toLowerCase().includes(lowerCaseQuery)
+    );
+    
+    // Filter group conversations
+    const filteredGroup = groupConversations.filter(group => 
+      group.name?.toLowerCase().includes(lowerCaseQuery)
+    );
+    
+    setSearchResults({
+      direct: filteredDirect,
+      group: filteredGroup
+    });
   };
 
-  const fetchUserProfilesForConversations = async () => {
-    const allUserIds = [
-      ...new Set(
-        directConversations.map((conv) => conv.other_user_id)
-      ),
-    ];
-
-    for (const userId of allUserIds) {
-      await fetchUserProfile(userId);
-    }
-  };
-
-  useEffect(() => {
-    fetchUserProfilesForConversations();
-  }, [directConversations]);
-
-  const searchUsers = async () => {
+  const fetchFollowingUsers = async () => {
     try {
-      setSearchLoading(true);
-      const response = await axios.get('/users/search', {
-        params: { q: searchQuery }
-      });
-      
-      // Filter out current user and get users that can be messaged
-      const filteredUsers = response.data.filter(user => user.id !== currentUser?.id);
-      setSearchResults(filteredUsers);
+      setLoadingFollowing(true);
+      const response = await axios.get('/users/following');
+      setFollowingUsers(response.data);
+      setFollowingSearchResults(response.data);
     } catch (error) {
-      console.error('Search error:', error);
+      console.error('Failed to fetch following users:', error);
+      setFollowingUsers([]);
+      setFollowingSearchResults([]);
     } finally {
-      setSearchLoading(false);
+      setLoadingFollowing(false);
     }
   };
 
-  const startConversationWithUser = (user) => {
+  const filterFollowingUsers = (query) => {
+    const lowerCaseQuery = query.toLowerCase();
+    const filtered = followingUsers.filter(user => 
+      user.username?.toLowerCase().includes(lowerCaseQuery)
+    );
+    setFollowingSearchResults(filtered);
+  };
+
+  const openCreateDirectMessageModal = () => {
+    fetchFollowingUsers();
+    setShowCreateDirectMessageModal(true);
+    setFollowingSearchQuery('');
+  };
+
+  const closeCreateDirectMessageModal = () => {
+    setShowCreateDirectMessageModal(false);
+    setFollowingSearchQuery('');
+  };
+
+  const startNewConversation = (user) => {
     setActiveChat({
       id: user.id,
       type: 'direct',
       user: user
     });
-    setSearchQuery('');
-    setSearchResults([]);
+    closeCreateDirectMessageModal();
+    // Force refresh conversations to ensure the new conversation appears
+    fetchConversations();
   };
 
   const clearSearch = () => {
     setSearchQuery('');
-    setSearchResults([]);
+    setSearchResults({ direct: [], group: [] });
   };
 
   const formatLastMessage = (message) => {
@@ -276,11 +301,7 @@ const Messages = () => {
       onClick={() => handleGroupChatClick(group)}
     >
       <div className="messages__conversation-avatar">
-        {group.profile_picture ? (
-          <img src={group.profile_picture} alt="Group" />
-        ) : (
-          <FaUsers />
-        )}
+        <FaUsers />
       </div>
       <div className="messages__conversation-info">
         <h4 style={{marginLeft:8}}>{group.name}</h4>
@@ -298,67 +319,71 @@ const Messages = () => {
     </div>
   );
 
-  useEffect(() => {
-    const fetchProfilesForDirectMessages = async () => {
-      const userIds = directConversations.map((conv) => conv.other_user_id);
-      for (const userId of userIds) {
-        await fetchUserProfile(userId);
-      }
-    };
-
-    fetchProfilesForDirectMessages();
-  }, [directConversations]);
-
-  const renderDirectMessage = (conv) => (
-    <div
-      key={`direct-${conv.conversation_id}`}
-      className={`messages__conversation ${
-        isActiveDirect(conv.other_user_id)
-          ? 'messages__conversation--active' 
-          : ''
-      } ${shouldShowDirectUnreadBadge(conv) ? 'messages__conversation--unread' : ''}`}
-      onClick={() => setActiveChat({ 
-        id: conv.other_user_id, 
-        type: 'direct', 
-        user: { 
-          id: conv.other_user_id, 
-          username: conv.other_user_username 
-        } 
-      })}
-    >
-      <Link 
-        to={`/profile/${conv.other_user_id}`}
-        className="messages__avatar-link"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="messages__avatar">
-          {userProfiles[conv.other_user_id] ? (
-            <img src={userProfiles[conv.other_user_id]} alt="User" className="messages__avatar__image" />
-          ) : (
-            <FaUser />
-          )}
+  const renderCreateDirectMessageModal = () => {
+    return showCreateDirectMessageModal ? (
+      <div className="modal-overlay">
+        <div className="create-direct-message-modal">
+          <div className="create-direct-message-modal__header">
+            <h3>New Direct Message</h3>
+            <button 
+              onClick={closeCreateDirectMessageModal}
+              className="create-direct-message-modal__close-btn"
+              aria-label="Close modal"
+            >
+              &times;
+            </button>
+          </div>
+          <div className="create-direct-message-modal__content">
+            <div className="create-direct-message-modal__search">
+              <FaSearch className="create-direct-message-modal__search-icon" />
+              <input
+                type="text"
+                placeholder="Search people you follow..."
+                value={followingSearchQuery}
+                onChange={(e) => setFollowingSearchQuery(e.target.value)}
+                className="create-direct-message-modal__search-input"
+              />
+            </div>
+            
+            {loadingFollowing ? (
+              <div className="create-direct-message-modal__loading">
+                <div className="loader"></div>
+                <p>Loading your following list...</p>
+              </div>
+            ) : (
+              <div className="create-direct-message-modal__users">
+                {followingSearchResults && followingSearchResults.length > 0 ? (
+                  followingSearchResults.map(user => (
+                    <div
+                      key={user.id}
+                      className="create-direct-message-modal__user"
+                      onClick={() => startNewConversation(user)}
+                    >
+                      <div className="create-direct-message-modal__user-avatar">
+                        <FaUser />
+                      </div>
+                      <div className="create-direct-message-modal__user-info">
+                        <h4>{user.username}</h4>
+                        {user.bio && <p>{user.bio}</p>}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="create-direct-message-modal__empty">
+                    <p>
+                      {followingUsers.length === 0
+                        ? "You are not following anyone yet"
+                        : "No users found with that name"}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
-      </Link>
-      <div className="messages__conversation-info">
-        <Link 
-          to={`/profile/${conv.other_user_id}`}
-          className="messages__username-link"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <h4>{conv.other_user_username || 'Unknown User'}</h4>
-        </Link>
-        <p>{formatLastMessage(conv.last_message_content)}</p>
       </div>
-      <div className="messages__conversation-meta">
-        <div className="messages__conversation-time">
-          {formatMessageTime(conv.last_message_time)}
-        </div>
-        {shouldShowDirectUnreadBadge(conv) && (
-          <span className="messages__unread-badge">{conv.unread_count}</span>
-        )}
-      </div>
-    </div>
-  );
+    ) : null;
+  };
 
   if (loading) {
     return (
@@ -377,6 +402,13 @@ const Messages = () => {
         <div className="messages__header">
           <h2>Messages</h2>
           <div className="messages__header-actions">
+            <button 
+              className="messages__new-message-btn" 
+              onClick={openCreateDirectMessageModal}
+              title="New Direct Message"
+            >
+              <FaPlus />
+            </button>
             {getTotalUnreadCount() > 0 && (
               <span className="messages__total-unread">{getTotalUnreadCount()}</span>
             )}
@@ -388,7 +420,7 @@ const Messages = () => {
             <FaSearch className="messages__search-icon" />
             <input
               type="text"
-              placeholder="Search users to message..."
+              placeholder="Search your conversations..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="messages__search-input"
@@ -403,39 +435,65 @@ const Messages = () => {
             )}
           </div>
           
-          {searchLoading && (
-            <div className="messages__search-loading">
-              <div className="loader"></div>
-            </div>
-          )}
-          
-          {searchResults.length > 0 && (
+          {searchQuery && (
             <div className="messages__search-results">
-              {searchResults.map((user) => (
-                <div
-                  key={user.id}
-                  className="messages__search-result"
-                  onClick={() => startConversationWithUser(user)}
-                >
-                  <div className="messages__search-result-avatar">
-                    {userProfiles[user.id] ? (
-                      <img src={userProfiles[user.id]} alt="User" className='messages__search-result-avatar__image' />
-                    ) : (
-                      <FaUser />
-                    )}
-                  </div>
-                  <div className="messages__search-result-info">
-                    <h4>{user.username}</h4>
-                    {user.bio && <p>{user.bio}</p>}
-                  </div>
+              {searchResults.direct && searchResults.direct.length > 0 && (
+                <div className="messages__search-section">
+                  <h4 className="messages__search-section-title">Direct Messages</h4>
+                  {searchResults.direct.map((conv) => (
+                    <div
+                      key={`direct-search-${conv.conversation_id || conv.other_user_id}`}
+                      className="messages__search-result"
+                      onClick={() => setActiveChat({ 
+                        id: conv.other_user_id, 
+                        type: 'direct', 
+                        user: { 
+                          id: conv.other_user_id, 
+                          username: conv.other_user_username 
+                        } 
+                      })}
+                    >
+                      <div className="messages__search-result-avatar">
+                        <FaUser />
+                      </div>
+                      <div className="messages__search-result-info">
+                        <h4>{conv.other_user_username}</h4>
+                        <p>{formatLastMessage(conv.last_message_content)}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          )}
-          
-          {searchQuery && searchResults.length === 0 && !searchLoading && (
-            <div className="messages__search-empty">
-              <p>No users found</p>
+              )}
+              
+              {searchResults.group && searchResults.group.length > 0 && (
+                <div className="messages__search-section">
+                  <h4 className="messages__search-section-title">Group Chats</h4>
+                  {searchResults.group.map((group) => (
+                    <div
+                      key={`group-search-${group.id}`}
+                      className="messages__search-result"
+                      onClick={() => handleGroupChatClick(group)}
+                    >
+                      <div className="messages__search-result-avatar">
+                        <FaUsers />
+                      </div>
+                      <div className="messages__search-result-info">
+                        <h4>{group.name}</h4>
+                        {group.last_message && (
+                          <p>{formatLastMessage(group.last_message.content)}</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {searchQuery && (!searchResults.direct || searchResults.direct.length === 0) && 
+               (!searchResults.group || searchResults.group.length === 0) && (
+                <div className="messages__search-empty">
+                  <p>No conversations found</p>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -448,7 +506,52 @@ const Messages = () => {
             {directConversations.length === 0 ? (
               <p className="messages__empty">No direct messages</p>
             ) : (
-              directConversations.map((conv) => renderDirectMessage(conv))
+              directConversations.map((conv) => (
+                <div
+                  key={`direct-${conv.conversation_id}`}
+                  className={`messages__conversation ${
+                    isActiveDirect(conv.other_user_id)
+                      ? 'messages__conversation--active' 
+                      : ''
+                  } ${shouldShowDirectUnreadBadge(conv) ? 'messages__conversation--unread' : ''}`}
+                  onClick={() => setActiveChat({ 
+                    id: conv.other_user_id, 
+                    type: 'direct', 
+                    user: { 
+                      id: conv.other_user_id, 
+                      username: conv.other_user_username 
+                    } 
+                  })}
+                >
+                  <Link 
+                    to={`/profile/${conv.other_user_id}`}
+                    className="messages__avatar-link"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="messages__avatar">
+                      <FaUser />
+                    </div>
+                  </Link>
+                  <div className="messages__conversation-info">
+                    <Link 
+                      to={`/profile/${conv.other_user_id}`}
+                      className="messages__username-link"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <h4>{conv.other_user_username || 'Unknown User'}</h4>
+                    </Link>
+                    <p>{formatLastMessage(conv.last_message_content)}</p>
+                  </div>
+                  <div className="messages__conversation-meta">
+                    <div className="messages__conversation-time">
+                      {formatMessageTime(conv.last_message_time)}
+                    </div>
+                    {shouldShowDirectUnreadBadge(conv) && (
+                      <span className="messages__unread-badge">{conv.unread_count}</span>
+                    )}
+                  </div>
+                </div>
+              ))
             )}
           </div>
 
@@ -487,6 +590,8 @@ const Messages = () => {
           </div>
         )}
       </div>
+
+      {renderCreateDirectMessageModal()}
     </div>
   );
 };

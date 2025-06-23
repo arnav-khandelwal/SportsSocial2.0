@@ -170,44 +170,56 @@ const DirectMessageThread = ({ otherUserId, otherUserName }) => {
     fetchProfilesForMessages();
   }, [messages]);
 
-  const renderMessage = (message) => (
-    <div
-      key={message.id}
-      className={`direct-message-thread__message ${
-        message.sender_id === user.id
-          ? 'direct-message-thread__message--own'
-          : 'direct-message-thread__message--other'
-      }`}
-    >
-      <div className="direct-message-thread__message-content">
-        {message.sender_id !== user.id && (
-          <Link
-            to={`/profile/${message.sender_id}`}
-            className="direct-message-thread__message-sender-link"
-          >
-            <div className="direct-message-thread__message-sender">
-              {message.sender_username}
-            </div>
-          </Link>
+  const renderMessage = (message, previousMessage) => {
+    const currentDate = new Date(message.created_at).toDateString();
+    const previousDate = previousMessage ? new Date(previousMessage.created_at).toDateString() : null;
+
+    return (
+      <>
+        {currentDate !== previousDate && (
+          <div className="direct-message-thread__date-divider">
+            {currentDate}
+          </div>
         )}
-        <div className="direct-message-thread__message-text">
-          {message.content}
+        <div
+          key={message.id}
+          className={`direct-message-thread__message ${
+            message.sender_id === user.id
+              ? 'direct-message-thread__message--own'
+              : 'direct-message-thread__message--other'
+          }`}
+        >
+          <div className="direct-message-thread__message-content">
+            {message.sender_id !== user.id && (
+              <Link
+                to={`/profile/${message.sender_id}`}
+                className="direct-message-thread__message-sender-link"
+              >
+                <div className="direct-message-thread__message-sender">
+                  {message.sender_username}
+                </div>
+              </Link>
+            )}
+            <div className="direct-message-thread__message-text">
+              {message.content}
+            </div>
+            <div className="direct-message-thread__message-time">
+              {formatTime(message.created_at)}
+              {message.sender_id === user.id && (
+                <span
+                  className={`direct-message-thread__read-status ${
+                    message.is_read ? 'read' : 'unread'
+                  }`}
+                >
+                  {message.is_read ? ' ✓✓' : ' ✓'}
+                </span>
+              )}
+            </div>
+          </div>
         </div>
-        <div className="direct-message-thread__message-time">
-          {formatTime(message.created_at)}
-          {message.sender_id === user.id && (
-            <span
-              className={`direct-message-thread__read-status ${
-                message.is_read ? 'read' : 'unread'
-              }`}
-            >
-              {message.is_read ? ' ✓✓' : ' ✓'}
-            </span>
-          )}
-        </div>
-      </div>
-    </div>
-  );
+      </>
+    );
+  };
 
   if (loading) {
     return (
@@ -255,7 +267,7 @@ const DirectMessageThread = ({ otherUserId, otherUserName }) => {
             <p>No messages yet. Start the conversation!</p>
           </div>
         ) : (
-          messages.map((message) => renderMessage(message))
+          messages.map((message, index) => renderMessage(message, messages[index - 1]))
         )}
         <div ref={messagesEndRef} />
       </div>
