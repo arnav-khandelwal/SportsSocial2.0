@@ -79,6 +79,9 @@ const Profile = () => {
       if (!userId || userId === currentUser?.id) {
         fetchSettings();
         fetchSkills();
+      } else {
+        // For other users, fetch their settings too
+        fetchOtherUserSettings(profileId);
       }
     }
   }, [userId, currentUser]);
@@ -108,6 +111,19 @@ const Profile = () => {
       setSettings(response.data || {});
     } catch (error) {
       console.error('Failed to fetch settings:', error);
+    }
+  };
+
+  const fetchOtherUserSettings = async (profileId) => {
+    try {
+      // For other users, we can only get their public settings
+      // This would need to be implemented on the backend to return only public data
+      const response = await axios.get(`/settings/public/${profileId}`);
+      setSettings(response.data || {});
+    } catch (error) {
+      console.error('Failed to fetch other user settings:', error);
+      // If the endpoint doesn't exist, set empty settings
+      setSettings({});
     }
   };
 
