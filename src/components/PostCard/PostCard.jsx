@@ -6,6 +6,33 @@ import { formatRelativeTime, formatDateTime } from '../../utils/dateUtils';
 import axios from 'axios';
 import './PostCard.scss';
 
+const getSportIcon = (sport) => {
+  const sportIcons = {
+    'Football': '⚽',
+    'Basketball': '🏀',
+    'Tennis': '🎾',
+    'Soccer': '⚽',
+    'Baseball': '⚾',
+    'Volleyball': '🏐',
+    'Swimming': '🏊‍♂️',
+    'Running': '🏃‍♂️',
+    'Cycling': '🚴‍♂️',
+    'Golf': '⛳',
+    'Hockey': '🏒',
+    'Cricket': '🏏',
+    'Rugby': '🏉',
+    'Badminton': '🏸',
+    'Table Tennis': '🏓',
+    'Other': '🎲',
+    'Valorant': '🎮',
+    'BGMI': '🎮',
+    'EAFC': '🎮',
+    'NBA': '🎮',
+    'Other Online Games': '🎮'
+  };
+  return sportIcons[sport] || '🎮'; // Default to game controller for unknown sports
+};
+
 const PostCard = ({ post, onInterest }) => {
   const { user } = useAuth();
   const [isInterested, setIsInterested] = useState(false);
@@ -78,7 +105,7 @@ const PostCard = ({ post, onInterest }) => {
           </div>
         </div>
         <div className="post-card__sport-badge">
-          {post.sport}
+          {getSportIcon(post.sport)} {post.sport}
         </div>
       </div>
 

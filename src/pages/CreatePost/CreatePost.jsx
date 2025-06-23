@@ -1,35 +1,169 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaCalendarAlt, FaUsers } from 'react-icons/fa';
+import { FaCalendarAlt, FaUsers, FaGamepad, FaTimes } from 'react-icons/fa';
 import axios from 'axios';
 import LocationPicker from '../../components/LocationPicker/LocationPicker';
 import './CreatePost.scss';
+
+const SportDropdown = ({ sport, isESports, selectedSport, onSelect }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const sportOptions = isESports
+    ? [
+        'Valorant', 'BGMI', 'EAFC', 'NBA', 'Other Online Games'
+      ]
+    : [
+        { name: 'Football', icon: '⚽' },
+        { name: 'Basketball', icon: '🏀' },
+        { name: 'Tennis', icon: '🎾' },
+        { name: 'Soccer', icon: '⚽' },
+        { name: 'Baseball', icon: '⚾' },
+        { name: 'Volleyball', icon: '🏐' },
+        { name: 'Swimming', icon: '🏊‍♂️' },
+        { name: 'Running', icon: '🏃‍♂️' },
+        { name: 'Cycling', icon: '🚴‍♂️' },
+        { name: 'Golf', icon: '⛳' },
+        { name: 'Hockey', icon: '🏒' },
+        { name: 'Cricket', icon: '🏏' },
+        { name: 'Rugby', icon: '🏉' },
+        { name: 'Badminton', icon: '🏸' },
+        { name: 'Table Tennis', icon: '🏓' },
+        {name: 'Rugby', icon: '🏉'},
+        {name: 'Other', icon: '🎲'},
+        
+      ];
+
+  return (
+    <div className="sport-dropdown">
+      <button
+        className="sport-dropdown__button"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {selectedSport ? 
+          (isESports ? selectedSport : sportOptions.find(s => s.name === selectedSport)?.icon + ' ' + selectedSport) : 
+          'Select Sport'}
+      </button>
+      {isOpen && (
+        <div className="sport-dropdown__options">
+          {sportOptions.map((sport, index) => (
+            <button
+              key={index}
+              className="sport-dropdown__option"
+              onClick={() => {
+                onSelect(sport.name);
+                setIsOpen(false);
+              }}
+            >
+              {isESports ? sport : sport.icon} {sport.name}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const TagInput = ({ tags, onAddTag, onRemoveTag }) => {
+  const [inputValue, setInputValue] = useState('');
+
+  const handleInputChange = (e) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === ' ' && inputValue.trim()) {
+      e.preventDefault();
+      const newTag = inputValue.trim();
+      if (!tags.includes(newTag)) {
+        onAddTag(newTag);
+        setInputValue('');
+      }
+    }
+  };
+
+  const handleBlur = () => {
+    if (inputValue.trim()) {
+      const newTag = inputValue.trim();
+      if (!tags.includes(newTag)) {
+        onAddTag(newTag);
+      }
+      setInputValue('');
+    }
+  };
+
+  return (
+    <div className="create-post__tags-container">
+      <div className="create-post__tags-list">
+        {tags.map((tag, index) => (
+          <span key={index} className="create-post__tag">
+            {tag}
+            <button
+              className="create-post__tag-remove"
+              onClick={() => onRemoveTag(tag)}
+              title="Remove tag"
+            >
+              <FaTimes />
+            </button>
+          </span>
+        ))}
+        <input
+          type="text"
+          value={inputValue}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          onBlur={handleBlur}
+          placeholder="Type tags (press space to add)"
+          className="create-post__tag-input"
+        />
+      </div>
+    </div>
+  );
+};
 
 const CreatePost = () => {
   const [formData, setFormData] = useState({
     sport: '',
     heading: '',
     description: '',
-    tags: '',
+    tags: [],
     eventTime: '',
     playersNeeded: 1
   });
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isESports, setIsESports] = useState(false);
   const navigate = useNavigate();
 
-  const sportOptions = [
-    'Football', 'Basketball', 'Tennis', 'Soccer', 'Baseball', 
-    'Volleyball', 'Swimming', 'Running', 'Cycling', 'Golf',
-    'Hockey', 'Cricket', 'Rugby', 'Badminton', 'Table Tennis'
-  ];
-
-  const handleChange = (e) => {
+  const handleAddTag = (tag) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      tags: [...formData.tags, tag]
     });
+  };
+
+  const handleRemoveTag = (tagToRemove) => {
+    setFormData({
+      ...formData,
+      tags: formData.tags.filter(tag => tag !== tagToRemove)
+    });
+  };
+
+  const handleChange = (e) => {
+    if (e.target.name === 'isESports') {
+      setIsESports(e.target.checked);
+    } else if (e.target.name === 'tags') {
+      // Handle tags separately
+      const newTags = e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag);
+      setFormData({
+        ...formData,
+        tags: newTags
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [e.target.name]: e.target.value
+      });
+    }
   };
 
   const handleLocationSelect = (selectedLocation) => {
@@ -55,7 +189,7 @@ const CreatePost = () => {
           coordinates: location.coordinates
         },
         locationName: location.name,
-        tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+        tags: formData.tags,
         playersNeeded: parseInt(formData.playersNeeded)
       };
 
@@ -82,17 +216,30 @@ const CreatePost = () => {
           <div className="create-post__row">
             <div className="create-post__field">
               <label>Sport *</label>
-              <select
-                name="sport"
-                value={formData.sport}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Select a sport</option>
-                {sportOptions.map(sport => (
-                  <option key={sport} value={sport}>{sport}</option>
-                ))}
-              </select>
+              <div className="create-post__input-with-icon">
+                <FaGamepad className="create-post__input-icon" />
+                <SportDropdown
+                  sport={formData.sport}
+                  isESports={isESports}
+                  selectedSport={formData.sport}
+                  onSelect={(sport) => {
+                    setFormData({ ...formData, sport });
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="create-post__field">
+              <label>Is E-Sport?</label>
+              <div className="create-post__input-with-icon">
+                <FaGamepad className="create-post__input-icon" />
+                <input
+                  type="checkbox"
+                  name="isESports"
+                  checked={isESports}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
 
             <div className="create-post__field">
@@ -139,13 +286,11 @@ const CreatePost = () => {
           </div>
 
           <div className="create-post__field">
-            <label>Tags</label>
-            <input
-              type="text"
-              name="tags"
-              value={formData.tags}
-              onChange={handleChange}
-              placeholder="e.g., beginner, competitive, fun (comma separated)"
+            <label>Tags (Optional)</label>
+            <TagInput
+              tags={formData.tags}
+              onAddTag={handleAddTag}
+              onRemoveTag={handleRemoveTag}
             />
           </div>
 
