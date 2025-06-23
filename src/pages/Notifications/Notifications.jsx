@@ -191,6 +191,11 @@ const Notifications = () => {
         return `/past-posts`;
       case 'nearby_post':
         return `/`;
+      case 'message':
+        // If conversation_id is provided in data, navigate directly to that conversation
+        return data && data.conversation_id 
+          ? `/messages?conversation=${data.conversation_id}` 
+          : `/messages`;
       default:
         return '#';
     }
@@ -203,6 +208,7 @@ const Notifications = () => {
       case 'follow':
       case 'interest':
       case 'nearby_post':
+      case 'message':
         return notifications.filter(n => n.type === filter);
       default:
         return notifications;
@@ -278,6 +284,12 @@ const Notifications = () => {
           onClick={() => setFilter('interest')}
         >
           Interests ({notifications.filter(n => n.type === 'interest').length})
+        </button>
+        <button
+          className={`notifications__filter ${filter === 'message' ? 'notifications__filter--active' : ''}`}
+          onClick={() => setFilter('message')}
+        >
+          Messages ({notifications.filter(n => n.type === 'message').length})
         </button>
         <button
           className={`notifications__filter ${filter === 'nearby_post' ? 'notifications__filter--active' : ''}`}
