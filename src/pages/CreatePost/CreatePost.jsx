@@ -5,6 +5,63 @@ import axios from 'axios';
 import LocationPicker from '../../components/LocationPicker/LocationPicker';
 import './CreatePost.scss';
 
+const SportDropdown = ({ sport, isESports, selectedSport, onSelect }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const sportOptions = isESports
+    ? [
+        'Valorant', 'BGMI', 'EAFC', 'NBA', 'Other Online Games'
+      ]
+    : [
+        { name: 'Football', icon: '⚽' },
+        { name: 'Basketball', icon: '🏀' },
+        { name: 'Tennis', icon: '🎾' },
+        { name: 'Soccer', icon: '⚽' },
+        { name: 'Baseball', icon: '⚾' },
+        { name: 'Volleyball', icon: '🏐' },
+        { name: 'Swimming', icon: '🏊‍♂️' },
+        { name: 'Running', icon: '🏃‍♂️' },
+        { name: 'Cycling', icon: '🚴‍♂️' },
+        { name: 'Golf', icon: '⛳' },
+        { name: 'Hockey', icon: '🏒' },
+        { name: 'Cricket', icon: '🏏' },
+        { name: 'Rugby', icon: '🏉' },
+        { name: 'Badminton', icon: '🏸' },
+        { name: 'Table Tennis', icon: '🏓' },
+        {name: 'Rugby', icon: '🏉'},
+        {name: 'Other', icon: '🎲'},
+        
+      ];
+
+  return (
+    <div className="sport-dropdown">
+      <button
+        className="sport-dropdown__button"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {selectedSport ? 
+          (isESports ? selectedSport : sportOptions.find(s => s.name === selectedSport)?.icon + ' ' + selectedSport) : 
+          'Select Sport'}
+      </button>
+      {isOpen && (
+        <div className="sport-dropdown__options">
+          {sportOptions.map((sport, index) => (
+            <button
+              key={index}
+              className="sport-dropdown__option"
+              onClick={() => {
+                onSelect(sport.name);
+                setIsOpen(false);
+              }}
+            >
+              {isESports ? sport : sport.icon} {sport.name}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const CreatePost = () => {
   const [formData, setFormData] = useState({
     sport: '',
@@ -19,16 +76,6 @@ const CreatePost = () => {
   const [error, setError] = useState('');
   const [isESports, setIsESports] = useState(false);
   const navigate = useNavigate();
-
-  const sportOptions = isESports
-    ? [
-        'Valorant', 'BGMI', 'EAFC', 'NBA', 'Other Online Games'
-      ]
-    : [
-        'Football', 'Basketball', 'Tennis', 'Soccer', 'Baseball', 
-        'Volleyball', 'Swimming', 'Running', 'Cycling', 'Golf',
-        'Hockey', 'Cricket', 'Rugby', 'Badminton', 'Table Tennis'
-      ];
 
   const handleChange = (e) => {
     if (e.target.name === 'isESports') {
@@ -93,19 +140,14 @@ const CreatePost = () => {
               <label>Sport *</label>
               <div className="create-post__input-with-icon">
                 <FaGamepad className="create-post__input-icon" />
-                <select
-                  name="sport"
-                  value={formData.sport}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Select a sport...</option>
-                  {sportOptions.map((sport) => (
-                    <option key={sport} value={sport}>
-                      {sport}
-                    </option>
-                  ))}
-                </select>
+                <SportDropdown
+                  sport={formData.sport}
+                  isESports={isESports}
+                  selectedSport={formData.sport}
+                  onSelect={(sport) => {
+                    setFormData({ ...formData, sport });
+                  }}
+                />
               </div>
             </div>
 

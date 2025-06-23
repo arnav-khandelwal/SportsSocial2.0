@@ -3,19 +3,64 @@ import { FaFilter, FaMapMarkerAlt, FaTimes } from 'react-icons/fa';
 import LocationPicker from '../LocationPicker/LocationPicker';
 import './PostFilters.scss';
 
-const PostFilters = ({ filters, onFilterChange }) => {
-  const [showFilters, setShowFilters] = useState(true);
-  const [localFilters, setLocalFilters] = useState(filters);
-  const [isESports, setIsESports] = useState(false);
-
+const SportDropdown = ({ sport, isESports, selectedSport, onSelect }) => {
+  const [isOpen, setIsOpen] = useState(false);
   const sportOptions = isESports
     ? [
         'Valorant', 'BGMI', 'EAFC', 'NBA', 'Other Online Games'
       ]
     : [
-        'Football', 'Basketball', 'Tennis', 'Soccer', 'Baseball', 
-        'Volleyball', 'Swimming', 'Running', 'Cycling', 'Golf'
+        { name: 'Football', icon: '⚽' },
+        { name: 'Basketball', icon: '🏀' },
+        { name: 'Tennis', icon: '🎾' },
+        { name: 'Soccer', icon: '⚽' },
+        { name: 'Baseball', icon: '⚾' },
+        { name: 'Volleyball', icon: '🏐' },
+        { name: 'Swimming', icon: '🏊‍♂️' },
+        { name: 'Running', icon: '🏃‍♂️' },
+        { name: 'Cycling', icon: '🚴‍♂️' },
+        { name: 'Golf', icon: '⛳' },
+        { name: 'Hockey', icon: '🏒' },
+        { name: 'Cricket', icon: '🏏' },
+        { name: 'Rugby', icon: '🏉' },
+        { name: 'Badminton', icon: '🏸' },
+        { name: 'Table Tennis', icon: '🏓' }
       ];
+
+  return (
+    <div className="sport-dropdown">
+      <button
+        className="sport-dropdown__button"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {selectedSport ? 
+          (isESports ? selectedSport : sportOptions.find(s => s.name === selectedSport)?.icon + ' ' + selectedSport) : 
+          'Select Sport'}
+      </button>
+      {isOpen && (
+        <div className="sport-dropdown__options">
+          {sportOptions.map((sport, index) => (
+            <button
+              key={index}
+              className="sport-dropdown__option"
+              onClick={() => {
+                onSelect(sport.name);
+                setIsOpen(false);
+              }}
+            >
+              {isESports ? sport : sport.icon} {sport.name}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const PostFilters = ({ filters, onFilterChange }) => {
+  const [showFilters, setShowFilters] = useState(true);
+  const [localFilters, setLocalFilters] = useState(filters);
+  const [isESports, setIsESports] = useState(false);
 
   const radiusOptions = [
     { value: 1000, label: '1km' },
@@ -96,19 +141,14 @@ const PostFilters = ({ filters, onFilterChange }) => {
           <div className="post-filters__section">
             <h3>Sport</h3>
             <div className="post-filters__field">
-              <select
-                name="sport"
-                value={localFilters.sport}
-                onChange={handleFilterChange}
-                className="post-filters__select"
-              >
-                <option value="">All Sports</option>
-                {sportOptions.map((sport) => (
-                  <option key={sport} value={sport}>
-                    {sport}
-                  </option>
-                ))}
-              </select>
+              <SportDropdown
+                sport={localFilters.sport}
+                isESports={isESports}
+                selectedSport={localFilters.sport}
+                onSelect={(sport) => {
+                  setLocalFilters({ ...localFilters, sport });
+                }}
+              />
             </div>
 
             <div className="post-filters__field">
