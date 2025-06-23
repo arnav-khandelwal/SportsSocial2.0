@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaCalendarAlt, FaUsers, FaGamepad } from 'react-icons/fa';
+import { FaCalendarAlt, FaUsers, FaGamepad, FaTimes } from 'react-icons/fa';
 import axios from 'axios';
 import LocationPicker from '../../components/LocationPicker/LocationPicker';
 import './CreatePost.scss';
@@ -62,12 +62,69 @@ const SportDropdown = ({ sport, isESports, selectedSport, onSelect }) => {
   );
 };
 
+const TagInput = ({ tags, onAddTag, onRemoveTag }) => {
+  const [inputValue, setInputValue] = useState('');
+
+  const handleInputChange = (e) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === ' ' && inputValue.trim()) {
+      e.preventDefault();
+      const newTag = inputValue.trim();
+      if (!tags.includes(newTag)) {
+        onAddTag(newTag);
+        setInputValue('');
+      }
+    }
+  };
+
+  const handleBlur = () => {
+    if (inputValue.trim()) {
+      const newTag = inputValue.trim();
+      if (!tags.includes(newTag)) {
+        onAddTag(newTag);
+      }
+      setInputValue('');
+    }
+  };
+
+  return (
+    <div className="create-post__tags-container">
+      <div className="create-post__tags-list">
+        {tags.map((tag, index) => (
+          <span key={index} className="create-post__tag">
+            {tag}
+            <button
+              className="create-post__tag-remove"
+              onClick={() => onRemoveTag(tag)}
+              title="Remove tag"
+            >
+              <FaTimes />
+            </button>
+          </span>
+        ))}
+        <input
+          type="text"
+          value={inputValue}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          onBlur={handleBlur}
+          placeholder="Type tags (press space to add)"
+          className="create-post__tag-input"
+        />
+      </div>
+    </div>
+  );
+};
+
 const CreatePost = () => {
   const [formData, setFormData] = useState({
     sport: '',
     heading: '',
     description: '',
-    tags: '',
+    tags: [],
     eventTime: '',
     playersNeeded: 1
   });
@@ -77,9 +134,30 @@ const CreatePost = () => {
   const [isESports, setIsESports] = useState(false);
   const navigate = useNavigate();
 
+  const handleAddTag = (tag) => {
+    setFormData({
+      ...formData,
+      tags: [...formData.tags, tag]
+    });
+  };
+
+  const handleRemoveTag = (tagToRemove) => {
+    setFormData({
+      ...formData,
+      tags: formData.tags.filter(tag => tag !== tagToRemove)
+    });
+  };
+
   const handleChange = (e) => {
     if (e.target.name === 'isESports') {
       setIsESports(e.target.checked);
+    } else if (e.target.name === 'tags') {
+      // Handle tags separately
+      const newTags = e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag);
+      setFormData({
+        ...formData,
+        tags: newTags
+      });
     } else {
       setFormData({
         ...formData,
@@ -111,7 +189,7 @@ const CreatePost = () => {
           coordinates: location.coordinates
         },
         locationName: location.name,
-        tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+        tags: formData.tags,
         playersNeeded: parseInt(formData.playersNeeded)
       };
 
@@ -208,13 +286,11 @@ const CreatePost = () => {
           </div>
 
           <div className="create-post__field">
-            <label>Tags</label>
-            <input
-              type="text"
-              name="tags"
-              value={formData.tags}
-              onChange={handleChange}
-              placeholder="e.g., beginner, competitive, fun (comma separated)"
+            <label>Tags (Optional)</label>
+            <TagInput
+              tags={formData.tags}
+              onAddTag={handleAddTag}
+              onRemoveTag={handleRemoveTag}
             />
           </div>
 

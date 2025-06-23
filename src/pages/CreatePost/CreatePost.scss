@@ -128,6 +128,64 @@
     }
   }
 
+  &__tags-container {
+    position: relative;
+    width: 100%;
+    background: #000000;
+    padding: 8px;
+    border-radius: 4px;
+  }
+
+  &__tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0;
+    margin: 0;
+  }
+
+  &__tag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    background: #e9ecef;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: #495057;
+  }
+
+  &__tag-remove {
+    background: none;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+    padding: 0;
+    font-size: 0.8rem;
+  
+    &:hover {
+      color: #c82333;
+    }
+  }
+
+  &__tag-input {
+    flex: 1;
+    padding: 4px 8px;
+    border: none;
+    font-size: 0.9rem;
+    margin-left: 8px;
+    background: #f8f9fa;
+    color: #495057;
+    
+    &:focus {
+      outline: none;
+    }
+    
+    &::placeholder {
+      color: #6c757d;
+    }
+  }
+
   &__actions {
     display: flex;
     gap: 16px;
