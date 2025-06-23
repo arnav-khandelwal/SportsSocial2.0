@@ -4,7 +4,7 @@ import LocationPicker from '../LocationPicker/LocationPicker';
 import './PostFilters.scss';
 
 const PostFilters = ({ filters, onFilterChange }) => {
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(true); // Changed to true for expanded on first load
   const [localFilters, setLocalFilters] = useState(filters);
 
   const sportOptions = [

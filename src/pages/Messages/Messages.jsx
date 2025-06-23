@@ -213,8 +213,22 @@ const Messages = () => {
   };
 
   const shouldShowGroupUnreadBadge = (group) => {
-    // Only show unread badge if the user has opened this group chat before AND there are unread messages
-    return openedGroupChats.has(group.id) && group.unread_count > 0;
+    // Only show unread badge if the user has opened this group chat before AND there are unread messages AND it's not currently active
+    return openedGroupChats.has(group.id) && 
+           group.unread_count > 0 && 
+           !(activeChat?.id === group.id && activeChat?.type === 'group');
+  };
+
+  const isActiveDirect = (userId) => {
+    return activeChat?.id === userId && activeChat?.type === 'direct';
+  };
+
+  const isActiveGroup = (groupId) => {
+    return activeChat?.id === groupId && activeChat?.type === 'group';
+  };
+
+  const shouldShowDirectUnreadBadge = (conv) => {
+    return conv.unread_count > 0 && !isActiveDirect(conv.other_user_id);
   };
 
   if (loading) {
@@ -305,10 +319,10 @@ const Messages = () => {
                 <div
                   key={`direct-${conv.conversation_id}`}
                   className={`messages__conversation ${
-                    activeChat?.id === conv.other_user_id && activeChat?.type === 'direct' 
+                    isActiveDirect(conv.other_user_id)
                       ? 'messages__conversation--active' 
                       : ''
-                  } ${conv.unread_count > 0 ? 'messages__conversation--unread' : ''}`}
+                  } ${shouldShowDirectUnreadBadge(conv) ? 'messages__conversation--unread' : ''}`}
                   onClick={() => setActiveChat({ 
                     id: conv.other_user_id, 
                     type: 'direct', 
@@ -341,13 +355,10 @@ const Messages = () => {
                     <div className="messages__conversation-time">
                       {formatMessageTime(conv.last_message_time)}
                     </div>
-                    {conv.unread_count > 0 && (
+                    {shouldShowDirectUnreadBadge(conv) && (
                       <span className="messages__unread-badge">{conv.unread_count}</span>
                     )}
                   </div>
-                  {conv.other_user_is_online && (
-                    <div className="messages__online-indicator"></div>
-                  )}
                 </div>
               ))
             )}
@@ -364,7 +375,7 @@ const Messages = () => {
                 <div
                   key={`group-${group.id}`}
                   className={`messages__conversation ${
-                    activeChat?.id === group.id && activeChat?.type === 'group' 
+                    isActiveGroup(group.id)
                       ? 'messages__conversation--active' 
                       : ''
                   } ${shouldShowGroupUnreadBadge(group) ? 'messages__conversation--unread' : ''}`}

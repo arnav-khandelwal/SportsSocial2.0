@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaBell, FaCog } from 'react-icons/fa';
+import { FaBell, FaCog, FaCheck } from 'react-icons/fa';
 import axios from 'axios';
 import { useSocket } from '../../context/SocketContext';
 import { formatRelativeTime } from '../../utils/dateUtils';
@@ -10,6 +10,7 @@ const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [markingAllRead, setMarkingAllRead] = useState(false);
+  const [markingIndividual, setMarkingIndividual] = useState(new Set());
   const [filter, setFilter] = useState('all'); // 'all', 'unread', 'follow', 'interest', 'nearby_post'
   const { socket } = useSocket();
 
@@ -69,10 +70,26 @@ const Notifications = () => {
       setNotifications(prev => prev.map(notif => ({ ...notif, is_read: true })));
     } catch (error) {
       console.error('Failed to mark all notifications as read:', error);
-      // You might want to show a toast notification here
       alert('Failed to mark all notifications as read. Please try again.');
     } finally {
       setMarkingAllRead(false);
+    }
+  };
+
+  const markIndividualAsRead = async (notificationId) => {
+    if (markingIndividual.has(notificationId)) return;
+    
+    try {
+      setMarkingIndividual(prev => new Set([...prev, notificationId]));
+      await markAsRead([notificationId]);
+    } catch (error) {
+      console.error('Failed to mark notification as read:', error);
+    } finally {
+      setMarkingIndividual(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(notificationId);
+        return newSet;
+      });
     }
   };
 
@@ -203,23 +220,42 @@ const Notifications = () => {
         ) : (
           <div className="notifications__list">
             {filteredNotifications.map((notification) => (
-              <Link
+              <div
                 key={notification.id}
-                to={getNotificationLink(notification)}
                 className={`notifications__item ${
                   !notification.is_read ? 'notifications__item--unread' : ''
                 }`}
-                onClick={() => handleNotificationClick(notification)}
               >
-                <div className="notifications__item-content">
-                  <p className="notifications__message">
-                    {formatNotificationMessage(notification)}
-                  </p>
-                </div>
+                <Link
+                  to={getNotificationLink(notification)}
+                  className="notifications__item-link"
+                  onClick={() => handleNotificationClick(notification)}
+                >
+                  <div className="notifications__item-content">
+                    <p className="notifications__message">
+                      {formatNotificationMessage(notification)}
+                    </p>
+                  </div>
+                  {!notification.is_read && (
+                    <div className="notifications__unread-dot"></div>
+                  )}
+                </Link>
+                
                 {!notification.is_read && (
-                  <div className="notifications__unread-dot"></div>
+                  <button
+                    className="notifications__mark-read-btn"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      markIndividualAsRead(notification.id);
+                    }}
+                    disabled={markingIndividual.has(notification.id)}
+                    title="Mark as read"
+                  >
+                    <FaCheck />
+                  </button>
                 )}
-              </Link>
+              </div>
             ))}
           </div>
         )}
