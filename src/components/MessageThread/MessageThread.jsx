@@ -10,6 +10,7 @@ const MessageThread = ({ chatId, chatType, chatName }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
+  const [userProfiles, setUserProfiles] = useState({});
   const messagesEndRef = useRef(null);
   const { socket, sendDirectMessage, sendGroupMessage, joinGroupChat, leaveGroupChat } = useSocket();
   const { user } = useAuth();
@@ -90,6 +91,31 @@ const MessageThread = ({ chatId, chatType, chatName }) => {
     }
   };
 
+  const fetchUserProfile = async (profileId) => {
+    if (userProfiles[profileId]) return; // Skip if already cached
+
+    try {
+      const response = await axios.get(`/settings/public/${profileId}`);
+      setUserProfiles((prevProfiles) => ({
+        ...prevProfiles,
+        [profileId]: response.data.profile_picture_url,
+      }));
+    } catch (error) {
+      console.error(`Failed to fetch profile for user ${profileId}:`, error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchProfilesForMessages = async () => {
+      const userIds = messages.map((msg) => msg.sender_id);
+      for (const userId of userIds) {
+        await fetchUserProfile(userId);
+      }
+    };
+
+    fetchProfilesForMessages();
+  }, [messages]);
+
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
@@ -136,6 +162,54 @@ const MessageThread = ({ chatId, chatType, chatName }) => {
     );
   }
 
+  const renderMessage = (message) => (
+    <div
+      key={message.id}
+      className={`message-thread__message ${
+        message.sender_id === user.id
+          ? 'message-thread__message--own'
+          : 'message-thread__message--other'
+      }`}
+    >
+      {message.sender_id !== user.id && (
+        <Link
+          to={`/profile/${message.sender_id}`}
+          className="message-thread__message-avatar-link"
+        >
+          <div className="message-thread__message-avatar">
+            {userProfiles[message.sender_id] ? (
+              <img
+                src={userProfiles[message.sender_id]}
+                alt="User"
+                className="message-thread__message-avatar-img"
+              />
+            ) : (
+              <FaUser />
+            )}
+          </div>
+        </Link>
+      )}
+      <div className="message-thread__message-content">
+        {message.sender_id !== user.id && message.sender && (
+          <Link
+            to={`/profile/${message.sender_id}`}
+            className="message-thread__message-sender-link"
+          >
+            <div className="message-thread__message-sender">
+              {message.sender.username}
+            </div>
+          </Link>
+        )}
+        <div className="message-thread__message-text">
+          {message.content}
+        </div>
+        <div className="message-thread__message-time">
+          {formatTime(message.created_at)}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="message-thread">
       <div className="message-thread__header">
@@ -154,45 +228,7 @@ const MessageThread = ({ chatId, chatType, chatName }) => {
             <p>No messages yet. Start the conversation!</p>
           </div>
         ) : (
-          messages.map((message) => (
-            <div
-              key={message.id}
-              className={`message-thread__message ${
-                message.sender_id === user.id 
-                  ? 'message-thread__message--own' 
-                  : 'message-thread__message--other'
-              }`}
-            >
-              {message.sender_id !== user.id && (
-                <Link 
-                  to={`/profile/${message.sender_id}`}
-                  className="message-thread__message-avatar-link"
-                >
-                  <div className="message-thread__message-avatar">
-                    <FaUser />
-                  </div>
-                </Link>
-              )}
-              <div className="message-thread__message-content">
-                {message.sender_id !== user.id && message.sender && (
-                  <Link 
-                    to={`/profile/${message.sender_id}`}
-                    className="message-thread__message-sender-link"
-                  >
-                    <div className="message-thread__message-sender">
-                      {message.sender.username}
-                    </div>
-                  </Link>
-                )}
-                <div className="message-thread__message-text">
-                  {message.content}
-                </div>
-                <div className="message-thread__message-time">
-                  {formatTime(message.created_at)}
-                </div>
-              </div>
-            </div>
-          ))
+          messages.map((message) => renderMessage(message))
         )}
         <div ref={messagesEndRef} />
       </div>

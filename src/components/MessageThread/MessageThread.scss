@@ -114,6 +114,14 @@
     font-size: 12px;
     margin-right: 8px;
     flex-shrink: 0;
+    overflow: hidden; // Ensure the image does not overflow the container
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; // Ensure the image covers the container proportionally
+      border-radius: 50%; // Match the container's rounded shape
+    }
   }
 
   &__message-content {

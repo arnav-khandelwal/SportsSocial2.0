@@ -48,9 +48,22 @@ const Search = () => {
       const response = await axios.get('/users/search', {
         params: { q: searchQuery }
       });
-      
+
       // Filter out the current user from search results
       const filteredUsers = response.data.filter(user => user.id !== currentUser?.id);
+
+      // Fetch profile pictures for each user
+      for (const user of filteredUsers) {
+        if (!user.profile_picture_url) {
+          try {
+            const profileResponse = await axios.get(`/settings/public/${user.id}`);
+            user.profile_picture_url = profileResponse.data.profile_picture_url;
+          } catch (error) {
+            console.error(`Failed to fetch profile for user ${user.id}:`, error);
+          }
+        }
+      }
+
       setUsers(filteredUsers);
     } catch (error) {
       console.error('Search error:', error);
@@ -141,7 +154,15 @@ const Search = () => {
               className="search__user-avatar-link"
             >
               <div className="search__user-avatar">
-                <FaUser />
+                {user.profile_picture_url ? (
+                  <img 
+                    src={user.profile_picture_url} 
+                    alt={`${user.username}'s profile`} 
+                    className="search__user-avatar__image"
+                  />
+                ) : (
+                  <FaUser />
+                )}
               </div>
             </Link>
             

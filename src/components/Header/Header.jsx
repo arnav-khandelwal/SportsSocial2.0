@@ -10,6 +10,7 @@ import './Header.scss';
 const Header = ({ toggleSidebar }) => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [userProfile, setUserProfile] = useState(null);
   const { user, logout } = useAuth();
   const { socket } = useSocket();
   const navigate = useNavigate();
@@ -39,6 +40,22 @@ const Header = ({ toggleSidebar }) => {
       };
     }
   }, [socket]);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+      const response = await axios.get(`/settings/public/${user.id}`);
+        setUserProfile(response.data);
+        console.log('User profile fetched:', response.data);
+        
+      } catch (error) {
+        console.error('Failed to fetch user profile:', error);
+      }
+    };
+    if (user?.id) {
+      fetchUserProfile();
+    }
+  }, [user?.id]);
 
   const fetchUnreadCount = async () => {
     try {
@@ -82,10 +99,14 @@ const Header = ({ toggleSidebar }) => {
 
         <div className="header__profile" onClick={() => setShowProfileMenu(!showProfileMenu)}>
           <div className="header__avatar">
-            <FaUser />
+            {userProfile?.profile_picture_url ? (
+              <img src={userProfile.profile_picture_url} alt="Profile" className='header__avatar'/>
+            ) : (
+              <FaUser />
+            )}
           </div>
           <span className="header__username">{user?.username}</span>
-          
+
           {showProfileMenu && (
             <div className="header__profile-menu">
               <Link to={`/profile/${user?.id}`} className="header__profile-item">

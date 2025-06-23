@@ -3,12 +3,14 @@ import { Link } from 'react-router-dom';
 import { FaMapMarkerAlt, FaClock, FaUsers, FaHeart, FaTags, FaUser } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import { formatRelativeTime, formatDateTime } from '../../utils/dateUtils';
+import axios from 'axios';
 import './PostCard.scss';
 
 const PostCard = ({ post, onInterest }) => {
   const { user } = useAuth();
   const [isInterested, setIsInterested] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [authorProfile, setAuthorProfile] = useState(null);
 
   useEffect(() => {
     // Check if current user has already shown interest in this post
@@ -19,6 +21,21 @@ const PostCard = ({ post, onInterest }) => {
       setIsInterested(userHasInterest);
     }
   }, [post.interested_users, user]);
+
+  useEffect(() => {
+    const fetchAuthorProfile = async () => {
+      try {
+        const response = await axios.get(`/settings/public/${post.author?.id || post.author_id}`);
+        setAuthorProfile({ profile_picture: response.data.profile_picture_url });
+      } catch (error) {
+        console.error('Failed to fetch author profile:', error);
+      }
+    };
+
+    if (post.author?.id || post.author_id) {
+      fetchAuthorProfile();
+    }
+  }, [post.author?.id, post.author_id]);
 
   const handleInterest = async () => {
     if (isInterested || loading) return;
@@ -43,7 +60,11 @@ const PostCard = ({ post, onInterest }) => {
             className="post-card__avatar-link"
           >
             <div className="post-card__avatar">
-              <FaUser />
+              {authorProfile?.profile_picture ? (
+                <img src={authorProfile.profile_picture} alt="Author" className='post-card__avatar__image' />
+              ) : (
+                <FaUser />
+              )}
             </div>
           </Link>
           <div className="post-card__author-info">

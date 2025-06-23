@@ -19,6 +19,7 @@ const Messages = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [openedGroupChats, setOpenedGroupChats] = useState(new Set());
+  const [userProfiles, setUserProfiles] = useState({});
   const { socket } = useSocket();
 
   useEffect(() => {
@@ -126,6 +127,35 @@ const Messages = () => {
       setLoading(false);
     }
   };
+  const fetchUserProfile = async (profileId) => {
+    if (userProfiles[profileId]) return; // Skip if already cached
+
+    try {
+      const response = await axios.get(`/settings/public/${profileId}`);
+      setUserProfiles((prevProfiles) => ({
+        ...prevProfiles,
+        [profileId]: response.data.profile_picture_url,
+      }));
+    } catch (error) {
+      console.error(`Failed to fetch profile for user ${profileId}:`, error);
+    }
+  };
+
+  const fetchUserProfilesForConversations = async () => {
+    const allUserIds = [
+      ...new Set(
+        directConversations.map((conv) => conv.other_user_id)
+      ),
+    ];
+
+    for (const userId of allUserIds) {
+      await fetchUserProfile(userId);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserProfilesForConversations();
+  }, [directConversations]);
 
   const searchUsers = async () => {
     try {
@@ -246,10 +276,14 @@ const Messages = () => {
       onClick={() => handleGroupChatClick(group)}
     >
       <div className="messages__conversation-avatar">
-        <FaUsers />
+        {group.profile_picture ? (
+          <img src={group.profile_picture} alt="Group" />
+        ) : (
+          <FaUsers />
+        )}
       </div>
       <div className="messages__conversation-info">
-        <h4>{group.name}</h4>
+        <h4 style={{marginLeft:8}}>{group.name}</h4>
         {group.last_message && (
           <p className="messages__conversation-preview">
             {group.last_message.content}
@@ -261,6 +295,68 @@ const Messages = () => {
           {group.unread_count}
         </span>
       )}
+    </div>
+  );
+
+  useEffect(() => {
+    const fetchProfilesForDirectMessages = async () => {
+      const userIds = directConversations.map((conv) => conv.other_user_id);
+      for (const userId of userIds) {
+        await fetchUserProfile(userId);
+      }
+    };
+
+    fetchProfilesForDirectMessages();
+  }, [directConversations]);
+
+  const renderDirectMessage = (conv) => (
+    <div
+      key={`direct-${conv.conversation_id}`}
+      className={`messages__conversation ${
+        isActiveDirect(conv.other_user_id)
+          ? 'messages__conversation--active' 
+          : ''
+      } ${shouldShowDirectUnreadBadge(conv) ? 'messages__conversation--unread' : ''}`}
+      onClick={() => setActiveChat({ 
+        id: conv.other_user_id, 
+        type: 'direct', 
+        user: { 
+          id: conv.other_user_id, 
+          username: conv.other_user_username 
+        } 
+      })}
+    >
+      <Link 
+        to={`/profile/${conv.other_user_id}`}
+        className="messages__avatar-link"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="messages__avatar">
+          {userProfiles[conv.other_user_id] ? (
+            <img src={userProfiles[conv.other_user_id]} alt="User" className="messages__avatar__image" />
+          ) : (
+            <FaUser />
+          )}
+        </div>
+      </Link>
+      <div className="messages__conversation-info">
+        <Link 
+          to={`/profile/${conv.other_user_id}`}
+          className="messages__username-link"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <h4>{conv.other_user_username || 'Unknown User'}</h4>
+        </Link>
+        <p>{formatLastMessage(conv.last_message_content)}</p>
+      </div>
+      <div className="messages__conversation-meta">
+        <div className="messages__conversation-time">
+          {formatMessageTime(conv.last_message_time)}
+        </div>
+        {shouldShowDirectUnreadBadge(conv) && (
+          <span className="messages__unread-badge">{conv.unread_count}</span>
+        )}
+      </div>
     </div>
   );
 
@@ -322,7 +418,11 @@ const Messages = () => {
                   onClick={() => startConversationWithUser(user)}
                 >
                   <div className="messages__search-result-avatar">
-                    <FaUser />
+                    {userProfiles[user.id] ? (
+                      <img src={userProfiles[user.id]} alt="User" className='messages__search-result-avatar__image' />
+                    ) : (
+                      <FaUser />
+                    )}
                   </div>
                   <div className="messages__search-result-info">
                     <h4>{user.username}</h4>
@@ -348,52 +448,7 @@ const Messages = () => {
             {directConversations.length === 0 ? (
               <p className="messages__empty">No direct messages</p>
             ) : (
-              directConversations.map((conv) => (
-                <div
-                  key={`direct-${conv.conversation_id}`}
-                  className={`messages__conversation ${
-                    isActiveDirect(conv.other_user_id)
-                      ? 'messages__conversation--active' 
-                      : ''
-                  } ${shouldShowDirectUnreadBadge(conv) ? 'messages__conversation--unread' : ''}`}
-                  onClick={() => setActiveChat({ 
-                    id: conv.other_user_id, 
-                    type: 'direct', 
-                    user: { 
-                      id: conv.other_user_id, 
-                      username: conv.other_user_username 
-                    } 
-                  })}
-                >
-                  <Link 
-                    to={`/profile/${conv.other_user_id}`}
-                    className="messages__avatar-link"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <div className="messages__avatar">
-                      <FaUser />
-                    </div>
-                  </Link>
-                  <div className="messages__conversation-info">
-                    <Link 
-                      to={`/profile/${conv.other_user_id}`}
-                      className="messages__username-link"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <h4>{conv.other_user_username || 'Unknown User'}</h4>
-                    </Link>
-                    <p>{formatLastMessage(conv.last_message_content)}</p>
-                  </div>
-                  <div className="messages__conversation-meta">
-                    <div className="messages__conversation-time">
-                      {formatMessageTime(conv.last_message_time)}
-                    </div>
-                    {shouldShowDirectUnreadBadge(conv) && (
-                      <span className="messages__unread-badge">{conv.unread_count}</span>
-                    )}
-                  </div>
-                </div>
-              ))
+              directConversations.map((conv) => renderDirectMessage(conv))
             )}
           </div>
 

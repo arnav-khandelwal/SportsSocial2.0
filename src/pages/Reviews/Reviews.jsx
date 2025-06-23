@@ -14,6 +14,7 @@ const Reviews = () => {
   const [filter, setFilter] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [reviewAuthors, setReviewAuthors] = useState({});
 
   const categoryOptions = [
     { value: 'all', label: 'All Categories' },
@@ -29,6 +30,12 @@ const Reviews = () => {
     fetchReviews();
     fetchStats();
   }, [filter]);
+
+  useEffect(() => {
+  if (reviews.length > 0) {
+    fetchReviewAuthors();
+  }
+}, [reviews]);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -58,6 +65,31 @@ const Reviews = () => {
       setStats(response.data);
     } catch (error) {
       console.error('Failed to fetch stats:', error);
+    }
+  };
+
+  const fetchReviewAuthors = async () => {
+    try {
+      const authors = {};
+
+      for (const review of reviews) {
+        const authorId = review.author_id;
+        if (!authors[authorId]) {
+          try {
+            const profileResponse = await axios.get(`/settings/public/${authorId}`);
+            authors[authorId] = {
+              profile_picture: profileResponse.data.profile_picture_url,
+              username: review.author_username,
+            };
+          } catch (error) {
+            console.error(`Failed to fetch profile for author ${authorId}:`, error);
+          }
+        }
+      }
+      
+      setReviewAuthors(authors);
+    } catch (error) {
+      console.error('Failed to fetch review authors:', error);
     }
   };
 
@@ -247,7 +279,11 @@ const Reviews = () => {
                         className="reviews__avatar-link"
                       >
                         <div className="reviews__avatar">
-                          <FaUser />
+                          {reviewAuthors[review.author_id]?.profile_picture ? (
+                            <img src={reviewAuthors[review.author_id].profile_picture} alt="Author" className='reviews__avatar__image' />
+                          ) : (
+                            <FaUser />
+                          )}
                         </div>
                       </Link>
                       <div className="reviews__author-info">
@@ -284,36 +320,7 @@ const Reviews = () => {
                     <p className="reviews__content-text">{review.content}</p>
                   </div>
 
-                  <div className="reviews__card-footer">
-                    <div className="reviews__votes">
-                      <button
-                        className={`reviews__vote-btn ${
-                          review.user_vote === 'helpful' ? 'reviews__vote-btn--active' : ''
-                        }`}
-                        onClick={() => 
-                          review.user_vote === 'helpful' 
-                            ? handleRemoveVote(review.id)
-                            : handleVote(review.id, 'helpful')
-                        }
-                      >
-                        <FaThumbsUp />
-                        <span>{review.helpful_votes}</span>
-                      </button>
-                      <button
-                        className={`reviews__vote-btn ${
-                          review.user_vote === 'not_helpful' ? 'reviews__vote-btn--active' : ''
-                        }`}
-                        onClick={() => 
-                          review.user_vote === 'not_helpful' 
-                            ? handleRemoveVote(review.id)
-                            : handleVote(review.id, 'not_helpful')
-                        }
-                      >
-                        <FaThumbsDown />
-                        <span>{review.not_helpful_votes}</span>
-                      </button>
-                    </div>
-                  </div>
+                  
                 </div>
               ))}
             </div>

@@ -11,6 +11,7 @@ const DirectMessageThread = ({ otherUserId, otherUserName }) => {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [conversationId, setConversationId] = useState(null);
+  const [userProfiles, setUserProfiles] = useState({});
   const messagesEndRef = useRef(null);
   const { socket } = useSocket();
   const { user } = useAuth();
@@ -144,6 +145,70 @@ const DirectMessageThread = ({ otherUserId, otherUserName }) => {
     }
   };
 
+  const fetchUserProfile = async (profileId) => {
+    if (userProfiles[profileId]) return; // Skip if already cached
+
+    try {
+      const response = await axios.get(`/settings/public/${profileId}`);
+      setUserProfiles((prevProfiles) => ({
+        ...prevProfiles,
+        [profileId]: response.data.profile_picture_url,
+      }));
+    } catch (error) {
+      console.error(`Failed to fetch profile for user ${profileId}:`, error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchProfilesForMessages = async () => {
+      const userIds = messages.map((msg) => msg.sender_id);
+      for (const userId of userIds) {
+        await fetchUserProfile(userId);
+      }
+    };
+
+    fetchProfilesForMessages();
+  }, [messages]);
+
+  const renderMessage = (message) => (
+    <div
+      key={message.id}
+      className={`direct-message-thread__message ${
+        message.sender_id === user.id
+          ? 'direct-message-thread__message--own'
+          : 'direct-message-thread__message--other'
+      }`}
+    >
+      <div className="direct-message-thread__message-content">
+        {message.sender_id !== user.id && (
+          <Link
+            to={`/profile/${message.sender_id}`}
+            className="direct-message-thread__message-sender-link"
+          >
+            <div className="direct-message-thread__message-sender">
+              {message.sender_username}
+            </div>
+          </Link>
+        )}
+        <div className="direct-message-thread__message-text">
+          {message.content}
+        </div>
+        <div className="direct-message-thread__message-time">
+          {formatTime(message.created_at)}
+          {message.sender_id === user.id && (
+            <span
+              className={`direct-message-thread__read-status ${
+                message.is_read ? 'read' : 'unread'
+              }`}
+            >
+              {message.is_read ? ' ✓✓' : ' ✓'}
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
   if (loading) {
     return (
       <div className="direct-message-thread">
@@ -162,7 +227,15 @@ const DirectMessageThread = ({ otherUserId, otherUserName }) => {
           className="direct-message-thread__avatar-link"
         >
           <div className="direct-message-thread__avatar">
-            <FaUser />
+            {userProfiles[otherUserId] ? (
+              <img
+                src={userProfiles[otherUserId]}
+                alt="User"
+                className="direct-message-thread__avatar__image"
+              />
+            ) : (
+              <FaUser />
+            )}
           </div>
         </Link>
         <div className="direct-message-thread__info">
@@ -182,50 +255,7 @@ const DirectMessageThread = ({ otherUserId, otherUserName }) => {
             <p>No messages yet. Start the conversation!</p>
           </div>
         ) : (
-          messages.map((message) => (
-            <div
-              key={message.id}
-              className={`direct-message-thread__message ${
-                message.sender_id === user.id 
-                  ? 'direct-message-thread__message--own' 
-                  : 'direct-message-thread__message--other'
-              }`}
-            >
-              {message.sender_id !== user.id && (
-                <Link 
-                  to={`/profile/${message.sender_id}`}
-                  className="direct-message-thread__message-avatar-link"
-                >
-                  <div className="direct-message-thread__message-avatar">
-                    <FaUser />
-                  </div>
-                </Link>
-              )}
-              <div className="direct-message-thread__message-content">
-                {message.sender_id !== user.id && (
-                  <Link 
-                    to={`/profile/${message.sender_id}`}
-                    className="direct-message-thread__message-sender-link"
-                  >
-                    <div className="direct-message-thread__message-sender">
-                      {message.sender_username}
-                    </div>
-                  </Link>
-                )}
-                <div className="direct-message-thread__message-text">
-                  {message.content}
-                </div>
-                <div className="direct-message-thread__message-time">
-                  {formatTime(message.created_at)}
-                  {message.sender_id === user.id && (
-                    <span className={`direct-message-thread__read-status ${message.is_read ? 'read' : 'unread'}`}>
-                      {message.is_read ? ' ✓✓' : ' ✓'}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))
+          messages.map((message) => renderMessage(message))
         )}
         <div ref={messagesEndRef} />
       </div>

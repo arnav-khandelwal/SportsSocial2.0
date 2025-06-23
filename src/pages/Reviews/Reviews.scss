@@ -386,12 +386,24 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    background: linear-gradient(135deg, var(--secondary), var(--accent));
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--text-primary);
-    font-size: 16px;
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-right: 14px;
+    border: 2px solid var(--background-secondary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    overflow: hidden; // Ensure the image does not overflow the container
+
+    &__image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; // Ensure the image covers the container proportionally
+      border-radius: 50%; // Match the container's rounded shape
+    }
   }
 
   &__author-info {
