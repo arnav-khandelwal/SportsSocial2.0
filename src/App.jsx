@@ -27,7 +27,7 @@ import { SocketProvider } from './context/SocketContext';
 import './styles/main.scss';
 
 // Configure axios defaults
-axios.defaults.baseURL = 'http://localhost:5000/api';
+axios.defaults.baseURL = 'http://localhost:5001/api';
 
 function AppRoutes() {
   const { user, loading } = useAuth();

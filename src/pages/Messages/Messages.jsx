@@ -105,11 +105,21 @@ const Messages = () => {
     try {
       // Fetch direct conversations
       const directResponse = await axios.get('/direct-messages/conversations');
-      setDirectConversations(directResponse.data);
+      const sortedDirectConversations = directResponse.data.sort((a, b) => {
+        const aTime = new Date(a.last_message?.created_at || 0).getTime();
+        const bTime = new Date(b.last_message?.created_at || 0).getTime();
+        return bTime - aTime; // Sort newest first
+      });
+      setDirectConversations(sortedDirectConversations);
 
-      // Fetch group conversations (existing system)
+      // Fetch group conversations
       const groupResponse = await axios.get('/messages/conversations');
-      setGroupConversations(groupResponse.data.groupChats || []);
+      const sortedGroupConversations = (groupResponse.data.groupChats || []).sort((a, b) => {
+        const aTime = new Date(a.last_message?.created_at || 0).getTime();
+        const bTime = new Date(b.last_message?.created_at || 0).getTime();
+        return bTime - aTime; // Sort newest first
+      });
+      setGroupConversations(sortedGroupConversations);
     } catch (error) {
       console.error('Failed to fetch conversations:', error);
     } finally {
@@ -213,10 +223,8 @@ const Messages = () => {
   };
 
   const shouldShowGroupUnreadBadge = (group) => {
-    // Only show unread badge if the user has opened this group chat before AND there are unread messages AND it's not currently active
-    return openedGroupChats.has(group.id) && 
-           group.unread_count > 0 && 
-           !(activeChat?.id === group.id && activeChat?.type === 'group');
+    // Only show unread badge if there are unread messages AND it's not currently active
+    return group.unread_count > 0 && !(activeChat?.id === group.id && activeChat?.type === 'group');
   };
 
   const isActiveDirect = (userId) => {
@@ -230,6 +238,31 @@ const Messages = () => {
   const shouldShowDirectUnreadBadge = (conv) => {
     return conv.unread_count > 0 && !isActiveDirect(conv.other_user_id);
   };
+
+  const renderGroupChat = (group) => (
+    <div
+      key={group.id}
+      className={`messages__conversation ${isActiveGroup(group.id) ? 'active' : ''}`}
+      onClick={() => handleGroupChatClick(group)}
+    >
+      <div className="messages__conversation-avatar">
+        <FaUsers />
+      </div>
+      <div className="messages__conversation-info">
+        <h4>{group.name}</h4>
+        {group.last_message && (
+          <p className="messages__conversation-preview">
+            {group.last_message.content}
+          </p>
+        )}
+      </div>
+      {shouldShowGroupUnreadBadge(group) && (
+        <span className="messages__unread-badge">
+          {group.unread_count}
+        </span>
+      )}
+    </div>
+  );
 
   if (loading) {
     return (
@@ -371,36 +404,7 @@ const Messages = () => {
             {groupConversations.length === 0 ? (
               <p className="messages__empty">No group chats</p>
             ) : (
-              groupConversations.map((group) => (
-                <div
-                  key={`group-${group.id}`}
-                  className={`messages__conversation ${
-                    isActiveGroup(group.id)
-                      ? 'messages__conversation--active' 
-                      : ''
-                  } ${shouldShowGroupUnreadBadge(group) ? 'messages__conversation--unread' : ''}`}
-                  onClick={() => handleGroupChatClick(group)}
-                >
-                  <div className="messages__avatar messages__avatar--group">
-                    <FaUsers />
-                  </div>
-                  <div className="messages__conversation-info">
-                    <h4>{group.name}</h4>
-                    <p>{formatLastMessage(group.last_message?.content)}</p>
-                  </div>
-                  <div className="messages__conversation-meta">
-                    <div className="messages__conversation-time">
-                      {formatMessageTime(group.last_message?.created_at)}
-                    </div>
-                    {shouldShowGroupUnreadBadge(group) && (
-                      <span className="messages__unread-badge">{group.unread_count}</span>
-                    )}
-                  </div>
-                  <div className="messages__member-count">
-                    {group.member_ids ? group.member_ids.length : 0}
-                  </div>
-                </div>
-              ))
+              groupConversations.map((group) => renderGroupChat(group))
             )}
           </div>
         </div>

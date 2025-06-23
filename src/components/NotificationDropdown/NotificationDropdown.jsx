@@ -10,6 +10,7 @@ const NotificationDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [lastSeenId, setLastSeenId] = useState(null);
   const [loading, setLoading] = useState(false);
   const dropdownRef = useRef(null);
   const { socket } = useSocket();
@@ -17,13 +18,24 @@ const NotificationDropdown = () => {
   useEffect(() => {
     fetchNotifications();
     fetchUnreadCount();
+    
+    // Load last seen notification ID from localStorage
+    const savedLastSeenId = localStorage.getItem('lastSeenNotificationId');
+    if (savedLastSeenId) {
+      setLastSeenId(savedLastSeenId);
+    }
   }, []);
 
   useEffect(() => {
     if (socket) {
       const handleNotification = (notification) => {
-        setNotifications(prev => [notification, ...prev]);
-        setUnreadCount(prev => prev + 1);
+        // Only add new notifications that haven't been seen before
+        if (!lastSeenId || notification.id > lastSeenId) {
+          setNotifications(prev => [notification, ...prev]);
+          setUnreadCount(prev => prev + 1);
+          setLastSeenId(notification.id);
+          localStorage.setItem('lastSeenNotificationId', notification.id);
+        }
       };
 
       socket.on('notification', handleNotification);
@@ -32,7 +44,7 @@ const NotificationDropdown = () => {
         socket.off('notification', handleNotification);
       };
     }
-  }, [socket]);
+  }, [socket, lastSeenId]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -50,8 +62,18 @@ const NotificationDropdown = () => {
   const fetchNotifications = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/notifications');
-      setNotifications(response.data);
+      const response = await axios.get('/notifications?limit=50');
+      const uniqueNotifications = Array.from(
+        new Map(response.data.map(item => [item.id, item])).values()
+      );
+      setNotifications(uniqueNotifications);
+      
+      // Update last seen ID if we have new notifications
+      if (uniqueNotifications.length > 0) {
+        const latestId = uniqueNotifications[0].id;
+        setLastSeenId(latestId);
+        localStorage.setItem('lastSeenNotificationId', latestId);
+      }
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
     } finally {
@@ -79,6 +101,11 @@ const NotificationDropdown = () => {
         )
       );
       setUnreadCount(prev => Math.max(0, prev - notificationIds.length));
+      
+      // Remove read notifications from view
+      setNotifications(prev => 
+        prev.filter(notif => !notificationIds.includes(notif.id))
+      );
     } catch (error) {
       console.error('Failed to mark notifications as read:', error);
     }
@@ -87,8 +114,15 @@ const NotificationDropdown = () => {
   const markAllAsRead = async () => {
     try {
       await axios.post('/notifications/mark-all-read');
-      setNotifications(prev => prev.map(notif => ({ ...notif, is_read: true })));
+      setNotifications([]);
       setUnreadCount(0);
+      
+      // Update last seen ID to prevent duplicates
+      if (notifications.length > 0) {
+        const latestId = notifications[0].id;
+        setLastSeenId(latestId);
+        localStorage.setItem('lastSeenNotificationId', latestId);
+      }
     } catch (error) {
       console.error('Failed to mark all notifications as read:', error);
     }

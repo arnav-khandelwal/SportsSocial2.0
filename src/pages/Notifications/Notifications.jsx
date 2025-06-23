@@ -12,16 +12,28 @@ const Notifications = () => {
   const [markingAllRead, setMarkingAllRead] = useState(false);
   const [markingIndividual, setMarkingIndividual] = useState(new Set());
   const [filter, setFilter] = useState('all'); // 'all', 'unread', 'follow', 'interest', 'nearby_post'
+  const [lastSeenId, setLastSeenId] = useState(null);
   const { socket } = useSocket();
 
   useEffect(() => {
     fetchNotifications();
+    
+    // Load last seen notification ID from localStorage
+    const savedLastSeenId = localStorage.getItem('lastSeenNotificationId');
+    if (savedLastSeenId) {
+      setLastSeenId(savedLastSeenId);
+    }
   }, []);
 
   useEffect(() => {
     if (socket) {
       const handleNotification = (notification) => {
-        setNotifications(prev => [notification, ...prev]);
+        // Only add new notifications that haven't been seen before
+        if (!lastSeenId || notification.id > lastSeenId) {
+          setNotifications(prev => [notification, ...prev]);
+          setLastSeenId(notification.id);
+          localStorage.setItem('lastSeenNotificationId', notification.id);
+        }
       };
 
       socket.on('notification', handleNotification);
@@ -30,13 +42,23 @@ const Notifications = () => {
         socket.off('notification', handleNotification);
       };
     }
-  }, [socket]);
+  }, [socket, lastSeenId]);
 
   const fetchNotifications = async () => {
     try {
       setLoading(true);
       const response = await axios.get('/notifications?limit=50');
-      setNotifications(response.data);
+      const uniqueNotifications = Array.from(
+        new Map(response.data.map(item => [item.id, item])).values()
+      );
+      setNotifications(uniqueNotifications);
+      
+      // Update last seen ID if we have new notifications
+      if (uniqueNotifications.length > 0) {
+        const latestId = uniqueNotifications[0].id;
+        setLastSeenId(latestId);
+        localStorage.setItem('lastSeenNotificationId', latestId);
+      }
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
     } finally {
@@ -54,6 +76,11 @@ const Notifications = () => {
             : notif
         )
       );
+      
+      // Remove read notifications from view
+      setNotifications(prev => 
+        prev.filter(notif => !notificationIds.includes(notif.id))
+      );
     } catch (error) {
       console.error('Failed to mark notifications as read:', error);
     }
@@ -66,8 +93,15 @@ const Notifications = () => {
       setMarkingAllRead(true);
       await axios.post('/notifications/mark-all-read');
       
-      // Update all notifications to be marked as read
-      setNotifications(prev => prev.map(notif => ({ ...notif, is_read: true })));
+      // Remove all notifications from view since they're marked as read
+      setNotifications([]);
+      
+      // Update last seen ID to prevent duplicates
+      if (notifications.length > 0) {
+        const latestId = notifications[0].id;
+        setLastSeenId(latestId);
+        localStorage.setItem('lastSeenNotificationId', latestId);
+      }
     } catch (error) {
       console.error('Failed to mark all notifications as read:', error);
       alert('Failed to mark all notifications as read. Please try again.');
@@ -82,6 +116,11 @@ const Notifications = () => {
     try {
       setMarkingIndividual(prev => new Set([...prev, notificationId]));
       await markAsRead([notificationId]);
+      
+      // Remove the read notification from view
+      setNotifications(prev => 
+        prev.filter(notif => notif.id !== notificationId)
+      );
     } catch (error) {
       console.error('Failed to mark notification as read:', error);
     } finally {
@@ -95,7 +134,7 @@ const Notifications = () => {
 
   const handleNotificationClick = (notification) => {
     if (!notification.is_read) {
-      markAsRead([notification.id]);
+      markIndividualAsRead(notification.id);
     }
   };
 
