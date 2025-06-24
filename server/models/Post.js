@@ -1,6 +1,50 @@
 import { supabase } from '../config/supabase.js';
 
 export class Post {
+  // Helper constants and functions for sport matching
+  static TRADITIONAL_SPORTS = [
+    'Football', 'Basketball', 'Tennis', 'Soccer', 'Baseball', 'Volleyball',
+    'Swimming', 'Running', 'Cycling', 'Golf', 'Hockey', 'Cricket', 'Rugby',
+    'Badminton', 'Table Tennis'
+  ];
+  
+  static ESPORTS = [
+    'Valorant', 'BGMI', 'EAFC', 'NBA 2K', 'League of Legends',
+    'Call of Duty', 'Minecraft', 'Apex Legends', 'Other Online Games'
+  ];
+  
+  // Case-insensitive sport matching
+  static matchSport(sportName) {
+    const lowerSportName = sportName.toLowerCase();
+    
+    // Try to find in traditional sports first
+    const traditionalMatch = this.TRADITIONAL_SPORTS.find(
+      s => s.toLowerCase() === lowerSportName
+    );
+    if (traditionalMatch) {
+      return {
+        normalizedName: traditionalMatch,
+        type: 'TRADITIONAL'
+      };
+    }
+    
+    // Try to find in esports
+    const esportMatch = this.ESPORTS.find(
+      s => s.toLowerCase() === lowerSportName
+    );
+    if (esportMatch) {
+      return {
+        normalizedName: esportMatch,
+        type: 'ESPORT'
+      };
+    }
+    
+    // Default fallback
+    return {
+      normalizedName: sportName,
+      type: 'OTHER'
+    };
+  }
   static async create(postData) {
     const {
       author_id,
@@ -14,11 +58,21 @@ export class Post {
       players_needed
     } = postData;
     
+    // Ensure sport is always an array format
+    const sportArray = Array.isArray(sport) ? sport : [sport];
+    
+    // Use our helper to determine sport type and get normalized name
+    const { type: sportType, normalizedName } = Post.matchSport(sportArray[0]);
+    
+    // Update the sport array with the normalized name
+    const normalizedSportArray = [normalizedName];
+    
     const { data, error } = await supabase
       .from('posts')
       .insert([{
         author_id,
-        sport,
+        sport: normalizedSportArray,
+        sport_type: sportType,
         heading,
         description,
         tags,
@@ -40,16 +94,9 @@ export class Post {
   }
   
   static async findNearby(lat, lng, radius = 25000, filters = {}) {
-    // Helper: valid sport/game names
-    const TRADITIONAL_SPORTS = [
-      'Football', 'Basketball', 'Tennis', 'Soccer', 'Baseball', 'Volleyball',
-      'Swimming', 'Running', 'Cycling', 'Golf', 'Hockey', 'Cricket', 'Rugby',
-      'Badminton', 'Table Tennis'
-    ];
-    const ESPORTS = [
-      'Valorant', 'BGMI', 'EAFC', 'NBA 2K', 'League of Legends',
-      'Call of Duty', 'Minecraft', 'Apex Legends', 'Other Online Games'
-    ];
+    // Use the static sport lists
+    const TRADITIONAL_SPORTS = Post.TRADITIONAL_SPORTS;
+    const ESPORTS = Post.ESPORTS;
     
     // Debug logging
     console.log("Filters received:", JSON.stringify(filters));
@@ -88,28 +135,65 @@ export class Post {
         .eq('is_active', true)
         .gte('event_time', new Date().toISOString());
       
-      // Process and apply filtering
-      let sportsArray = Array.isArray(filters.sports) ? filters.sports.filter(s => TRADITIONAL_SPORTS.includes(s)) : [];
-      let esportsArray = Array.isArray(filters.esports) ? filters.esports.filter(s => ESPORTS.includes(s)) : [];
+      // Process and apply filtering - make case-insensitive
+      let sportsArray = Array.isArray(filters.sports) ? 
+        filters.sports.filter(s => {
+          return TRADITIONAL_SPORTS.some(sport => sport.toLowerCase() === s.toLowerCase());
+        }) : [];
+      let esportsArray = Array.isArray(filters.esports) ? 
+        filters.esports.filter(s => {
+          return ESPORTS.some(esport => esport.toLowerCase() === s.toLowerCase());
+        }) : [];
       let filterType = filters.filterType || 'ALL';
       let sportFilterArr = [];
       let sportTypeFilter = undefined;
       
       if (filterType === 'SPORTS_ONLY') {
-        sportFilterArr = sportsArray;
+        sportFilterArr = sportsArray.length > 0 ? sportsArray : TRADITIONAL_SPORTS;
         sportTypeFilter = 'TRADITIONAL';
       } else if (filterType === 'ESPORTS_ONLY') {
-        sportFilterArr = esportsArray;
+        sportFilterArr = esportsArray.length > 0 ? esportsArray : ESPORTS;
         sportTypeFilter = 'ESPORT';
       } else {
+        // When not using toggles, use exactly what was selected
         sportFilterArr = [...sportsArray, ...esportsArray];
+        
+        // Only apply sport type filter if only one type is selected
+        if (sportsArray.length > 0 && esportsArray.length === 0) {
+          sportTypeFilter = 'TRADITIONAL';
+        } else if (esportsArray.length > 0 && sportsArray.length === 0) {
+          sportTypeFilter = 'ESPORT';
+        }
       }
       
       console.log("Sport filter array:", sportFilterArr);
       console.log("Sport type filter:", sportTypeFilter);
       
       if (sportFilterArr.length > 0) {
-        query = query.overlaps('sport', sportFilterArr);
+        // For a single sport, use case-insensitive contains instead of overlaps
+        if (sportFilterArr.length === 1) {
+          console.log(`Using ilike for single sport: ${sportFilterArr[0]}`);
+          query = query.ilike('sport', `%${sportFilterArr[0]}%`);
+        } else {
+          try {
+            // Ensure each sport name is properly formatted for array comparison
+            const formattedSports = sportFilterArr.map(sport => sport.trim());
+            console.log("Using overlaps with formatted sports:", formattedSports);
+            query = query.overlaps('sport', formattedSports);
+          } catch (err) {
+            console.error("Error applying sport overlap filter:", err);
+            // Fallback for each sport individually with OR conditions
+            let firstSport = true;
+            sportFilterArr.forEach(sport => {
+              if (firstSport) {
+                query = query.ilike('sport', `%${sport}%`);
+                firstSport = false;
+              } else {
+                query = query.or(`sport.ilike.%${sport}%`);
+              }
+            });
+          }
+        }
       }
       
       if (sportTypeFilter) {
@@ -161,28 +245,65 @@ export class Post {
         .eq('is_active', true)
         .gte('event_time', new Date().toISOString());
       
-      // Process and apply filtering
-      let sportsArray = Array.isArray(filters.sports) ? filters.sports.filter(s => TRADITIONAL_SPORTS.includes(s)) : [];
-      let esportsArray = Array.isArray(filters.esports) ? filters.esports.filter(s => ESPORTS.includes(s)) : [];
+      // Process and apply filtering - make case-insensitive
+      let sportsArray = Array.isArray(filters.sports) ? 
+        filters.sports.filter(s => {
+          return TRADITIONAL_SPORTS.some(sport => sport.toLowerCase() === s.toLowerCase());
+        }) : [];
+      let esportsArray = Array.isArray(filters.esports) ? 
+        filters.esports.filter(s => {
+          return ESPORTS.some(esport => esport.toLowerCase() === s.toLowerCase());
+        }) : [];
       let filterType = filters.filterType || 'ALL';
       let sportFilterArr = [];
       let sportTypeFilter = undefined;
       
       if (filterType === 'SPORTS_ONLY') {
-        sportFilterArr = sportsArray;
+        sportFilterArr = sportsArray.length > 0 ? sportsArray : TRADITIONAL_SPORTS;
         sportTypeFilter = 'TRADITIONAL';
       } else if (filterType === 'ESPORTS_ONLY') {
-        sportFilterArr = esportsArray;
+        sportFilterArr = esportsArray.length > 0 ? esportsArray : ESPORTS;
         sportTypeFilter = 'ESPORT';
       } else {
+        // When not using toggles, use exactly what was selected
         sportFilterArr = [...sportsArray, ...esportsArray];
+        
+        // Only apply sport type filter if only one type is selected
+        if (sportsArray.length > 0 && esportsArray.length === 0) {
+          sportTypeFilter = 'TRADITIONAL';
+        } else if (esportsArray.length > 0 && sportsArray.length === 0) {
+          sportTypeFilter = 'ESPORT';
+        }
       }
       
       console.log("Sport filter array (no geo):", sportFilterArr);
       console.log("Sport type filter (no geo):", sportTypeFilter);
       
       if (sportFilterArr.length > 0) {
-        query = query.overlaps('sport', sportFilterArr);
+        // For a single sport, use case-insensitive contains instead of overlaps
+        if (sportFilterArr.length === 1) {
+          console.log(`Using ilike for single sport (no geo): ${sportFilterArr[0]}`);
+          query = query.ilike('sport', `%${sportFilterArr[0]}%`);
+        } else {
+          try {
+            // Ensure each sport name is properly formatted for array comparison
+            const formattedSports = sportFilterArr.map(sport => sport.trim());
+            console.log("Using overlaps with formatted sports (no geo):", formattedSports);
+            query = query.overlaps('sport', formattedSports);
+          } catch (err) {
+            console.error("Error applying sport overlap filter (no geo):", err);
+            // Fallback for each sport individually with OR conditions
+            let firstSport = true;
+            sportFilterArr.forEach(sport => {
+              if (firstSport) {
+                query = query.ilike('sport', `%${sport}%`);
+                firstSport = false;
+              } else {
+                query = query.or(`sport.ilike.%${sport}%`);
+              }
+            });
+          }
+        }
       }
       
       if (sportTypeFilter) {
