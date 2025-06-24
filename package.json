@@ -9,7 +9,8 @@
     "server": "cd server && npm i && npm run dev",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check": "npm run build && npm run lint"
   },
   "dependencies": {
     "react": "^18.3.1",
