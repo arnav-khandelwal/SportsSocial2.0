@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { FaCalendarAlt, FaUsers, FaGamepad, FaTimes } from 'react-icons/fa';
 import axios from 'axios';
 import LocationPicker from '../../components/LocationPicker/LocationPicker';
@@ -126,12 +126,13 @@ const CreatePost = () => {
     description: '',
     tags: [],
     eventTime: '',
-    playersNeeded: 1
+    playersNeeded: '',
+    isESports: false
   });
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [isESports, setIsESports] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
 
   const handleAddTag = (tag) => {
@@ -149,20 +150,27 @@ const CreatePost = () => {
   };
 
   const handleChange = (e) => {
-    if (e.target.name === 'isESports') {
-      setIsESports(e.target.checked);
-    } else if (e.target.name === 'tags') {
-      // Handle tags separately
-      const newTags = e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag);
-      setFormData({
-        ...formData,
-        tags: newTags
-      });
+    const { name, value } = e.target;
+    
+    if (name === 'playersNeeded') {
+      // Only allow positive integers
+      const num = parseInt(value);
+      if (value === '' || (!isNaN(num) && num > 0)) {
+        setFormData(prev => ({
+          ...prev,
+          [name]: value
+        }));
+      }
+    } else if (name === 'isESports') {
+      setFormData(prev => ({
+        ...prev,
+        [name]: e.target.checked
+      }));
     } else {
-      setFormData({
-        ...formData,
-        [e.target.name]: e.target.value
-      });
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
     }
   };
 
@@ -174,6 +182,7 @@ const CreatePost = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setSuccessMessage('');
 
     if (!location) {
       setError('Please select a location for your event.');
@@ -181,20 +190,42 @@ const CreatePost = () => {
       return;
     }
 
+    // Validate players needed
+    if (!formData.playersNeeded) {
+      setError('Please enter the number of players needed');
+      setLoading(false);
+      return;
+    }
+
+    const playersNum = parseInt(formData.playersNeeded);
+    if (isNaN(playersNum) || playersNum <= 0) {
+      setError('Please enter a valid number greater than 0');
+      setLoading(false);
+      return;
+    }
+
     try {
       const postData = {
-        ...formData,
+        sport: formData.sport,
+        heading: formData.heading,
+        description: formData.description,
+        tags: formData.tags,
         location: {
           type: 'Point',
           coordinates: location.coordinates
         },
         locationName: location.name,
-        tags: formData.tags,
-        playersNeeded: parseInt(formData.playersNeeded)
+        eventTime: formData.eventTime,
+        playersNeeded: playersNum // Convert to number before sending
       };
 
       await axios.post('/posts', postData);
-      navigate('/');
+      setSuccessMessage('Post created successfully!');
+      
+      // Wait for 4 seconds before navigating
+      setTimeout(() => {
+        navigate('/');
+      }, 4000);
     } catch (error) {
       setError(error.response?.data?.message || 'Failed to create post');
     } finally {
@@ -202,8 +233,22 @@ const CreatePost = () => {
     }
   };
 
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage('');
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
   return (
     <div className="create-post">
+      {successMessage && (
+        <div className="create-post__success-message">
+          {successMessage}
+        </div>
+      )}
       <div className="create-post__container">
         <div className="create-post__header">
           <h1 className="create-post__title">Create New Post</h1>
@@ -220,7 +265,7 @@ const CreatePost = () => {
                 <FaGamepad className="create-post__input-icon" />
                 <SportDropdown
                   sport={formData.sport}
-                  isESports={isESports}
+                  isESports={formData.isESports}
                   selectedSport={formData.sport}
                   onSelect={(sport) => {
                     setFormData({ ...formData, sport });
@@ -236,7 +281,7 @@ const CreatePost = () => {
                 <input
                   type="checkbox"
                   name="isESports"
-                  checked={isESports}
+                  checked={formData.isESports}
                   onChange={handleChange}
                 />
               </div>
@@ -244,18 +289,16 @@ const CreatePost = () => {
 
             <div className="create-post__field">
               <label>Players Needed *</label>
-              <div className="create-post__input-with-icon">
-                <FaUsers className="create-post__input-icon" />
-                <input
-                  type="number"
-                  name="playersNeeded"
-                  value={formData.playersNeeded}
-                  onChange={handleChange}
-                  min="1"
-                  max="50"
-                  required
-                />
-              </div>
+              <input
+                type="text"
+                name="playersNeeded"
+                value={formData.playersNeeded}
+                onChange={handleChange}
+                placeholder="Enter number of players needed"
+                required
+                pattern="[1-9][0-9]*"
+                title="Please enter a number greater than 0"
+              />
             </div>
           </div>
 

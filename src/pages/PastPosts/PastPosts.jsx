@@ -36,9 +36,10 @@ const PastPosts = () => {
     try {
       await axios.delete(`/posts/${postId}`);
       setPosts(posts.filter(post => post.id !== postId));
+      addNotification('Post deleted successfully!', 'success', 4000);
     } catch (error) {
       console.error('Failed to delete post:', error);
-      alert('Failed to delete post. Please try again.');
+      addNotification('Failed to delete post', 'error', 4000);
     }
   };
 
@@ -201,20 +202,20 @@ const PastPosts = () => {
 
                     <div className="past-posts__actions">
                       {postStatus.status === 'upcoming' && (
-                        <button
-                          className="past-posts__action-btn past-posts__action-btn--edit"
-                          title="Edit Post"
-                        >
-                          <FaEdit />
-                        </button>
+                        <>
+                          <Link to={`/create-post?edit=${post.id}`} className="past-posts__edit-btn">
+                            <FaEdit />
+                            Edit
+                          </Link>
+                          <button
+                            className="past-posts__delete-btn"
+                            onClick={() => handleDeletePost(post.id)}
+                          >
+                            <FaTrash />
+                            Delete
+                          </button>
+                        </>
                       )}
-                      <button
-                        className="past-posts__action-btn past-posts__action-btn--delete"
-                        onClick={() => handleDeletePost(post.id)}
-                        title="Delete Post"
-                      >
-                        <FaTrash />
-                      </button>
                     </div>
                   </div>
                 </div>
