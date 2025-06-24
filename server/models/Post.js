@@ -40,6 +40,23 @@ export class Post {
   }
   
   static async findNearby(lat, lng, radius = 25000, filters = {}) {
+    // Helper: valid sport/game names
+    const TRADITIONAL_SPORTS = [
+      'Football', 'Basketball', 'Tennis', 'Soccer', 'Baseball', 'Volleyball',
+      'Swimming', 'Running', 'Cycling', 'Golf', 'Hockey', 'Cricket', 'Rugby',
+      'Badminton', 'Table Tennis'
+    ];
+    const ESPORTS = [
+      'Valorant', 'BGMI', 'EAFC', 'NBA 2K', 'League of Legends',
+      'Call of Duty', 'Minecraft', 'Apex Legends', 'Other Online Games'
+    ];
+    
+    // Debug logging
+    console.log("Filters received:", JSON.stringify(filters));
+    
+    // Debug logging 
+    console.log("Filters received:", JSON.stringify(filters));
+    
     // If geolocation is provided, use RPC function first to get post IDs with distances
     if (lat && lng) {
       // First, get post IDs within radius using RPC
@@ -71,21 +88,32 @@ export class Post {
         .eq('is_active', true)
         .gte('event_time', new Date().toISOString());
       
-      // Apply filters
-      if (filters.sport && filters.sport.trim() !== '') {
-        // Handle comma-separated list of sports/games for multi-select filtering
-        const sportsArray = filters.sport.split(',').filter(s => s.trim() !== '');
-        
-        if (sportsArray.length === 1) {
-          // Single sport/game selected
-          query = query.ilike('sport', `%${sportsArray[0].trim()}%`);
-        } else if (sportsArray.length > 1) {
-          // Multiple sports/games selected - build OR filter
-          // Note: Limited OR support in Supabase requires creating a filter string
-          const filterString = sportsArray.map(sport => 
-            `sport.ilike.%${sport.trim()}%`).join(',');
-          query = query.or(filterString);
-        }
+      // Process and apply filtering
+      let sportsArray = Array.isArray(filters.sports) ? filters.sports.filter(s => TRADITIONAL_SPORTS.includes(s)) : [];
+      let esportsArray = Array.isArray(filters.esports) ? filters.esports.filter(s => ESPORTS.includes(s)) : [];
+      let filterType = filters.filterType || 'ALL';
+      let sportFilterArr = [];
+      let sportTypeFilter = undefined;
+      
+      if (filterType === 'SPORTS_ONLY') {
+        sportFilterArr = sportsArray;
+        sportTypeFilter = 'TRADITIONAL';
+      } else if (filterType === 'ESPORTS_ONLY') {
+        sportFilterArr = esportsArray;
+        sportTypeFilter = 'ESPORT';
+      } else {
+        sportFilterArr = [...sportsArray, ...esportsArray];
+      }
+      
+      console.log("Sport filter array:", sportFilterArr);
+      console.log("Sport type filter:", sportTypeFilter);
+      
+      if (sportFilterArr.length > 0) {
+        query = query.overlaps('sport', sportFilterArr);
+      }
+      
+      if (sportTypeFilter) {
+        query = query.eq('sport_type', sportTypeFilter);
       }
       
       if (filters.date) {
@@ -106,7 +134,10 @@ export class Post {
         .order('event_time', { ascending: true })
         .limit(parseInt(filters.limit) || 10);
       
-      if (postsError) throw postsError;
+      if (postsError) {
+        console.error("Query error:", postsError);
+        throw postsError;
+      }
       
       // Merge distance information back into posts
       const postsWithDistance = posts.map(post => {
@@ -130,20 +161,32 @@ export class Post {
         .eq('is_active', true)
         .gte('event_time', new Date().toISOString());
       
-      // Apply filters
-      if (filters.sport && filters.sport.trim() !== '') {
-        // Handle comma-separated list of sports/games for multi-select filtering
-        const sportsArray = filters.sport.split(',').filter(s => s.trim() !== '');
-        
-        if (sportsArray.length === 1) {
-          // Single sport/game selected
-          query = query.ilike('sport', `%${sportsArray[0].trim()}%`);
-        } else if (sportsArray.length > 1) {
-          // Multiple sports/games selected - build OR filter
-          const filterString = sportsArray.map(sport => 
-            `sport.ilike.%${sport.trim()}%`).join(',');
-          query = query.or(filterString);
-        }
+      // Process and apply filtering
+      let sportsArray = Array.isArray(filters.sports) ? filters.sports.filter(s => TRADITIONAL_SPORTS.includes(s)) : [];
+      let esportsArray = Array.isArray(filters.esports) ? filters.esports.filter(s => ESPORTS.includes(s)) : [];
+      let filterType = filters.filterType || 'ALL';
+      let sportFilterArr = [];
+      let sportTypeFilter = undefined;
+      
+      if (filterType === 'SPORTS_ONLY') {
+        sportFilterArr = sportsArray;
+        sportTypeFilter = 'TRADITIONAL';
+      } else if (filterType === 'ESPORTS_ONLY') {
+        sportFilterArr = esportsArray;
+        sportTypeFilter = 'ESPORT';
+      } else {
+        sportFilterArr = [...sportsArray, ...esportsArray];
+      }
+      
+      console.log("Sport filter array (no geo):", sportFilterArr);
+      console.log("Sport type filter (no geo):", sportTypeFilter);
+      
+      if (sportFilterArr.length > 0) {
+        query = query.overlaps('sport', sportFilterArr);
+      }
+      
+      if (sportTypeFilter) {
+        query = query.eq('sport_type', sportTypeFilter);
       }
       
       if (filters.date) {
@@ -164,7 +207,11 @@ export class Post {
         .order('event_time', { ascending: true })
         .limit(parseInt(filters.limit) || 10);
       
-      if (error) throw error;
+      if (error) {
+        console.error("Query error (no geo):", error);
+        throw error;
+      }
+      
       return data;
     }
   }

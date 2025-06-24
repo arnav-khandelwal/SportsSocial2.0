@@ -10,40 +10,39 @@ const Home = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
-    sport: '',
+    sports: [],
+    esports: [],
+    filterType: 'ALL',
     tags: [],
     date: '',
     location: null,
-    radius: -1, // -1 means no location filter
-    isESports: false
+    radius: -1
   });
+
+  // Debounce filter changes
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      fetchPosts();
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [filters]);
 
   useEffect(() => {
     fetchPosts();
-  }, [filters]);
+  }, []);
 
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      const params = {
-        sport: filters.sport,
-        tags: filters.tags,
-        date: filters.date,
-        radius: filters.radius,
-        isESports: filters.isESports
-      };
-
+      const params = { ...filters };
       if (filters.location && filters.radius !== -1) {
-        params.lat = filters.location.coordinates[1]; // latitude
-        params.lng = filters.location.coordinates[0]; // longitude
+        params.lat = filters.location.coordinates[1];
+        params.lng = filters.location.coordinates[0];
       }
-
       const response = await axios.get('/posts', { params });
-
       const filteredPosts = response.data.filter(
         (post) => post.author_id !== user?.id
       );
-
       setPosts(filteredPosts);
     } catch (error) {
       console.error('Failed to fetch posts:', error);
@@ -53,7 +52,10 @@ const Home = () => {
   };
 
   const handleFilterChange = (newFilters) => {
-    setFilters(newFilters);
+    setFilters({
+      ...filters,
+      ...newFilters
+    });
   };
 
   const handleInterest = async (postId) => {

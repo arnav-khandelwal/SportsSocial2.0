@@ -9,7 +9,9 @@ const router = express.Router();
 router.get('/', authenticateToken, async (req, res) => {
   try {
     const { 
-      sport, 
+      sports,
+      esports,
+      filterType,
       tags, 
       date, 
       lat, 
@@ -19,8 +21,20 @@ router.get('/', authenticateToken, async (req, res) => {
       limit = 10 
     } = req.query;
 
+    // Convert string arrays from query params if needed
+    const parseSportParam = (param) => {
+      if (!param) return [];
+      if (Array.isArray(param)) return param;
+      if (typeof param === 'string') {
+        return param.split(',').filter(Boolean).map(s => s.trim());
+      }
+      return [];
+    };
+    
     const filters = {
-      sport,
+      sports: parseSportParam(sports),
+      esports: parseSportParam(esports),
+      filterType: filterType || 'ALL',
       tags: tags ? (Array.isArray(tags) ? tags : [tags]) : [],
       date,
       limit

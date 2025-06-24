@@ -380,7 +380,7 @@ const CreatePost = () => {
               <div className="create-post__selected-location">
                 <span>Selected: {location.name}</span>
               </div>
-            )}
+            )}  
           </div>
 
           <div className="create-post__field">

@@ -126,13 +126,78 @@ const MultiSelectDropdown = ({ options, selectedItems, onChange, placeholder, ic
 
 const PostFilters = ({ filters, onFilterChange }) => {
   const [showFilters, setShowFilters] = useState(true);
-  const [localFilters, setLocalFilters] = useState({
-    ...filters,
-    sportsList: filters.sport ? [filters.sport] : [], // Convert single sport to array
-    gamesList: [], // New field for selected online games
-    onlySports: false, // New checkbox for filtering only sports
-    onlyGames: false, // New checkbox for filtering only online games
-  });
+  const [sports, setSports] = useState([]);
+  const [esports, setEsports] = useState([]);
+  const [filterType, setFilterType] = useState('ALL');
+  const [date, setDate] = useState(filters.date || '');
+  const [location, setLocation] = useState(filters.location || null);
+  const [radius, setRadius] = useState(filters.radius || -1);
+  const [tags, setTags] = useState(filters.tags || []);
+
+  // Sync state from filters prop
+  useEffect(() => {
+    // Sync from filters prop
+    setSports(Array.isArray(filters.sports) ? filters.sports : []);
+    setEsports(Array.isArray(filters.esports) ? filters.esports : []);
+    setFilterType(filters.filterType || 'ALL');
+    setDate(filters.date || '');
+    setLocation(filters.location || null);
+    setRadius(filters.radius || -1);
+    setTags(filters.tags || []);
+  }, [filters]);
+
+  // Multi-select handlers
+  const handleSportsChange = (selected) => {
+    setSports(selected);
+    if (filterType === 'ESPORTS_ONLY') setFilterType('ALL');
+  };
+  const handleGamesChange = (selected) => {
+    setEsports(selected);
+    if (filterType === 'SPORTS_ONLY') setFilterType('ALL');
+  };
+
+  // Toggle handlers
+  const handleOnlySports = () => {
+    setFilterType(filterType === 'SPORTS_ONLY' ? 'ALL' : 'SPORTS_ONLY');
+    if (filterType !== 'SPORTS_ONLY') setEsports([]);
+  };
+  const handleOnlyGames = () => {
+    setFilterType(filterType === 'ESPORTS_ONLY' ? 'ALL' : 'ESPORTS_ONLY');
+    if (filterType !== 'ESPORTS_ONLY') setSports([]);
+  };
+
+  // Apply filters
+  const applyFilters = () => {
+    onFilterChange({
+      sports,
+      esports,
+      filterType,
+      date,
+      location,
+      radius,
+      tags,
+    });
+  };
+
+  // Clear all
+  const clearFilters = () => {
+    setSports([]);
+    setEsports([]);
+    setFilterType('ALL');
+    setDate('');
+    setLocation(null);
+    setRadius(-1);
+    setTags([]);
+    onFilterChange({
+      sports: [],
+      esports: [],
+      filterType: 'ALL',
+      date: '',
+      location: null,
+      radius: -1,
+      tags: [],
+    });
+  };
 
   const radiusOptions = [
     { value: 1000, label: '1km' },
@@ -152,22 +217,11 @@ const PostFilters = ({ filters, onFilterChange }) => {
       
       // If "only sports" is checked, ensure "only games" is unchecked and vice versa
       if (name === 'onlySports' && isChecked) {
-        setLocalFilters({
-          ...localFilters,
-          onlySports: true,
-          onlyGames: false
-        });
+        setFilterType('SPORTS_ONLY');
+        setEsports([]);
       } else if (name === 'onlyGames' && isChecked) {
-        setLocalFilters({
-          ...localFilters,
-          onlyGames: true,
-          onlySports: false
-        });
-      } else {
-        setLocalFilters({
-          ...localFilters,
-          [name]: isChecked
-        });
+        setFilterType('ESPORTS_ONLY');
+        setSports([]);
       }
     } else {
       // Handle regular input changes
@@ -178,102 +232,15 @@ const PostFilters = ({ filters, onFilterChange }) => {
     }
   };
 
-  // Handle sports multi-select
-  const handleSportsChange = (selectedSports) => {
-    setLocalFilters({
-      ...localFilters,
-      sportsList: selectedSports
-    });
-  };
-
-  // Handle online games multi-select
-  const handleGamesChange = (selectedGames) => {
-    setLocalFilters({
-      ...localFilters,
-      gamesList: selectedGames
-    });
-  };
-
   const handleLocationSelect = (location) => {
-    setLocalFilters({ 
-      ...localFilters, 
-      location,
-      // Reset radius to default when location changes
-      radius: location ? 25000 : -1
-    });
+    setLocation(location);
+    // Reset radius to default when location changes
+    setRadius(location ? 25000 : -1);
   };
 
   const clearLocation = () => {
-    setLocalFilters({ 
-      ...localFilters, 
-      location: null,
-      radius: -1
-    });
-  };
-
-  const applyFilters = () => {
-    // Prepare the filters for the parent component
-    // Combine sports and games based on the "only" checkboxes
-    let sport = '';
-    
-    if (localFilters.onlySports && localFilters.sportsList.length > 0) {
-      // Only use sports filters
-      sport = localFilters.sportsList.join(',');
-    } else if (localFilters.onlyGames && localFilters.gamesList.length > 0) {
-      // Only use games filters
-      sport = localFilters.gamesList.join(',');
-    } else if (localFilters.sportsList.length > 0 || localFilters.gamesList.length > 0) {
-      // Combine both sports and games
-      sport = [...localFilters.sportsList, ...localFilters.gamesList].join(',');
-    }
-    
-    const finalFilters = {
-      ...localFilters,
-      sport, // Update the single sport string that the API expects
-    };
-    
-    // Remove the internal fields that the API doesn't need
-    delete finalFilters.sportsList;
-    delete finalFilters.gamesList;
-    delete finalFilters.onlySports;
-    delete finalFilters.onlyGames;
-    
-    onFilterChange(finalFilters);
-    
-    // Don't hide filters automatically to provide better UX
-    // setShowFilters(false);
-  };
-
-  const clearFilters = () => {
-    const clearedFilters = {
-      sport: '',
-      sportsList: [],
-      gamesList: [],
-      tags: [],
-      date: '',
-      location: null,
-      radius: -1,
-      onlySports: false,
-      onlyGames: false
-    };
-    
-    // Update local state
-    setLocalFilters(clearedFilters);
-    
-    // Apply the cleared filters immediately
-    const finalFilters = {
-      ...clearedFilters,
-      sport: ''
-    };
-    
-    // Remove the internal fields that the API doesn't need
-    delete finalFilters.sportsList;
-    delete finalFilters.gamesList;
-    delete finalFilters.onlySports;
-    delete finalFilters.onlyGames;
-    
-    // Pass to parent component to trigger data refresh
-    onFilterChange(finalFilters);
+    setLocation(null);
+    setRadius(-1);
   };
 
   return (
@@ -298,7 +265,7 @@ const PostFilters = ({ filters, onFilterChange }) => {
             <div className="post-filters__field">
               <MultiSelectDropdown
                 options={SPORTS}
-                selectedItems={localFilters.sportsList}
+                selectedItems={sports}
                 onChange={handleSportsChange}
                 placeholder="Select Sports"
                 icon={<FaRunning />}
@@ -310,8 +277,8 @@ const PostFilters = ({ filters, onFilterChange }) => {
                 <input
                   type="checkbox"
                   name="onlySports"
-                  checked={localFilters.onlySports}
-                  onChange={handleFilterChange}
+                  checked={filterType === 'SPORTS_ONLY'}
+                  onChange={handleOnlySports}
                 />
                 <span className="checkmark"></span>
                 <span>Only Sports</span>
@@ -327,7 +294,7 @@ const PostFilters = ({ filters, onFilterChange }) => {
             <div className="post-filters__field">
               <MultiSelectDropdown
                 options={ONLINE_GAMES}
-                selectedItems={localFilters.gamesList}
+                selectedItems={esports}
                 onChange={handleGamesChange}
                 placeholder="Select E Sports"
                 icon={<FaGamepad />}
@@ -339,8 +306,8 @@ const PostFilters = ({ filters, onFilterChange }) => {
                 <input
                   type="checkbox"
                   name="onlyGames"
-                  checked={localFilters.onlyGames}
-                  onChange={handleFilterChange}
+                  checked={filterType === 'ESPORTS_ONLY'}
+                  onChange={handleOnlyGames}
                 />
                 <span className="checkmark"></span>
                 <span>Only E Sports</span>
@@ -354,8 +321,8 @@ const PostFilters = ({ filters, onFilterChange }) => {
               <input
                 type="date"
                 name="date"
-                value={localFilters.date || ''}
-                onChange={handleFilterChange}
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
                 className="post-filters__date-input"
               />
             </div>
@@ -369,17 +336,17 @@ const PostFilters = ({ filters, onFilterChange }) => {
             <div className="post-filters__field">
               <LocationPicker
                 onLocationSelect={handleLocationSelect}
-                initialLocation={localFilters.location}
+                initialLocation={location}
                 placeholder="Search for a location to find nearby events..."
               />
             </div>
 
-            {localFilters.location && (
+            {location && (
               <div className="post-filters__field">
-                <label>Distance from {localFilters.location.name}</label>
+                <label>Distance from {location.name}</label>
                 <select
                   name="radius"
-                  value={localFilters.radius}
+                  value={radius}
                   onChange={handleFilterChange}
                   className="post-filters__select"
                 >
