@@ -202,19 +202,13 @@ const PastPosts = () => {
 
                     <div className="past-posts__actions">
                       {postStatus.status === 'upcoming' && (
-                        <>
-                          <Link to={`/create-post?edit=${post.id}`} className="past-posts__edit-btn">
-                            <FaEdit />
-                            Edit
-                          </Link>
-                          <button
-                            className="past-posts__delete-btn"
-                            onClick={() => handleDeletePost(post.id)}
-                          >
-                            <FaTrash />
-                            Delete
-                          </button>
-                        </>
+                        <button
+                          className="past-posts__delete-btn"
+                          onClick={() => handleDeletePost(post.id)}
+                        >
+                          <FaTrash />
+                          Delete
+                        </button>
                       )}
                     </div>
                   </div>

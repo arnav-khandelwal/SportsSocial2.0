@@ -1,60 +1,85 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FaCalendarAlt, FaUsers, FaGamepad, FaTimes } from 'react-icons/fa';
+import { FaCalendarAlt, FaUsers, FaGamepad, FaTimes, FaChevronDown } from 'react-icons/fa';
 import axios from 'axios';
 import LocationPicker from '../../components/LocationPicker/LocationPicker';
 import './CreatePost.scss';
+import valorantIcon from '../../assets/icons/valorant.png';
+import bgmiIcon from '../../assets/icons/bgmi.png';
+import eafcIcon from '../../assets/icons/EAFC.png';
+import nba2kIcon from '../../assets/icons/NBA2K.png';
+import leagueOfLegendsIcon from '../../assets/icons/leagueoflegends.png';
+import callOfDutyIcon from '../../assets/icons/CallOfDuty.png';
+import minecraftIcon from '../../assets/icons/minecraft.png';
+import apexLegendsIcon from '../../assets/icons/apexlegends.png';
 
-const SportDropdown = ({ sport, isESports, selectedSport, onSelect }) => {
+const SPORTS = [
+  { name: 'Football', icon: '⚽' },
+  { name: 'Basketball', icon: '🏀' },
+  { name: 'Tennis', icon: '🎾' },
+  { name: 'Soccer', icon: '⚽' },
+  { name: 'Baseball', icon: '⚾' },
+  { name: 'Volleyball', icon: '🏐' },
+  { name: 'Swimming', icon: '🏊‍♂️' },
+  { name: 'Running', icon: '🏃‍♂️' },
+  { name: 'Cycling', icon: '🚴‍♂️' },
+  { name: 'Golf', icon: '⛳' },
+  { name: 'Hockey', icon: '🏒' },
+  { name: 'Cricket', icon: '🏏' },
+  { name: 'Rugby', icon: '🏉' },
+  { name: 'Badminton', icon: '🏸' },
+  { name: 'Table Tennis', icon: '🏓' }
+];
+
+const ONLINE_GAMES = [
+  { name: 'Valorant', icon: valorantIcon, useImage: true },
+  { name: 'BGMI', icon: bgmiIcon, useImage: true },
+  { name: 'EAFC', icon: eafcIcon, useImage: true },
+  { name: 'NBA 2K', icon: nba2kIcon, useImage: true },
+  { name: 'League of Legends', icon: leagueOfLegendsIcon, useImage: true },
+  { name: 'Call of Duty', icon: callOfDutyIcon, useImage: true },
+  { name: 'Minecraft', icon: minecraftIcon, useImage: true },
+  { name: 'Apex Legends', icon: apexLegendsIcon, useImage: true },
+  { name: 'Other Online Games', icon: '🎮', useImage: false }
+];
+
+const SingleSelectDropdown = ({ options, selected, onSelect, placeholder }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const sportOptions = isESports
-    ? [
-        'Valorant', 'BGMI', 'EAFC', 'NBA', 'Other Online Games'
-      ]
-    : [
-        { name: 'Football', icon: '⚽' },
-        { name: 'Basketball', icon: '🏀' },
-        { name: 'Tennis', icon: '🎾' },
-        { name: 'Soccer', icon: '⚽' },
-        { name: 'Baseball', icon: '⚾' },
-        { name: 'Volleyball', icon: '🏐' },
-        { name: 'Swimming', icon: '🏊‍♂️' },
-        { name: 'Running', icon: '🏃‍♂️' },
-        { name: 'Cycling', icon: '🚴‍♂️' },
-        { name: 'Golf', icon: '⛳' },
-        { name: 'Hockey', icon: '🏒' },
-        { name: 'Cricket', icon: '🏏' },
-        { name: 'Rugby', icon: '🏉' },
-        { name: 'Badminton', icon: '🏸' },
-        { name: 'Table Tennis', icon: '🏓' },
-        {name: 'Rugby', icon: '🏉'},
-        {name: 'Other', icon: '🎲'},
-        
-      ];
-
   return (
-    <div className="sport-dropdown">
+    <div className="single-select-dropdown">
       <button
-        className="sport-dropdown__button"
+        className="single-select-dropdown__button"
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
       >
-        {selectedSport ? 
-          (isESports ? selectedSport : sportOptions.find(s => s.name === selectedSport)?.icon + ' ' + selectedSport) : 
-          'Select Sport'}
+        <span className="single-select-dropdown__selected">
+          {selected
+            ? (<span className="single-select-dropdown__item">
+                {options.find(o => o.name === selected)?.useImage
+                  ? <img src={options.find(o => o.name === selected).icon} alt={selected} className="single-select-dropdown__game-icon" />
+                  : options.find(o => o.name === selected)?.icon}
+                <span className="single-select-dropdown__item-name">{selected}</span>
+              </span>)
+            : placeholder}
+        </span>
+        <FaChevronDown className={`single-select-dropdown__chevron${isOpen ? ' single-select-dropdown__chevron--open' : ''}`} />
       </button>
       {isOpen && (
-        <div className="sport-dropdown__options">
-          {sportOptions.map((sport, index) => (
-            <button
-              key={index}
-              className="sport-dropdown__option"
+        <div className="single-select-dropdown__options">
+          {options.map((item) => (
+            <div
+              key={item.name}
+              className={`single-select-dropdown__option${selected === item.name ? ' single-select-dropdown__option--selected' : ''}`}
               onClick={() => {
-                onSelect(sport.name);
+                onSelect(item.name);
                 setIsOpen(false);
               }}
             >
-              {isESports ? sport : sport.icon} {sport.name}
-            </button>
+              {item.useImage
+                ? <img src={item.icon} alt={item.name} className="single-select-dropdown__game-icon" />
+                : item.icon}
+              <span className="single-select-dropdown__item-name">{item.name}</span>
+            </div>
           ))}
         </div>
       )}
@@ -133,6 +158,7 @@ const CreatePost = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [sportType, setSportType] = useState('sports'); // 'sports' or 'onlineGames'
   const navigate = useNavigate();
 
   const handleAddTag = (tag) => {
@@ -260,33 +286,39 @@ const CreatePost = () => {
 
           <div className="create-post__row">
             <div className="create-post__field">
-              <label>Sport *</label>
-              <div className="create-post__input-with-icon">
-                <FaGamepad className="create-post__input-icon" />
-                <SportDropdown
-                  sport={formData.sport}
-                  isESports={formData.isESports}
-                  selectedSport={formData.sport}
-                  onSelect={(sport) => {
-                    setFormData({ ...formData, sport });
+              <label>Type *</label>
+              <div className="create-post__type-toggle">
+                <button
+                  type="button"
+                  className={`create-post__type-btn${sportType === 'sports' ? ' create-post__type-btn--active' : ''}`}
+                  onClick={() => {
+                    setSportType('sports');
+                    setFormData({ ...formData, sport: '' });
                   }}
-                />
+                >
+                  Sports
+                </button>
+                <button
+                  type="button"
+                  className={`create-post__type-btn${sportType === 'onlineGames' ? ' create-post__type-btn--active' : ''}`}
+                  onClick={() => {
+                    setSportType('onlineGames');
+                    setFormData({ ...formData, sport: '' });
+                  }}
+                >
+                  Online Game
+                </button>
               </div>
             </div>
-
             <div className="create-post__field">
-              <label>Is E-Sport?</label>
-              <div className="create-post__input-with-icon">
-                <FaGamepad className="create-post__input-icon" />
-                <input
-                  type="checkbox"
-                  name="isESports"
-                  checked={formData.isESports}
-                  onChange={handleChange}
-                />
-              </div>
+              <label>{sportType === 'sports' ? 'Sport' : 'Online Game'} *</label>
+              <SingleSelectDropdown
+                options={sportType === 'sports' ? SPORTS : ONLINE_GAMES}
+                selected={formData.sport}
+                onSelect={(name) => setFormData({ ...formData, sport: name })}
+                placeholder={`Select ${sportType === 'sports' ? 'Sport' : 'Online Game'}`}
+              />
             </div>
-
             <div className="create-post__field">
               <label>Players Needed *</label>
               <input
