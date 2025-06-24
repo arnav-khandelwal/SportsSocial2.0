@@ -157,7 +157,58 @@
       }
     }
 
-    .create-post__tags-input {
+    .create-post__tags-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .create-post__tags-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 8px;
+      background: var(--background-card);
+      border: 1px solid var(--border-primary);
+      border-radius: 8px;
+      min-height: 40px;
+    }
+
+    .create-post__tag {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 12px;
+      background: var(--primary);
+      color: var(--text-primary);
+      border-radius: 25px;
+      font-size: 14px;
+    }
+
+    .create-post__tag-remove {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s ease;
+
+      &:hover {
+        opacity: 1;
+      }
+
+      &:focus {
+        outline: none;
+      }
+    }
+
+    .create-post__tag-input {
       width: 100%;
       padding: 12px;
       border: 1px solid var(--border-primary);

@@ -117,6 +117,15 @@ const TagInput = ({ tags, onAddTag, onRemoveTag }) => {
 
   return (
     <div className="create-post__tags-container">
+      <input
+        type="text"
+        value={inputValue}
+        onChange={handleInputChange}
+        onKeyDown={handleKeyDown}
+        onBlur={handleBlur}
+        placeholder="Type tags (press space to add)"
+        className="create-post__tag-input"
+      />
       <div className="create-post__tags-list">
         {tags.map((tag, index) => (
           <span key={index} className="create-post__tag">
@@ -130,15 +139,6 @@ const TagInput = ({ tags, onAddTag, onRemoveTag }) => {
             </button>
           </span>
         ))}
-        <input
-          type="text"
-          value={inputValue}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          onBlur={handleBlur}
-          placeholder="Type tags (press space to add)"
-          className="create-post__tag-input"
-        />
       </div>
     </div>
   );
