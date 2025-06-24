@@ -90,6 +90,19 @@
   --z-tooltip: 1070;
 }
 
+// 1. Import Laira font from local assets
+@font-face {
+  font-family: 'Laira';
+  src: url('../assets/fonts/WorkSans-VariableFont_wght.ttf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+// 2. Set global font-family
+body, html, * {
+  font-family: 'Laira', Arial, sans-serif !important;
+}
+
 // Reset and base styles
 * {
   margin: 0;

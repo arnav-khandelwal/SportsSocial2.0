@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
 import NotificationDropdown from '../NotificationDropdown/NotificationDropdown';
 import axios from 'axios';
+import logo from '../../assets/logo/logo.png';
 import './Header.scss';
 
 const Header = ({ toggleSidebar }) => {
@@ -78,6 +79,7 @@ const Header = ({ toggleSidebar }) => {
           <FaBars />
         </button>
         <Link to="/" className="header__logo">
+          <img src={logo} alt="Logo" className="header__logo-img" style={{ height: 32, width: 32, marginRight: 10, verticalAlign: 'middle' }} />
           <span className="header__logo-text">Sports Social</span>
         </Link>
       </div>
