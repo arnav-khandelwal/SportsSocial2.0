@@ -62,16 +62,13 @@ export class Post {
     const sportArray = Array.isArray(sport) ? sport : [sport];
     
     // Use our helper to determine sport type and get normalized name
-    const { type: sportType, normalizedName } = Post.matchSport(sportArray[0]);
-    
-    // Update the sport array with the normalized name
-    const normalizedSportArray = [normalizedName];
-    
+    const { type: sportType, normalizedName } = Post.matchSport(sport);
+
     const { data, error } = await supabase
       .from('posts')
       .insert([{
         author_id,
-        sport: normalizedSportArray,
+        sport: normalizedName, // store as string, not array
         sport_type: sportType,
         heading,
         description,

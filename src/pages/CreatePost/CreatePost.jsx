@@ -231,8 +231,18 @@ const CreatePost = () => {
     }
 
     try {
+      // Normalize sport name to match display name
+      let normalizedSport = formData.sport;
+      if (sportType === 'sports') {
+        const match = SPORTS.find(s => s.name.toLowerCase() === formData.sport.toLowerCase());
+        if (match) normalizedSport = match.name;
+      } else if (sportType === 'onlineGames') {
+        const match = ONLINE_GAMES.find(s => s.name.toLowerCase() === formData.sport.toLowerCase());
+        if (match) normalizedSport = match.name;
+      }
+
       const postData = {
-        sport: formData.sport,
+        sport: normalizedSport, // always a string, never array or uppercase
         heading: formData.heading,
         description: formData.description,
         tags: formData.tags,
