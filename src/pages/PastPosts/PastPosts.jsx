@@ -5,6 +5,63 @@ import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { formatRelativeTime, formatDateTime } from '../../utils/dateUtils';
 import './PastPosts.scss';
+import valorantIcon from '../../assets/icons/valorant.png';
+import bgmiIcon from '../../assets/icons/bgmi.png';
+import eafcIcon from '../../assets/icons/EAFC.png';
+import nba2kIcon from '../../assets/icons/NBA2K.png';
+import leagueOfLegendsIcon from '../../assets/icons/leagueoflegends.png';
+import callOfDutyIcon from '../../assets/icons/CallOfDuty.png';
+import minecraftIcon from '../../assets/icons/minecraft.png';
+import apexLegendsIcon from '../../assets/icons/apexlegends.png';
+
+const SPORTS = [
+  'Football', 'Basketball', 'Tennis', 'Soccer', 'Baseball', 'Volleyball',
+  'Swimming', 'Running', 'Cycling', 'Golf', 'Hockey', 'Cricket', 'Rugby',
+  'Badminton', 'Table Tennis'
+];
+const ONLINE_GAMES = [
+  'Valorant', 'BGMI', 'EAFC', 'NBA 2K', 'League of Legends',
+  'Call of Duty', 'Minecraft', 'Apex Legends', 'Other Online Games'
+];
+
+const getSportIcon = (sport) => {
+  const onlineGameIcons = {
+    'Valorant': valorantIcon,
+    'BGMI': bgmiIcon,
+    'EAFC': eafcIcon,
+    'NBA 2K': nba2kIcon,
+    'League of Legends': leagueOfLegendsIcon,
+    'Call of Duty': callOfDutyIcon,
+    'Minecraft': minecraftIcon,
+    'Apex Legends': apexLegendsIcon,
+  };
+  if (ONLINE_GAMES.includes(sport)) {
+    if (onlineGameIcons[sport]) {
+      return { type: 'esport', icon: onlineGameIcons[sport], useImage: true };
+    }
+    return { type: 'esport', icon: '🎮', useImage: false };
+  }
+  // Default to emoji for sports
+  const sportIcons = {
+    'Football': '⚽',
+    'Basketball': '🏀',
+    'Tennis': '🎾',
+    'Soccer': '⚽',
+    'Baseball': '⚾',
+    'Volleyball': '🏐',
+    'Swimming': '🏊‍♂️',
+    'Running': '🏃‍♂️',
+    'Cycling': '🚴‍♂️',
+    'Golf': '⛳',
+    'Hockey': '🏒',
+    'Cricket': '🏏',
+    'Rugby': '🏉',
+    'Badminton': '🏸',
+    'Table Tennis': '🏓',
+    'Other': '🎲',
+  };
+  return { type: 'sport', icon: sportIcons[sport] || '🎲', useImage: false };
+};
 
 const PastPosts = () => {
   const { user } = useAuth();
@@ -148,7 +205,12 @@ const PastPosts = () => {
               return (
                 <div key={post.id} className="past-posts__card">
                   <div className="past-posts__card-header">
-                    <div className="past-posts__sport-badge">
+                    <div className={`past-posts__sport-badge past-posts__sport-badge--${getSportIcon(post.sport).type}`}>
+                      {getSportIcon(post.sport).useImage ? (
+                        <img src={getSportIcon(post.sport).icon} alt={post.sport} style={{ height: 20, width: 20, verticalAlign: 'middle', marginRight: 6 }} />
+                      ) : (
+                        <span style={{ marginRight: 6 }}>{getSportIcon(post.sport).icon}</span>
+                      )}
                       {post.sport}
                     </div>
                     <div className={`past-posts__status past-posts__status--${postStatus.className}`}>

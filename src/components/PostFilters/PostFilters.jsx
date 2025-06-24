@@ -289,14 +289,14 @@ const PostFilters = ({ filters, onFilterChange }) => {
           <div className="post-filters__section">
             <h3 className="post-filters__section-title">
               <FaGamepad className="post-filters__section-icon" />
-              E Sports
+              Online Games
             </h3>
             <div className="post-filters__field">
               <MultiSelectDropdown
                 options={ONLINE_GAMES}
                 selectedItems={esports}
                 onChange={handleGamesChange}
-                placeholder="Select E Sports"
+                placeholder="Select Online Games"
                 icon={<FaGamepad />}
               />
             </div>
@@ -310,7 +310,7 @@ const PostFilters = ({ filters, onFilterChange }) => {
                   onChange={handleOnlyGames}
                 />
                 <span className="checkmark"></span>
-                <span>Only E Sports</span>
+                <span>Only Online Games</span>
               </label>
             </div>
           </div>
