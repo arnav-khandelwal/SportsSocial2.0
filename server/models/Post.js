@@ -72,8 +72,20 @@ export class Post {
         .gte('event_time', new Date().toISOString());
       
       // Apply filters
-      if (filters.sport) {
-        query = query.ilike('sport', `%${filters.sport}%`);
+      if (filters.sport && filters.sport.trim() !== '') {
+        // Handle comma-separated list of sports/games for multi-select filtering
+        const sportsArray = filters.sport.split(',').filter(s => s.trim() !== '');
+        
+        if (sportsArray.length === 1) {
+          // Single sport/game selected
+          query = query.ilike('sport', `%${sportsArray[0].trim()}%`);
+        } else if (sportsArray.length > 1) {
+          // Multiple sports/games selected - build OR filter
+          // Note: Limited OR support in Supabase requires creating a filter string
+          const filterString = sportsArray.map(sport => 
+            `sport.ilike.%${sport.trim()}%`).join(',');
+          query = query.or(filterString);
+        }
       }
       
       if (filters.date) {
@@ -119,8 +131,19 @@ export class Post {
         .gte('event_time', new Date().toISOString());
       
       // Apply filters
-      if (filters.sport) {
-        query = query.ilike('sport', `%${filters.sport}%`);
+      if (filters.sport && filters.sport.trim() !== '') {
+        // Handle comma-separated list of sports/games for multi-select filtering
+        const sportsArray = filters.sport.split(',').filter(s => s.trim() !== '');
+        
+        if (sportsArray.length === 1) {
+          // Single sport/game selected
+          query = query.ilike('sport', `%${sportsArray[0].trim()}%`);
+        } else if (sportsArray.length > 1) {
+          // Multiple sports/games selected - build OR filter
+          const filterString = sportsArray.map(sport => 
+            `sport.ilike.%${sport.trim()}%`).join(',');
+          query = query.or(filterString);
+        }
       }
       
       if (filters.date) {

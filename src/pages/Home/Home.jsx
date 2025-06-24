@@ -14,7 +14,8 @@ const Home = () => {
     tags: [],
     date: '',
     location: null,
-    radius: -1 // -1 means no location filter
+    radius: -1, // -1 means no location filter
+    isESports: false
   });
 
   useEffect(() => {
@@ -28,7 +29,8 @@ const Home = () => {
         sport: filters.sport,
         tags: filters.tags,
         date: filters.date,
-        radius: filters.radius
+        radius: filters.radius,
+        isESports: filters.isESports
       };
 
       if (filters.location && filters.radius !== -1) {

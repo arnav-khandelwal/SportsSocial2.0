@@ -63,12 +63,14 @@
     margin-top: 24px;
 
     @media (min-width: 1024px) {
-      width: 320px;
+      width: 300px;
       flex-shrink: 0;
       position: sticky;
-      top: 100px;
+      top: 20px; /* Position higher on the page */
       height: fit-content;
       margin-top: 0;
+      max-height: calc(100vh - 40px); /* Ensure it fits in viewport */
+      overflow-y: visible;
     }
   }
 
