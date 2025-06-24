@@ -170,33 +170,26 @@ export class Post {
       console.log("Sport type filter:", sportTypeFilter);
       
       if (sportFilterArr.length > 0) {
-        // For a single sport, use case-insensitive contains instead of overlaps
+        // For all sport filtering cases, use individual ilike queries with OR
+        console.log(`Using ilike for sports filtering with ${sportFilterArr.length} sports`);
+        
         if (sportFilterArr.length === 1) {
-          console.log(`Using ilike for single sport: ${sportFilterArr[0]}`);
+          // Single sport case
           query = query.ilike('sport', `%${sportFilterArr[0]}%`);
         } else {
-          try {
-            // Ensure each sport name is properly formatted for array comparison
-            const formattedSports = sportFilterArr.map(sport => sport.trim());
-            console.log("Using overlaps with formatted sports:", formattedSports);
-            query = query.overlaps('sport', formattedSports);
-          } catch (err) {
-            console.error("Error applying sport overlap filter:", err);
-            // Fallback for each sport individually with OR conditions
-            let firstSport = true;
-            sportFilterArr.forEach(sport => {
-              if (firstSport) {
-                query = query.ilike('sport', `%${sport}%`);
-                firstSport = false;
-              } else {
-                query = query.or(`sport.ilike.%${sport}%`);
-              }
-            });
-          }
+          // Multiple sports case - build OR conditions
+          let filterString = sportFilterArr.map((sport, index) => {
+            return `sport.ilike.%${sport}%`;
+          }).join(',');
+          
+          console.log(`Using or filter string: ${filterString}`);
+          query = query.or(filterString);
         }
       }
       
-      if (sportTypeFilter) {
+      // Apply sport type filter if specified (and we aren't already filtering by specific sports)
+      if (sportTypeFilter && (filterType === 'SPORTS_ONLY' || filterType === 'ESPORTS_ONLY' || sportFilterArr.length === 0)) {
+        console.log(`Applying sport_type filter: ${sportTypeFilter}`);
         query = query.eq('sport_type', sportTypeFilter);
       }
       
@@ -280,33 +273,26 @@ export class Post {
       console.log("Sport type filter (no geo):", sportTypeFilter);
       
       if (sportFilterArr.length > 0) {
-        // For a single sport, use case-insensitive contains instead of overlaps
+        // For all sport filtering cases, use individual ilike queries with OR
+        console.log(`Using ilike for sports filtering with ${sportFilterArr.length} sports (no geo)`);
+        
         if (sportFilterArr.length === 1) {
-          console.log(`Using ilike for single sport (no geo): ${sportFilterArr[0]}`);
+          // Single sport case
           query = query.ilike('sport', `%${sportFilterArr[0]}%`);
         } else {
-          try {
-            // Ensure each sport name is properly formatted for array comparison
-            const formattedSports = sportFilterArr.map(sport => sport.trim());
-            console.log("Using overlaps with formatted sports (no geo):", formattedSports);
-            query = query.overlaps('sport', formattedSports);
-          } catch (err) {
-            console.error("Error applying sport overlap filter (no geo):", err);
-            // Fallback for each sport individually with OR conditions
-            let firstSport = true;
-            sportFilterArr.forEach(sport => {
-              if (firstSport) {
-                query = query.ilike('sport', `%${sport}%`);
-                firstSport = false;
-              } else {
-                query = query.or(`sport.ilike.%${sport}%`);
-              }
-            });
-          }
+          // Multiple sports case - build OR conditions
+          let filterString = sportFilterArr.map((sport, index) => {
+            return `sport.ilike.%${sport}%`;
+          }).join(',');
+          
+          console.log(`Using or filter string: ${filterString}`);
+          query = query.or(filterString);
         }
       }
       
-      if (sportTypeFilter) {
+      // Apply sport type filter if specified (and we aren't already filtering by specific sports)
+      if (sportTypeFilter && (filterType === 'SPORTS_ONLY' || filterType === 'ESPORTS_ONLY' || sportFilterArr.length === 0)) {
+        console.log(`Applying sport_type filter (no geo): ${sportTypeFilter}`);
         query = query.eq('sport_type', sportTypeFilter);
       }
       
