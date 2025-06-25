@@ -17,23 +17,22 @@ const About = () => {
       <div className="about__content">
         {/* Mission Section */}
         <section className="about__section">
-          <div className="about__section-header">
-            <FaHeart className="about__section-icon" />
-            <h2>Our Mission</h2>
-          </div>
-          <div className="about__mission">
-            <p>
-              We believe that <strong>fitness should never be a solo journey</strong>. Sports Social exists to break down the barriers 
-              that keep people from staying active by making it ridiculously easy to find workout buddies, 
-              sports partners, and fitness communities right in your neighborhood.
-            </p>
-            <p>
-              Whether you're a seasoned athlete looking for competitive teammates or someone just starting their 
-              fitness journey who needs that extra motivation, we're here to connect you with like-minded people 
-              who share your passion for staying active.
-            </p>
-          </div>
-        </section>
+        <div className="about__section-header">
+          <FaHeart className="about__section-icon" />
+          <h2>Our Mission</h2>
+        </div>
+        <div className="about__mission">
+          <p>
+            We believe that <strong>connection and fun should never be a solo journey</strong>. Sports Social exists to break down the barriers 
+            that keep people from enjoying their favorite activities—whether physical or digital—by making it incredibly easy to find 
+            teammates, partners, and communities who share your interests.
+          </p>
+          <p>
+            Whether you're into sports, workouts, casual meetups, or even online gaming, we’re here to help you connect with like-minded 
+            people who motivate, challenge, and enjoy the things you love—together.
+          </p>
+        </div>
+      </section>
 
         {/* Origin Story */}
         <section className="about__section">
@@ -55,7 +54,7 @@ const About = () => {
             <p>
               That lightbulb moment led to countless late-night coding sessions, way too much coffee, and 
               eventually... Sports Social! We built the platform we wished existed – a place where 
-              <strong> "Want to work out?" </strong> gets answered with <strong>"Yes! When and where?"</strong>
+              <strong> "Want to work out at this time and this place?" </strong> gets answered with a very simple but strong: <strong>"Yes!"</strong>
             </p>
           </div>
         </section>
@@ -71,11 +70,11 @@ const About = () => {
               <div className="about__feature-icon">
                 <FaFutbol />
               </div>
-              <h3>Find Your Sport, Find Your People</h3>
+              <h3>Find Your Activity, Find Your People</h3>
               <p>
-                Post activities for any sport or fitness activity – from pickup basketball and morning runs 
-                to yoga sessions and rock climbing adventures. Set your location, time, and skill level, 
-                and watch the community respond!
+                Share any activity you’re interested in – from pickup basketball and study groups to online gaming sessions 
+                and weekend hikes. Set your location (or go virtual), time, and preferences, and let others who share your 
+                interests join in!
               </p>
             </div>
 
@@ -83,11 +82,11 @@ const About = () => {
               <div className="about__feature-icon">
                 <FaUsers />
               </div>
-              <h3>Connect & Build Your Crew</h3>
+             <h3>Connect & Build Your Crew</h3>
               <p>
-                Follow other active people in your area, build your fitness network, and never work out 
-                alone again. Our smart location-based matching helps you discover activities happening 
-                right around the corner.
+                Follow like-minded people who share your interests—whether it's gaming, working out, learning, or just hanging out. 
+                Build your own circle, and never go solo again. Our smart location-based (and virtual) matching helps you discover 
+                activities and communities that fit your vibe.
               </p>
             </div>
 
@@ -124,7 +123,7 @@ const About = () => {
           </div>
           <div className="about__personal">
             <p>
-              Hey there! 👋 We're Alex and Jordan, the two slightly obsessed college students who built this thing.
+              Hey there! 👋 We're Arnav and Rudra, the two slightly obsessed college students who built this thing.
             </p>
             <p>
               We know what it's like to want to stay active but struggle with motivation, schedules, or just 
