@@ -16,6 +16,7 @@ import directMessageRoutes from './routes/directMessages.js';
 import notificationRoutes from './routes/notifications.js';
 import reviewRoutes from './routes/reviews.js';
 import settingsRoutes from './routes/settings.js';
+import eventRegistrationsRoutes from './routes/eventRegistrations.js';
 
 // Import socket handlers
 import { handleSocketConnection } from './socket/socketHandlers.js';
@@ -73,6 +74,7 @@ app.use('/api/direct-messages', directMessageRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/event-registrations', eventRegistrationsRoutes);
 
 // Socket.io connection handling
 io.on('connection', (socket) => {

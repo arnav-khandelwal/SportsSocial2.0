@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   FaCalendarAlt, 
   FaMapMarkerAlt, 
@@ -12,12 +12,17 @@ import {
   FaTags,
   FaCheckCircle,
   FaHourglassHalf,
-  FaTimes
+  FaTimes,
+  FaTrophy
 } from 'react-icons/fa';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { formatRelativeTime, formatDateTime } from '../../utils/dateUtils';
 import './Events.scss';
+
+// Import game icons
+import valorantIcon from '../../assets/icons/valorant.png';
+import rocketLeagueIcon from '../../assets/icons/rocketleague.png';
 
 const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
@@ -30,6 +35,7 @@ const useIsMobile = () => {
 };
 
 const Events = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -48,7 +54,8 @@ const Events = () => {
   const sportOptions = [
     'Football', 'Basketball', 'Tennis', 'Soccer', 'Baseball', 
     'Volleyball', 'Swimming', 'Running', 'Cycling', 'Golf',
-    'Hockey', 'Cricket', 'Rugby', 'Badminton', 'Table Tennis'
+    'Hockey', 'Cricket', 'Rugby', 'Badminton', 'Table Tennis',
+    'Valorant', 'Rocket League'
   ];
 
   const skillLevels = [
@@ -82,47 +89,65 @@ const Events = () => {
         params.lat = filters.location.coordinates[1];
         params.lng = filters.location.coordinates[0];
       }
-
-      // For now, we'll use a mock API call since the backend routes don't exist yet
-      // const response = await axios.get('/events', { params });
       
-      // Mock data for demonstration
+      // Mock data for the three specified events
       const mockEvents = [
         {
           id: '1',
-          title: 'Weekend Basketball Tournament',
-          description: 'Join us for an exciting basketball tournament! All skill levels welcome.',
-          sport: 'Basketball',
-          organizer: { id: '1', username: 'john_doe' },
-          location_name: 'Central Park Basketball Courts',
-          event_date: new Date(Date.now() + 86400000 * 2).toISOString(), // 2 days from now
-          duration_hours: 4,
-          max_participants: 16,
-          current_participants: 8,
+          title: '5v5 Valorant Matchup',
+          description: 'Compete in a 5v5 Valorant tournament! Online event open for all teams. Registration is free. Cash prize: ₹1000 for the winning team.',
+          sport: 'Valorant',
+          organizer: { id: 'admin', username: 'admin' },
+          location_name: 'Online',
+          event_date: '2025-06-28T12:00:00.000Z', // June 28th
+          duration_hours: 72, // 3 days (Jun 28-30)
+          max_participants: null,
+          current_participants: 0,
           skill_level: 'all',
-          equipment_provided: true,
+          equipment_provided: false,
           cost: 0,
-          tags: ['tournament', 'competitive', 'outdoor'],
+          tags: ['online', 'esports', 'valorant', '5v5'],
           created_at: new Date().toISOString(),
-          distance: 2500
+          distance: null,
+          prize: '₹1000'
         },
         {
           id: '2',
-          title: 'Morning Tennis Practice',
-          description: 'Improve your tennis skills with experienced players.',
-          sport: 'Tennis',
-          organizer: { id: '2', username: 'tennis_pro' },
-          location_name: 'City Tennis Club',
-          event_date: new Date(Date.now() + 86400000).toISOString(), // Tomorrow
-          duration_hours: 2,
-          max_participants: 8,
-          current_participants: 5,
-          skill_level: 'intermediate',
+          title: '3v3 Rocket League Game',
+          description: 'Join our 3v3 Rocket League online tournament! Free to register. Show your skills and teamwork to win an exciting cash prize of ₹1000.',
+          sport: 'Rocket League',
+          organizer: { id: 'admin', username: 'admin' },
+          location_name: 'Online',
+          event_date: '2025-06-28T14:00:00.000Z', // June 28th
+          duration_hours: 72, // 3 days (Jun 28-30)
+          max_participants: null,
+          current_participants: 0,
+          skill_level: 'all',
           equipment_provided: false,
-          cost: 15.00,
-          tags: ['practice', 'coaching', 'indoor'],
+          cost: 0,
+          tags: ['online', 'esports', 'rocketleague', '3v3'],
           created_at: new Date().toISOString(),
-          distance: 1200
+          distance: null,
+          prize: '₹1000'
+        },
+        {
+          id: '3',
+          title: "3v3 Basketball Match at Lion's Club",
+          description: "Join our 3v3 basketball tournament at Lion's Club, Indirapuram! Team registration fee is ₹100. Compete for a cash prize of ₹1000.",
+          sport: 'Basketball',
+          organizer: { id: 'admin', username: 'admin' },
+          location_name: "Lion's Club, 28°37'32.3\"N 77°25'43.2\"E, Indirapuram, Ghaziabad, Uttar Pradesh 201014",
+          event_date: '2025-06-28T17:00:00+05:30', // June 28th 5pm IST
+          duration_hours: 3, // 5-8 PM
+          max_participants: null,
+          current_participants: 0,
+          skill_level: 'all',
+          equipment_provided: true,
+          cost: 100,
+          tags: ['basketball', 'offline', 'sports', '3v3'],
+          created_at: new Date().toISOString(),
+          distance: null,
+          prize: '₹1000'
         }
       ];
 
@@ -135,23 +160,13 @@ const Events = () => {
     }
   };
 
-  const handleRegister = async (eventId) => {
-    try {
-      // Mock registration for now
-      console.log('Registering for event:', eventId);
-      // const response = await axios.post(`/events/${eventId}/register`);
-      
-      // Update local state
-      setEvents(prevEvents =>
-        prevEvents.map(event =>
-          event.id === eventId
-            ? { ...event, current_participants: event.current_participants + 1 }
-            : event
-        )
-      );
-    } catch (error) {
-      console.error('Failed to register for event:', error);
-    }
+  const handleRegister = (event) => {
+    navigate('/events/register', { 
+      state: { 
+        eventTitle: event.title,
+        eventId: event.id
+      }
+    });
   };
 
   const getEventStatus = (event) => {
@@ -170,16 +185,6 @@ const Events = () => {
       return { status: 'this-week', label: 'This Week', className: 'this-week' };
     } else {
       return { status: 'upcoming', label: 'Upcoming', className: 'upcoming' };
-    }
-  };
-
-  const getAvailabilityStatus = (event) => {
-    if (event.current_participants >= event.max_participants) {
-      return { status: 'full', label: 'Full', className: 'full' };
-    } else if (event.current_participants >= event.max_participants * 0.8) {
-      return { status: 'filling', label: 'Filling Fast', className: 'filling' };
-    } else {
-      return { status: 'available', label: 'Available', className: 'available' };
     }
   };
 
@@ -254,7 +259,7 @@ const Events = () => {
             </div>
 
             <div className="events__filter-field">
-              <label>Max Cost ($)</label>
+              <label>Max Cost (₹)</label>
               <input
                 type="number"
                 value={filters.maxCost}
@@ -293,23 +298,35 @@ const Events = () => {
           <div className="events__grid">
             {events.map((event) => {
               const eventStatus = getEventStatus(event);
-              const availabilityStatus = getAvailabilityStatus(event);
               
               return (
                 <div key={event.id} className="events__card">
                   <div className="events__card-header">
                     <div className="events__card-badges">
-                      <span className="events__sport-badge">{event.sport}</span>
+                      <span className="events__sport-badge events__sport-badge--custom">
+                        {event.sport === 'Valorant' && (
+                          <img src={valorantIcon} alt="Valorant" className="events__sport-icon" />
+                        )}
+                        {event.sport === 'Rocket League' && (
+                          <img src={rocketLeagueIcon} alt="Rocket League" className="events__sport-icon" />
+                        )}
+                        {event.sport === 'Basketball' && (
+                          <span role="img" aria-label="Basketball" style={{fontSize: '20px', marginRight: '6px'}}>🏀</span>
+                        )}
+                        {event.sport}
+                      </span>
                       <span className={`events__status events__status--${eventStatus.className}`}>
                         {eventStatus.label}
                       </span>
-                      <span className={`events__availability events__availability--${availabilityStatus.className}`}>
-                        {availabilityStatus.label}
+                      
+                      <span className="events__prize-badge">
+                        <FaTrophy />
+                        Prize: {event.prize}
                       </span>
                     </div>
                     <div className="events__organizer">
                       <Link 
-                        to={`/profile/${event.organizer?.id}`}
+                        to="/about"
                         className="events__organizer-link"
                       >
                         <div className="events__organizer-avatar">
@@ -361,13 +378,13 @@ const Events = () => {
 
                     <div className="events__detail">
                       <FaUsers className="events__detail-icon" />
-                      <span>{event.current_participants}/{event.max_participants} participants</span>
+                      <span>Open participation</span>
                     </div>
 
                     {event.cost > 0 && (
                       <div className="events__detail">
                         <FaDollarSign className="events__detail-icon" />
-                        <span>${event.cost}</span>
+                        <span>₹{event.cost}</span>
                       </div>
                     )}
 
@@ -390,25 +407,11 @@ const Events = () => {
                     </div>
 
                     <button
-                      className={`events__register-btn ${
-                        event.current_participants >= event.max_participants 
-                          ? 'events__register-btn--full' 
-                          : ''
-                      }`}
-                      onClick={() => handleRegister(event.id)}
-                      disabled={event.current_participants >= event.max_participants}
+                      className="events__register-btn"
+                      onClick={() => handleRegister(event)}
                     >
-                      {event.current_participants >= event.max_participants ? (
-                        <>
-                          <FaTimes />
-                          Full
-                        </>
-                      ) : (
-                        <>
-                          <FaCheckCircle />
-                          Register
-                        </>
-                      )}
+                      <FaCheckCircle />
+                      Register
                     </button>
                   </div>
                 </div>
