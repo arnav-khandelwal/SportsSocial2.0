@@ -57,7 +57,10 @@
   }
 
   &__dropdown {
-    position: static; // Instead of absolute, so it expands the parent
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
     background-color: var(--background-card);
     border: 1px solid var(--border-primary);
     border-radius: 8px;
@@ -67,6 +70,7 @@
     overflow-y: visible;
     margin-top: 4px;
     width: 100%;
+    // max-height: 300px;
   }
 
   &__current-location {

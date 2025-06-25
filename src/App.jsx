@@ -16,6 +16,7 @@ import Notifications from './pages/Notifications/Notifications';
 import Reviews from './pages/Reviews/Reviews';
 import CreateReview from './pages/CreateReview/CreateReview';
 import Events from './pages/Events/Events';
+import EventRegister from './pages/Events/EventRegister';
 import About from './pages/About/About';
 import Settings from './pages/Settings/Settings';
 import BoltBadge from './components/BoltBadge/BoltBadge';
@@ -67,6 +68,7 @@ function AppRoutes() {
             <Route path="/profile/:userId?" element={<Profile />} />
             <Route path="/create-post" element={<CreatePost />} />
             <Route path="/past-posts" element={<PastPosts />} />
+            <Route path="/events/register" element={<EventRegister />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/events" element={<Events />} />
             <Route path="/about" element={<About />} />

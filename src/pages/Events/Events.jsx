@@ -6,6 +6,7 @@ import {
   FaUsers, 
   FaClock,
   FaPlus,
+  FaFilter,
   FaUser,
   FaDollarSign,
   FaTags,
@@ -14,6 +15,7 @@ import {
   FaTimes,
   FaTrophy
 } from 'react-icons/fa';
+import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { formatRelativeTime, formatDateTime } from '../../utils/dateUtils';
 import './Events.scss';
@@ -37,15 +39,57 @@ const Events = () => {
   const { user } = useAuth();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState({
+    sport: '',
+    skillLevel: '',
+    date: '',
+    location: null,
+    radius: -1,
+    maxCost: '',
+    equipmentProvided: false
+  });
   const isMobile = useIsMobile();
+  const [showFilters, setShowFilters] = useState(false);
+
+  const sportOptions = [
+    'Football', 'Basketball', 'Tennis', 'Soccer', 'Baseball', 
+    'Volleyball', 'Swimming', 'Running', 'Cycling', 'Golf',
+    'Hockey', 'Cricket', 'Rugby', 'Badminton', 'Table Tennis',
+    'Valorant', 'Rocket League'
+  ];
+
+  const skillLevels = [
+    { value: 'all', label: 'All Levels' },
+    { value: 'beginner', label: 'Beginner' },
+    { value: 'intermediate', label: 'Intermediate' },
+    { value: 'advanced', label: 'Advanced' }
+  ];
 
   useEffect(() => {
     fetchEvents();
-  }, []); // Only run once, not on filters
+  }, [filters]);
+
+  useEffect(() => {
+    setShowFilters(false);
+  }, [isMobile]);
 
   const fetchEvents = async () => {
     try {
       setLoading(true);
+      const params = {
+        sport: filters.sport,
+        skill_level: filters.skillLevel,
+        date: filters.date,
+        radius: filters.radius,
+        max_cost: filters.maxCost,
+        equipment_provided: filters.equipmentProvided
+      };
+
+      if (filters.location && filters.radius !== -1) {
+        params.lat = filters.location.coordinates[1];
+        params.lng = filters.location.coordinates[0];
+      }
+      
       // Mock data for the three specified events
       const mockEvents = [
         {
@@ -157,12 +201,75 @@ const Events = () => {
 
   return (
     <div className="events">
-      <div className="events__header" style={{ justifyContent: 'center', textAlign: 'center' }}>
-        <div className="events__title-section" style={{ width: '100%' }}>
-          <h1 className="events__title" style={{ textAlign: 'center' }}>Sports Events</h1>
-          <p className="events__subtitle" style={{ textAlign: 'center' }}>Discover and join amazing sports events in your area</p>
+      <div className="events__header">
+        <div className="events__title-section">
+          <h1 className="events__title">Sports Events</h1>
+          <p className="events__subtitle">Discover and join amazing sports events in your area</p>
         </div>
       </div>
+
+      {showFilters && (
+        <div className="events__filters">
+          <div className="events__filter-row">
+            <div className="events__filter-field">
+              <label>Sport</label>
+              <select
+                value={filters.sport}
+                onChange={(e) => setFilters({ ...filters, sport: e.target.value })}
+              >
+                <option value="">All Sports</option>
+                {sportOptions.map(sport => (
+                  <option key={sport} value={sport}>{sport}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="events__filter-field">
+              <label>Skill Level</label>
+              <select
+                value={filters.skillLevel}
+                onChange={(e) => setFilters({ ...filters, skillLevel: e.target.value })}
+              >
+                {skillLevels.map(level => (
+                  <option key={level.value} value={level.value}>{level.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="events__filter-field">
+              <label>Date</label>
+              <input
+                type="date"
+                value={filters.date}
+                onChange={(e) => setFilters({ ...filters, date: e.target.value })}
+              />
+            </div>
+
+            <div className="events__filter-field">
+              <label>Max Cost (₹)</label>
+              <input
+                type="number"
+                value={filters.maxCost}
+                onChange={(e) => setFilters({ ...filters, maxCost: e.target.value })}
+                placeholder="Any"
+                min="0"
+              />
+            </div>
+          </div>
+
+          <div className="events__filter-row">
+            <label className="events__filter-checkbox">
+              <input
+                type="checkbox"
+                checked={filters.equipmentProvided}
+                onChange={(e) => setFilters({ ...filters, equipmentProvided: e.target.checked })}
+              />
+              Equipment Provided
+            </label>
+          </div>
+        </div>
+      )}
+
       <div className="events__content">
         {events.length === 0 ? (
           <div className="events__empty">
