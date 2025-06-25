@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FaCalendarAlt, FaUsers, FaGamepad, FaTimes, FaChevronDown } from 'react-icons/fa';
+import { FaCalendarAlt, FaUsers, FaGamepad, FaTimes, FaChevronDown, FaMapMarkerAlt } from 'react-icons/fa';
 import axios from 'axios';
 import LocationPicker from '../../components/LocationPicker/LocationPicker';
 import './CreatePost.scss';
@@ -379,13 +379,16 @@ const CreatePost = () => {
             />
           </div>
 
-          <div className="create-post__field">
+          <div className="create-post__field create-post__event-location">
             <label>Event Location *</label>
-            <LocationPicker
-              onLocationSelect={handleLocationSelect}
-              initialLocation={location}
-              placeholder="Search for event location..."
-            />
+            <div className="create-post__input-with-icon">
+              <LocationPicker
+                onLocationSelect={handleLocationSelect}
+                initialLocation={location}
+                placeholder="Search for event location..."
+                inputProps={{ style: { paddingLeft: 32 } }}
+              />
+            </div>
             {location && (
               <div className="create-post__selected-location">
                 <span>Selected: {location.name}</span>

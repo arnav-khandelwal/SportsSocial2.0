@@ -1,13 +1,16 @@
 import { Link } from 'react-router-dom';
-import { FaUsers, FaMapMarkerAlt, FaComment, FaHeart, FaRunning, FaDumbbell, FaFutbol, FaEnvelope, FaGithub, FaLinkedin } from 'react-icons/fa';
+import { FaUsers, FaMapMarkerAlt, FaComment, FaHeart, FaRunning, FaDumbbell, FaFutbol, FaEnvelope, FaGithub, FaLinkedin, FaInstagram } from 'react-icons/fa';
 import './About.scss';
+import logo from '../../assets/logo/logo.png'; 
+
 
 const About = () => {
   return (
     <div className="about">
       <div className="about__hero">
         <div className="about__hero-content">
-          <h1 className="about__title">Welcome to Sports Social! 🏃‍♂️⚽</h1>
+          <img src={logo} alt="Sports Social Logo" className="about__logo" style={{ height: 60, width: 60, verticalAlign: 'middle' }} /><br/><br/>
+          <h1 className="about__title">Welcome to Sports Social! </h1>
           <p className="about__subtitle">
             Where fitness meets friendship, and every workout becomes an adventure with new people.
           </p>
@@ -48,7 +51,7 @@ const About = () => {
             </p>
             <p>
               "There has to be a better way," Arnav said, scrolling through generic social media posts. 
-              "Why isn't there a place where we can just say 'Hey, I want to play tennis at 3 PM' and 
+              "Why isn't there a place where we can just say 'Hey, I want to play basketball at 3 PM' and 
               actually find people who are down?"
             </p>
             <p>
@@ -181,7 +184,7 @@ const About = () => {
                 <FaEnvelope />
                 <div>
                   <h4>Email Us</h4>
-                  <p>hello@sportssocial.com</p>
+                  <p><a href="mailto:connect.sportssocial@gmail.com">connect.sportssocial@gmail.com</a></p>
                 </div>
               </div>
               
@@ -195,11 +198,11 @@ const About = () => {
             </div>
 
             <div className="about__social-links">
-              <a href="#" className="about__social-link" aria-label="GitHub">
+              <a href="https://github.com/arnav-khandelwal/SportsSocial2.0" className="about__social-link" aria-label="GitHub" target='__blank'>
                 <FaGithub />
               </a>
-              <a href="#" className="about__social-link" aria-label="LinkedIn">
-                <FaLinkedin />
+              <a href="https://www.instagram.com/sportssocial.connect/" className="about__social-link" aria-label="Instagram" target='__blank'>
+                <FaInstagram />
               </a>
             </div>
 
