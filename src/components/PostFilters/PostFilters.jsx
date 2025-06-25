@@ -265,10 +265,24 @@ const PostFilters = ({ filters, onFilterChange, is_open }) => {
       {showFilters && (
         <div className="post-filters__content">
           <div className="post-filters__section">
-            <h3 className="post-filters__section-title">
-              <FaRunning className="post-filters__section-icon" />
-              Sports
-            </h3>
+            <div className="post-filters__section-header">
+              <h3 className="post-filters__section-title">
+                <FaRunning className="post-filters__section-icon" />
+                Sports
+              </h3>
+              <div className="post-filters__checkbox-field">
+                <label className="checkbox-container">
+                  <input
+                    type="checkbox"
+                    name="onlySports"
+                    checked={filterType === 'SPORTS_ONLY'}
+                    onChange={handleOnlySports}
+                  />
+                  <span className="checkmark"></span>
+                  <span>Only</span>
+                </label>
+              </div>
+            </div>
             <div className="post-filters__field">
               <MultiSelectDropdown
                 options={SPORTS}
@@ -278,26 +292,27 @@ const PostFilters = ({ filters, onFilterChange, is_open }) => {
                 icon={<FaRunning />}
               />
             </div>
-            
-            <div className="post-filters__field post-filters__checkbox-field">
-              <label className="checkbox-container">
-                <input
-                  type="checkbox"
-                  name="onlySports"
-                  checked={filterType === 'SPORTS_ONLY'}
-                  onChange={handleOnlySports}
-                />
-                <span className="checkmark"></span>
-                <span>Only Sports</span>
-              </label>
-            </div>
           </div>
 
           <div className="post-filters__section">
-            <h3 className="post-filters__section-title">
-              <FaGamepad className="post-filters__section-icon" />
-              Online Games
-            </h3>
+            <div className="post-filters__section-header">
+              <h3 className="post-filters__section-title">
+                <FaGamepad className="post-filters__section-icon" />
+                Online Games
+              </h3>
+              <div className="post-filters__checkbox-field">
+                <label className="checkbox-container">
+                  <input
+                    type="checkbox"
+                    name="onlyGames"
+                    checked={filterType === 'ESPORTS_ONLY'}
+                    onChange={handleOnlyGames}
+                  />
+                  <span className="checkmark"></span>
+                  <span>Only</span>
+                </label>
+              </div>
+            </div>
             <div className="post-filters__field">
               <MultiSelectDropdown
                 options={ONLINE_GAMES}
@@ -305,32 +320,6 @@ const PostFilters = ({ filters, onFilterChange, is_open }) => {
                 onChange={handleGamesChange}
                 placeholder="Select Online Games"
                 icon={<FaGamepad />}
-              />
-            </div>
-            
-            <div className="post-filters__field post-filters__checkbox-field">
-              <label className="checkbox-container">
-                <input
-                  type="checkbox"
-                  name="onlyGames"
-                  checked={filterType === 'ESPORTS_ONLY'}
-                  onChange={handleOnlyGames}
-                />
-                <span className="checkmark"></span>
-                <span>Only Online Games</span>
-              </label>
-            </div>
-          </div>
-
-          <div className="post-filters__section">
-            <h3 className="post-filters__section-title">Date</h3>
-            <div className="post-filters__field">
-              <input
-                type="date"
-                name="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="post-filters__date-input"
               />
             </div>
           </div>
@@ -365,6 +354,19 @@ const PostFilters = ({ filters, onFilterChange, is_open }) => {
                 </select>
               </div>
             )}
+          </div>
+
+          <div className="post-filters__section">
+            <h3 className="post-filters__section-title">Date</h3>
+            <div className="post-filters__field">
+              <input
+                type="date"
+                name="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="post-filters__date-input"
+              />
+            </div>
           </div>
 
           <div className="post-filters__actions">
