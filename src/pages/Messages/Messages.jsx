@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FaComment, FaUsers, FaSearch, FaUser, FaTimes, FaPlus } from 'react-icons/fa';
+import { FaComment, FaUsers, FaSearch, FaUser, FaTimes, FaPlus, FaArrowLeft } from 'react-icons/fa';
 import axios from 'axios';
 import { useSocket } from '../../context/SocketContext';
 import { useAuth } from '../../context/AuthContext';
@@ -14,10 +14,12 @@ const Messages = () => {
   const [directConversations, setDirectConversations] = useState([]);
   const [groupConversations, setGroupConversations] = useState([]);
   const [activeChat, setActiveChat] = useState(null);
+  const [showMobileChat, setShowMobileChat] = useState(false);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState({ direct: [], group: [] });
   const [searchLoading, setSearchLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('direct'); // Add activeTab state
   const [openedGroupChats, setOpenedGroupChats] = useState(new Set());
   const [showCreateDirectMessageModal, setShowCreateDirectMessageModal] = useState(false);
   const [followingUsers, setFollowingUsers] = useState([]);
@@ -25,7 +27,10 @@ const Messages = () => {
   const [followingSearchResults, setFollowingSearchResults] = useState([]);
   const [loadingFollowing, setLoadingFollowing] = useState(false);
   const [userProfiles, setUserProfiles] = useState({});
+  const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
+  const [showChat, setShowChat] = useState(false);
   const { socket } = useSocket();
+  const searchContainerRef = React.useRef(null);
 
   useEffect(() => {
     fetchConversations();
@@ -86,6 +91,27 @@ const Messages = () => {
       setFollowingSearchResults(followingUsers);
     }
   }, [followingSearchQuery, followingUsers]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const isMobile = window.innerWidth <= 768;
+      setIsMobileView(isMobile);
+      if (!isMobile) {
+        setShowMobileChat(false);
+        setShowChat(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Update showChat and showMobileChat when activeChat changes
+  useEffect(() => {
+    if (isMobileView && activeChat) {
+      setShowMobileChat(true);
+      setShowChat(true);
+    }
+  }, [activeChat, isMobileView]);
 
   const loadOpenedGroupChats = () => {
     try {
@@ -158,17 +184,62 @@ const Messages = () => {
     
     // Filter direct conversations
     const filteredDirect = directConversations.filter(conv => 
-      conv.other_user_username?.toLowerCase().includes(lowerCaseQuery)
+      conv.other_user_username?.toLowerCase().includes(lowerCaseQuery) ||
+      conv.last_message_content?.toLowerCase().includes(lowerCaseQuery)
     );
     
     // Filter group conversations
     const filteredGroup = groupConversations.filter(group => 
-      group.name?.toLowerCase().includes(lowerCaseQuery)
+      group.name?.toLowerCase().includes(lowerCaseQuery) ||
+      group.last_message?.content?.toLowerCase().includes(lowerCaseQuery)
     );
     
+    // Sort results by relevance (exact username/group name matches first)
+    const sortedDirect = filteredDirect.sort((a, b) => {
+      // Exact username matches get highest priority
+      const aExactMatch = a.other_user_username?.toLowerCase() === lowerCaseQuery;
+      const bExactMatch = b.other_user_username?.toLowerCase() === lowerCaseQuery;
+      
+      if (aExactMatch && !bExactMatch) return -1;
+      if (!aExactMatch && bExactMatch) return 1;
+      
+      // Then sort by starts with
+      const aStartsWith = a.other_user_username?.toLowerCase().startsWith(lowerCaseQuery);
+      const bStartsWith = b.other_user_username?.toLowerCase().startsWith(lowerCaseQuery);
+      
+      if (aStartsWith && !bStartsWith) return -1;
+      if (!aStartsWith && bStartsWith) return 1;
+      
+      // Finally sort by most recent message
+      const aTime = new Date(a.last_message?.created_at || 0).getTime();
+      const bTime = new Date(b.last_message?.created_at || 0).getTime();
+      return bTime - aTime;
+    });
+    
+    const sortedGroup = filteredGroup.sort((a, b) => {
+      // Exact name matches get highest priority
+      const aExactMatch = a.name?.toLowerCase() === lowerCaseQuery;
+      const bExactMatch = b.name?.toLowerCase() === lowerCaseQuery;
+      
+      if (aExactMatch && !bExactMatch) return -1;
+      if (!aExactMatch && bExactMatch) return 1;
+      
+      // Then sort by starts with
+      const aStartsWith = a.name?.toLowerCase().startsWith(lowerCaseQuery);
+      const bStartsWith = b.name?.toLowerCase().startsWith(lowerCaseQuery);
+      
+      if (aStartsWith && !bStartsWith) return -1;
+      if (!aStartsWith && bStartsWith) return 1;
+      
+      // Finally sort by most recent message
+      const aTime = new Date(a.last_message?.created_at || 0).getTime();
+      const bTime = new Date(b.last_message?.created_at || 0).getTime();
+      return bTime - aTime;
+    });
+    
     setSearchResults({
-      direct: filteredDirect,
-      group: filteredGroup
+      direct: sortedDirect,
+      group: sortedGroup
     });
   };
 
@@ -287,7 +358,7 @@ const Messages = () => {
     // Mark this group chat as opened when user clicks on it
     markGroupChatAsOpened(group.id);
     
-    setActiveChat({ 
+    handleChatClick({ 
       id: group.id, 
       type: 'group', 
       name: group.name 
@@ -317,7 +388,7 @@ const Messages = () => {
       className={`messages__conversation ${isActiveGroup(group.id) ? 'active' : ''}`}
       onClick={() => handleGroupChatClick(group)}
     >
-      <div className="messages__conversation-avatar">
+      <div className="messages__avatar">
         <FaUsers />
       </div>
       <div className="messages__conversation-info">
@@ -450,6 +521,132 @@ const Messages = () => {
     fetchFollowingProfiles();
   }, [followingUsers]);
 
+  // When a chat is selected, set it as active and show mobile chat if on mobile
+  const handleChatClick = (chat) => {
+    setActiveChat(chat);
+    if (isMobileView) {
+      setShowMobileChat(true); 
+    }
+  };
+
+  // Handle back to conversations list (for mobile)
+  const handleBackToConversations = () => {
+    if (isMobileView) {
+      setShowMobileChat(false);
+    }
+    // Close the active chat regardless of device
+    setActiveChat(null);
+  };
+
+  // Use this effect to handle URL changes and reset the mobile chat view if needed
+  useEffect(() => {
+    if (isMobileView && location.pathname === '/messages') {
+      setShowMobileChat(false);
+    }
+  }, [location.pathname, isMobileView]);
+
+  // --- Search dropdown keyboard navigation state and handlers ---
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [selectedSearchIndex, setSelectedSearchIndex] = useState(-1);
+  const searchResultsRef = React.useRef(null);
+
+  const getTotalSearchResults = () => {
+    if (!searchResults) return 0;
+    return searchResults.direct.length + searchResults.group.length;
+  };
+
+  const handleSearchKeyDown = (e) => {
+    const totalResults = getTotalSearchResults();
+    if (totalResults === 0) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedSearchIndex(prev => (prev + 1) % totalResults);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedSearchIndex(prev => (prev <= 0 ? totalResults - 1 : prev - 1));
+    } else if (e.key === 'Enter' && selectedSearchIndex >= 0) {
+      e.preventDefault();
+      let selectedResult;
+      if (selectedSearchIndex < searchResults.direct.length) {
+        selectedResult = searchResults.direct[selectedSearchIndex];
+        handleChatClick({
+          id: selectedResult.other_user_id,
+          type: 'direct',
+          user: {
+            id: selectedResult.other_user_id,
+            username: selectedResult.other_user_username
+          }
+        });
+      } else {
+        const groupIndex = selectedSearchIndex - searchResults.direct.length;
+        selectedResult = searchResults.group[groupIndex];
+        handleGroupChatClick(selectedResult);
+      }
+      clearSearch();
+    } else if (e.key === 'Escape') {
+      clearSearch();
+      e.target.blur();
+    }
+  };
+
+  // Reset selected index when search results change
+  useEffect(() => {
+    setSelectedSearchIndex(-1);
+  }, [searchResults]);
+
+  // Scroll selected item into view when using keyboard navigation
+  useEffect(() => {
+    if (selectedSearchIndex >= 0 && searchResultsRef.current) {
+      const selectedElement = searchResultsRef.current.querySelector(`.search-result-${selectedSearchIndex}`);
+      if (selectedElement) {
+        selectedElement.scrollIntoView({ block: 'nearest' });
+      }
+    }
+  }, [selectedSearchIndex]);
+
+  const renderMainContent = () => {
+    if (isMobileView && !showChat) {
+      return null;
+    }
+
+    return (
+      <div className="messages__main">
+        {isMobileView && activeChat && (
+          <button 
+            className="messages__back-button"
+            onClick={handleBackToConversations}
+            aria-label="Back to conversations"
+          >
+            <FaArrowLeft /> Back
+          </button>
+        )}
+        {activeChat ? (
+          activeChat.type === 'direct' ? (
+            <DirectMessageThread
+              otherUserId={activeChat.id}
+              otherUserName={activeChat.user.username}
+              onBack={handleBackToConversations}
+            />
+          ) : (
+            <MessageThread
+              chatId={activeChat.id}
+              chatType={activeChat.type}
+              chatName={activeChat.name}
+              onBack={handleBackToConversations}
+            />
+          )
+        ) : (
+          <div className="messages__welcome">
+            <FaComment className="messages__welcome-icon" />
+            <h3>Select a conversation</h3>
+            <p>Choose a conversation from the sidebar or search for users to start messaging</p>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="messages">
@@ -463,7 +660,7 @@ const Messages = () => {
 
   return (
     <div className="messages">
-      <div className="messages__sidebar">
+      <div className={`messages__sidebar ${showMobileChat ? 'hidden-mobile' : ''}`}>
         <div className="messages__header">
           <h2>Messages</h2>
           <div className="messages__header-actions">
@@ -480,7 +677,7 @@ const Messages = () => {
           </div>
         </div>
 
-        <div className="messages__search">
+        <div className="messages__search" ref={searchContainerRef}>
           <div className="messages__search-input-container">
             <FaSearch className="messages__search-icon" />
             <input
@@ -488,112 +685,165 @@ const Messages = () => {
               placeholder="Search your conversations..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => setSearchFocused(true)}
+              onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
+              onKeyDown={handleSearchKeyDown}
               className="messages__search-input"
+              aria-label="Search conversations"
+              aria-expanded={searchQuery && getTotalSearchResults() > 0}
+              aria-controls={searchQuery ? "search-results-dropdown" : undefined}
+              aria-activedescendant={selectedSearchIndex >= 0 ? `search-result-${selectedSearchIndex}` : undefined}
             />
             {searchQuery && (
               <button
                 className="messages__search-clear"
                 onClick={clearSearch}
+                aria-label="Clear search"
               >
                 <FaTimes />
               </button>
             )}
           </div>
           
-          {searchQuery && (
-            <div className="messages__search-results">
-              {searchResults.direct && searchResults.direct.length > 0 && (
-                <div className="messages__search-section">
-                  <h4 className="messages__search-section-title">Direct Messages</h4>
-                  {searchResults.direct.map((conv) => (
-                    <div
-                      key={`direct-search-${conv.conversation_id || conv.other_user_id}`}
-                      className="messages__search-result"
-                      onClick={() => setActiveChat({ 
-                        id: conv.other_user_id, 
-                        type: 'direct', 
-                        user: { 
-                          id: conv.other_user_id, 
-                          username: conv.other_user_username 
-                        } 
-                      })}
-                    >
-                      <div className="messages__search-result-avatar">
-                        {userProfiles[conv.other_user_id] ? (
-                          <img 
-                            src={userProfiles[conv.other_user_id]} 
-                            alt={`${conv.other_user_username}'s profile`}
-                            className="profile-image__avatar"
-                          />
-                        ) : (
-                          <FaUser />
-                        )}
+          {/* Search Results Dropdown */}
+          {searchQuery && (searchFocused || selectedSearchIndex >= 0) && (
+            <div 
+              className="messages__search-dropdown" 
+              ref={searchResultsRef}
+              id="search-results-dropdown"
+              role="listbox"
+            >
+              {searchResults.direct.length > 0 && (
+                <div className="messages__search-dropdown-section">
+                  <h4>Direct Messages</h4>
+                  {searchResults.direct.map((result, index) => {
+                    const isSelected = selectedSearchIndex === index;
+                    
+                    return (
+                      <div
+                        key={`direct-${result.other_user_id}`}
+                        id={`search-result-${index}`}
+                        className={`messages__search-result search-result-${index} ${isSelected ? 'selected' : ''}`}
+                        onClick={() => {
+                          handleChatClick({
+                            id: result.other_user_id,
+                            type: 'direct',
+                            user: {
+                              id: result.other_user_id,
+                              username: result.other_user_username
+                            }
+                          });
+                          clearSearch();
+                        }}
+                        role="option"
+                        aria-selected={isSelected}
+                      >
+                        <div className="messages__search-result-avatar">
+                          {userProfiles[result.other_user_id] ? (
+                            <img 
+                              src={userProfiles[result.other_user_id]} 
+                              alt={`${result.other_user_username}'s profile`}
+                            />
+                          ) : (
+                            <FaUser />
+                          )}
+                        </div>
+                        <div className="messages__search-result-info">
+                          <h5>{result.other_user_username}</h5>
+                          <p>
+                            {shouldShowDirectUnreadBadge(result) && (
+                              <span className="messages__search-result-badge">{result.unread_count}</span>
+                            )}
+                            {formatLastMessage(result.last_message_content)}
+                          </p>
+                        </div>
                       </div>
-                      <div className="messages__search-result-info">
-                        <h4>{conv.other_user_username}</h4>
-                        <p>{formatLastMessage(conv.last_message_content)}</p>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
               
-              {searchResults.group && searchResults.group.length > 0 && (
-                <div className="messages__search-section">
-                  <h4 className="messages__search-section-title">Group Chats</h4>
-                  {searchResults.group.map((group) => (
-                    <div
-                      key={`group-search-${group.id}`}
-                      className="messages__search-result"
-                      onClick={() => handleGroupChatClick(group)}
-                    >
-                      <div className="messages__search-result-avatar">
-                        <FaUsers />
+              {searchResults.group.length > 0 && (
+                <div className="messages__search-dropdown-section">
+                  <h4>Group Chats</h4>
+                  {searchResults.group.map((result, groupIndex) => {
+                    const index = searchResults.direct.length + groupIndex;
+                    const isSelected = selectedSearchIndex === index;
+                    
+                    return (
+                      <div
+                        key={`group-${result.id}`}
+                        id={`search-result-${index}`}
+                        className={`messages__search-result search-result-${index} ${isSelected ? 'selected' : ''}`}
+                        onClick={() => {
+                          handleGroupChatClick(result);
+                          clearSearch();
+                        }}
+                        role="option"
+                        aria-selected={isSelected}
+                      >
+                        <div className="messages__search-result-avatar">
+                          <FaUsers />
+                        </div>
+                        <div className="messages__search-result-info">
+                          <h5>{result.name}</h5>
+                          <p>
+                            {shouldShowGroupUnreadBadge(result) && (
+                              <span className="messages__search-result-badge">{result.unread_count}</span>
+                            )}
+                            {formatLastMessage(result.last_message?.content)}
+                          </p>
+                        </div>
                       </div>
-                      <div className="messages__search-result-info">
-                        <h4>{group.name}</h4>
-                        {group.last_message && (
-                          <p>{formatLastMessage(group.last_message.content)}</p>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
               
-              {searchQuery && (!searchResults.direct || searchResults.direct.length === 0) && 
-               (!searchResults.group || searchResults.group.length === 0) && (
-                <div className="messages__search-empty">
-                  <p>No conversations found</p>
+              {searchResults.direct.length === 0 && searchResults.group.length === 0 && searchQuery.trim() !== '' && (
+                <div className="messages__search-no-results">
+                  <p>No conversations found matching "{searchQuery}"</p>
                 </div>
               )}
             </div>
           )}
         </div>
 
+        <div className="messages__tabs">
+          <button
+            className={`messages__tab ${activeTab === 'direct' ? 'active' : ''}`}
+            onClick={() => setActiveTab('direct')}
+            aria-label="Show Direct Messages"
+          >
+            <FaComment /> 
+            <span>Direct Messages</span>
+          </button>
+          <button
+            className={`messages__tab ${activeTab === 'group' ? 'active' : ''}`}
+            onClick={() => setActiveTab('group')}
+            aria-label="Show Group Chats"
+          >
+            <FaUsers /> 
+            <span>Group Chats</span>
+          </button>
+        </div>
+
         <div className="messages__conversations">
-          <div className="messages__section">
-            <h3 className="messages__section-title">
-              <FaComment /> Direct Messages
-            </h3>
-            {directConversations.length === 0 ? (
+          {activeTab === 'direct' ? (
+            directConversations.length === 0 ? (
               <p className="messages__empty">No direct messages</p>
             ) : (
               directConversations.map((conv) => (
                 <div
-                  key={`direct-${conv.conversation_id}`}
-                  className={`messages__conversation ${
-                    isActiveDirect(conv.other_user_id)
-                      ? 'messages__conversation--active' 
-                      : ''
-                  } ${shouldShowDirectUnreadBadge(conv) ? 'messages__conversation--unread' : ''}`}
-                  onClick={() => setActiveChat({ 
-                    id: conv.other_user_id, 
-                    type: 'direct', 
-                    user: { 
-                      id: conv.other_user_id, 
-                      username: conv.other_user_username 
-                    } 
+                  key={conv.conversation_id || conv.other_user_id}
+                  className={`messages__conversation ${isActiveDirect(conv.other_user_id) ? 'active' : ''}`}
+                  onClick={() => handleChatClick({
+                    id: conv.other_user_id,
+                    type: 'direct',
+                    user: {
+                      id: conv.other_user_id,
+                      username: conv.other_user_username
+                    }
                   })}
                 >
                   <Link 
@@ -633,36 +883,66 @@ const Messages = () => {
                   </div>
                 </div>
               ))
-            )}
-          </div>
-
-          <div className="messages__section">
-            <h3 className="messages__section-title">
-              <FaUsers /> Group Chats
-            </h3>
-            {groupConversations.length === 0 ? (
+            )
+          ) : (
+            groupConversations.length === 0 ? (
               <p className="messages__empty">No group chats</p>
             ) : (
-              groupConversations.map((group) => renderGroupChat(group))
-            )}
-          </div>
+              groupConversations.map(group => renderGroupChat(group))
+            )
+          )}
         </div>
       </div>
 
-      <div className="messages__main">
+      <div className={`messages__main ${isMobileView && !showMobileChat ? 'hidden-mobile' : ''}`}>
         {activeChat ? (
-          activeChat.type === 'direct' ? (
-            <DirectMessageThread
-              otherUserId={activeChat.id}
-              otherUserName={activeChat.user.username}
-            />
-          ) : (
-            <MessageThread
-              chatId={activeChat.id}
-              chatType={activeChat.type}
-              chatName={activeChat.name}
-            />
-          )
+          <>
+            {/* <div className="messages__chat-header">
+              <div className="messages__chat-header-row">
+                {isMobileView && (
+                  <button
+                    className="messages__back-button"
+                    onClick={handleBackToConversations}
+                    aria-label="Back to conversations"
+                  >
+                    <FaArrowLeft />
+                  </button>
+                )}
+                {activeChat && (
+                  <div className="messages__chat-avatar">
+                    {activeChat.type === 'direct' && userProfiles[activeChat.id] ? (
+                      <img
+                        src={userProfiles[activeChat.id]}
+                        alt={activeChat.user.username}
+                        className="messages__avatar__image"
+                      />
+                    ) : (
+                      <FaUser />
+                    )}
+                  </div>
+                )}
+                <div className="messages__chat-info">
+                  <h3>
+                    {activeChat.type === 'direct' ? activeChat.user.username : activeChat.name}
+                  </h3>
+                </div>
+              </div>
+            </div> */}
+            {activeChat.type === 'direct' ? (
+              <DirectMessageThread
+                otherUserId={activeChat.id}
+                otherUserName={activeChat.user.username}
+                onBack={handleBackToConversations}
+              />
+            ) : (
+              <MessageThread
+                chatId={activeChat.id}
+                chatType={activeChat.type}
+                chatName={activeChat.name}
+                onBack={handleBackToConversations}
+              />
+            )}
+          </>
         ) : (
           <div className="messages__welcome">
             <FaComment className="messages__welcome-icon" />

@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { FaPaperPlane, FaUser } from 'react-icons/fa';
+import { FaPaperPlane, FaUser, FaArrowLeft } from 'react-icons/fa';
 import axios from 'axios';
 import { useSocket } from '../../context/SocketContext';
 import { useAuth } from '../../context/AuthContext';
 import './DirectMessageThread.scss';
 
-const DirectMessageThread = ({ otherUserId, otherUserName }) => {
+const DirectMessageThread = ({ otherUserId, otherUserName, onBack }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
@@ -175,14 +175,13 @@ const DirectMessageThread = ({ otherUserId, otherUserName }) => {
     const previousDate = previousMessage ? new Date(previousMessage.created_at).toDateString() : null;
 
     return (
-      <>
+      <div key={message.id}>
         {currentDate !== previousDate && (
           <div className="direct-message-thread__date-divider">
             {currentDate}
           </div>
         )}
         <div
-          key={message.id}
           className={`direct-message-thread__message ${
             message.sender_id === user.id
               ? 'direct-message-thread__message--own'
@@ -217,7 +216,7 @@ const DirectMessageThread = ({ otherUserId, otherUserName }) => {
             </div>
           </div>
         </div>
-      </>
+      </div>
     );
   };
 
@@ -233,7 +232,13 @@ const DirectMessageThread = ({ otherUserId, otherUserName }) => {
 
   return (
     <div className="direct-message-thread">
-      <div className="direct-message-thread__header">
+      <div className="direct-message-thread__header-row">
+        <button 
+          onClick={onBack} 
+          className="direct-message-thread__back-btn"
+        >
+          <FaArrowLeft />
+        </button>
         <Link 
           to={`/profile/${otherUserId}`}
           className="direct-message-thread__avatar-link"

@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { FaPaperPlane, FaUser } from 'react-icons/fa';
+import { FaPaperPlane, FaUser, FaArrowLeft } from 'react-icons/fa';
 import axios from 'axios';
 import { useSocket } from '../../context/SocketContext';
 import { useAuth } from '../../context/AuthContext';
 import './MessageThread.scss';
 
-const MessageThread = ({ chatId, chatType, chatName }) => {
+const MessageThread = ({ chatId, chatType, chatName, onBack }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
@@ -167,14 +167,13 @@ const MessageThread = ({ chatId, chatType, chatName }) => {
     const previousDate = previousMessage ? new Date(previousMessage.created_at).toDateString() : null;
 
     return (
-      <>
+      <div key={message.id}>
         {currentDate !== previousDate && (
           <div className="message-thread__date-divider">
             {currentDate}
           </div>
         )}
         <div
-          key={message.id}
           className={`message-thread__message ${
             message.sender_id === user.id
               ? 'message-thread__message--own'
@@ -218,13 +217,20 @@ const MessageThread = ({ chatId, chatType, chatName }) => {
             </div>
           </div>
         </div>
-      </>
+      </div>
     );
   };
 
   return (
     <div className="message-thread">
-      <div className="message-thread__header">
+      <div className="message-thread__header-row">
+        <button 
+          onClick={onBack}
+          className="message-thread__back-btn"
+          aria-label="Back to conversations"
+        >
+          <FaArrowLeft />
+        </button>
         <div className="message-thread__avatar">
           {chatType === 'group' ? chatName.charAt(0) : <FaUser />}
         </div>
