@@ -36,14 +36,26 @@ const Messages = () => {
     fetchConversations();
     loadOpenedGroupChats();
     
-    // Check if we need to start a conversation from navigation state
-    if (location.state?.startConversation) {
-      const { startConversation } = location.state;
-      setActiveChat({
-        id: startConversation.id,
-        type: 'direct',
-        user: startConversation
-      });
+    if (location.state) {
+      // Handle direct message conversation start
+      if (location.state.startConversation) {
+        const { startConversation } = location.state;
+        setActiveChat({
+          id: startConversation.id,
+          type: 'direct',
+          user: startConversation
+        });
+      }
+      // Handle opening specific group or direct chat
+      else if (location.state.activeChat) {
+        const { activeChat: chatToOpen } = location.state;
+        setActiveChat(chatToOpen);
+
+        // If it's a group chat, mark it as opened
+        if (chatToOpen.type === 'group') {
+          markGroupChatAsOpened(chatToOpen.id);
+        }
+      }
       
       // Clear the navigation state
       window.history.replaceState({}, document.title);

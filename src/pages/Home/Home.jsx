@@ -55,7 +55,9 @@ const Home = () => {
 
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
-  };  const navigate = useNavigate();
+  };
+  
+  const navigate = useNavigate();
 
   const handleInterest = async (postId) => {
     try {
@@ -67,9 +69,8 @@ const Home = () => {
 
       // Register interest in the post
       const response = await axios.post(`/posts/${postId}/interest`);
-      const groupChatId = response.data.groupChatId;
-
-      if (!groupChatId) {
+      
+      if (!response.data || !response.data.groupChatId) {
         throw new Error('No group chat ID returned from server');
       }
 
@@ -90,9 +91,11 @@ const Home = () => {
 
       // Navigate to messages page with the group chat open
       navigate('/messages', {
+        replace: true, // Use replace to prevent going back to this state
         state: {
+          startConversation: null, // Ensure no direct message is started
           activeChat: {
-            id: groupChatId,
+            id: response.data.groupChatId,
             type: 'group',
             name: `${post.sport} - ${post.heading}`
           }
