@@ -77,23 +77,182 @@
   &__results {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 10px;
   }
 
   &__user-card {
     background-color: var(--background-card);
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: var(--shadow-medium);
+    border-radius: 10px;
+    padding: 8px 10px;
+    box-shadow: var(--shadow-small);
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 20px;
+    text-align: center;
+    gap: 8px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     border: 1px solid var(--border-primary);
 
+    @media (min-width: 768px) {
+      flex-direction: row;
+      text-align: left;
+      align-items: center;
+      padding: 12px 16px;
+      gap: 12px;
+      border-radius: 12px;
+    }
+  }
+
+  &__user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    font-weight: 600;
+    flex-shrink: 0;
+    border: 1px solid var(--border-primary);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--secondary), var(--accent));
+
+    @media (min-width: 768px) {
+      width: 48px;
+      height: 48px;
+      margin-right: 12px;
+      border: 2px solid var(--background-secondary);
+    }
+  }
+
+  &__user-info {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+
+    @media (min-width: 768px) {
+      align-items: flex-start;
+      gap: 4px;
+    }
+  }
+
+  &__user-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    transition: color 0.2s ease;
+
+    @media (min-width: 768px) {
+      font-size: 16px;
+      font-weight: 700;
+    }
+  }
+
+  &__user-bio {
+    color: var(--text-secondary);
+    margin: 0 0 8px 0;
+    line-height: 1.4;
+    font-size: 14px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  &__user-sports {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+
+    strong {
+      color: var(--text-primary);
+    }
+  }
+
+  &__user-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 8px;
+
+    @media (min-width: 768px) {
+      justify-content: flex-start;
+      margin-bottom: 0;
+    }
+  }
+
+  &__tag {
+    background-color: var(--background-tertiary);
+    color: var(--primary);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    border: 1px solid var(--border-primary);
+  }
+
+  &__user-actions {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 8px;
+
+    @media (min-width: 768px) {
+      flex-direction: column;
+      width: auto;
+      min-width: 100px;
+      margin-top: 0;
+      gap: 8px;
+    }
+  }
+
+  &__follow-btn,
+  &__message-btn {
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 13px;
+    border-radius: 20px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    max-width: 120px;
+
+    @media (min-width: 768px) {
+      width: 100%;
+      max-width: none;
+      padding: 8px 16px;
+    }
+  }
+
+  &__follow-btn {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: var(--text-primary);
+
+    &--following {
+      background: var(--background-tertiary);
+      color: var(--text-secondary);
+    }
+  }
+
+  &__message-btn {
+    background: var(--background-tertiary);
+    color: var(--text-primary);
+
     &:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-heavy);
+      background: var(--background-hover);
     }
   }
 
@@ -106,162 +265,12 @@
     }
   }
 
-  &__user-avatar {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-primary);
-    font-weight: 600;
-    flex-shrink: 0;
-    margin-right: 14px;
-    border: 2px solid var(--background-secondary);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    overflow: hidden; // Ensure the image does not overflow the container
-    background: linear-gradient(135deg, var(--secondary), var(--accent));
-
-    &__image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover; // Ensure the image covers the container proportionally
-      border-radius: 50%; // Match the container's rounded shape
-    }
-  }
-
-  &__user-info {
-    flex: 1;
-  }
-
   &__user-name-link {
     text-decoration: none;
     transition: color 0.2s ease;
 
     &:hover {
       color: var(--primary);
-    }
-  }
-
-  &__user-name {
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin: 0 0 8px 0;
-    transition: color 0.2s ease;
-
-    &:hover {
-      color: var(--primary);
-    }
-  }
-
-  &__user-bio {
-    color: var(--text-secondary);
-    margin: 0 0 12px 0;
-    line-height: 1.5;
-  }
-
-  &__user-sports {
-    font-size: 14px;
-    color: var(--text-secondary);
-    margin-bottom: 8px;
-
-    strong {
-      color: var(--text-primary);
-    }
-  }
-
-  &__user-tags {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  &__tag {
-    background-color: var(--background-tertiary);
-    color: var(--primary);
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 500;
-    border: 1px solid var(--border-primary);
-  }
-
-  &__user-actions {
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-
-    @media (max-width: 768px) {
-      flex-direction: row;
-    }
-  }
-
-  &__follow-btn,
-  &__message-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 25px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    min-width: 120px;
-    justify-content: center;
-    position: relative;
-
-    &:hover {
-      transform: translateY(-2px);
-    }
-  }
-
-  &__follow-btn {
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: var(--text-primary);
-
-    &:hover {
-      box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
-    }
-
-    &--following {
-      background: var(--success);
-      
-      &:hover {
-        background: var(--error);
-        box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
-        
-        &::before {
-          content: 'Unfollow';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: var(--error);
-          border-radius: 25px;
-        }
-        
-        > * {
-          opacity: 0;
-        }
-      }
-    }
-  }
-
-  &__message-btn {
-    background-color: var(--background-tertiary);
-    color: var(--text-primary);
-    border: 1px solid var(--border-primary);
-
-    &:hover {
-      background-color: var(--background-hover);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
   }
 

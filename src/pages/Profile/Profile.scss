@@ -150,7 +150,8 @@
     margin-bottom: 24px;
     box-shadow: var(--shadow-heavy);
     display: flex;
-    align-items: flex-end;
+    flex-direction: column;
+    align-items: center;
     gap: 24px;
     position: relative;
     border: 1px solid var(--border-primary);
@@ -165,6 +166,9 @@
 
   &__avatar-container {
     position: relative;
+    width: 100%;
+    max-width: 120px;
+    margin: 0 auto 24px;
     flex-shrink: 0;
   }
 
@@ -221,7 +225,9 @@
   }
 
   &__info {
-    flex: 1;
+    width: 100%;
+    text-align: center;
+    margin-top: 24px;
   }
 
   &__name {
