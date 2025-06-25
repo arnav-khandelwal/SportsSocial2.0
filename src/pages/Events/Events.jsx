@@ -19,6 +19,16 @@ import { useAuth } from '../../context/AuthContext';
 import { formatRelativeTime, formatDateTime } from '../../utils/dateUtils';
 import './Events.scss';
 
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 600);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  return isMobile;
+};
+
 const Events = () => {
   const { user } = useAuth();
   const [events, setEvents] = useState([]);
@@ -32,7 +42,8 @@ const Events = () => {
     maxCost: '',
     equipmentProvided: false
   });
-  const [showFilters, setShowFilters] = useState(true);
+  const isMobile = useIsMobile();
+  const [showFilters, setShowFilters] = useState(false);
 
   const sportOptions = [
     'Football', 'Basketball', 'Tennis', 'Soccer', 'Baseball', 
@@ -50,6 +61,10 @@ const Events = () => {
   useEffect(() => {
     fetchEvents();
   }, [filters]);
+
+  useEffect(() => {
+    setShowFilters(false);
+  }, [isMobile]);
 
   const fetchEvents = async () => {
     try {

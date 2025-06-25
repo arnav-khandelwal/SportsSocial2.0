@@ -124,8 +124,8 @@ const MultiSelectDropdown = ({ options, selectedItems, onChange, placeholder, ic
   );
 };
 
-const PostFilters = ({ filters, onFilterChange }) => {
-  const [showFilters, setShowFilters] = useState(true);
+const PostFilters = ({ filters, onFilterChange, is_open }) => {
+  const [showFilters, setShowFilters] = useState(is_open !== undefined ? is_open : true);
   const [sports, setSports] = useState([]);
   const [esports, setEsports] = useState([]);
   const [filterType, setFilterType] = useState('ALL');
@@ -145,6 +145,13 @@ const PostFilters = ({ filters, onFilterChange }) => {
     setRadius(filters.radius || -1);
     setTags(filters.tags || []);
   }, [filters]);
+
+  // Update local state when is_open prop changes
+  useEffect(() => {
+    if (typeof is_open === 'boolean') {
+      setShowFilters(is_open);
+    }
+  }, [is_open]);
 
   // Multi-select handlers
   const handleSportsChange = (selected) => {

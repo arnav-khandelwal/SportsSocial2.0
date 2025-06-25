@@ -5,6 +5,16 @@ import PostCard from '../../components/PostCard/PostCard';
 import PostFilters from '../../components/PostFilters/PostFilters';
 import './Home.scss';
 
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 600);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  return isMobile;
+};
+
 const Home = () => {
   const { user } = useAuth();
   const [posts, setPosts] = useState([]);
@@ -18,6 +28,8 @@ const Home = () => {
     location: null,
     radius: -1
   });
+
+  const isMobile = useIsMobile();
 
   // Debounce filter changes
   useEffect(() => {
@@ -121,6 +133,13 @@ const Home = () => {
         <p className="home__subtitle">{getSubtitle()}</p>
       </div>
 
+      {/* PostFilters at top for mobile, at right for desktop */}
+      {isMobile && (
+        <div className="home__filters home__filters--mobile">
+          <PostFilters filters={filters} onFilterChange={handleFilterChange} is_open={false} />
+        </div>
+      )}
+
       <div className="home__content">
         {/* Posts */}
         <div className="home__posts">
@@ -144,10 +163,12 @@ const Home = () => {
           )}
         </div>
 
-        {/* Filter Sidebar */}
-        <div className="home__filters">
-          <PostFilters filters={filters} onFilterChange={handleFilterChange} />
-        </div>
+        {/* PostFilters at right for desktop/tablet */}
+        {!isMobile && (
+          <div className="home__filters home__filters--desktop">
+            <PostFilters filters={filters} onFilterChange={handleFilterChange} is_open={true} />
+          </div>
+        )}
       </div>
     </div>
   );
