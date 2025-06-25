@@ -57,18 +57,16 @@
   }
 
   &__dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
+    position: static; // Instead of absolute, so it expands the parent
     background-color: var(--background-card);
     border: 1px solid var(--border-primary);
     border-radius: 8px;
     box-shadow: var(--shadow-heavy);
     z-index: 1000;
-    max-height: 300px;
-    overflow-y: auto;
+    max-height: 340px;
+    overflow-y: visible;
     margin-top: 4px;
+    width: 100%;
   }
 
   &__current-location {
@@ -100,6 +98,8 @@
   &__predictions {
     max-height: 240px;
     overflow-y: auto;
+    /* Prevent page scroll when at top/bottom of dropdown */
+    overscroll-behavior: contain;
   }
 
   &__prediction {
