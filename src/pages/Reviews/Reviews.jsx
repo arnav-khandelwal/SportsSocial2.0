@@ -219,22 +219,6 @@ const Reviews = () => {
           </div>
         </div>
 
-        {stats && (
-          <div className="reviews__stats">
-            <div className="reviews__stat">
-              <h3>{stats.total}</h3>
-              <p>Total Reviews</p>
-            </div>
-            <div className="reviews__stat">
-              <h3>{stats.averageRating.toFixed(1)}</h3>
-              <div className="reviews__stat-stars">
-                {renderStars(Math.round(stats.averageRating))}
-              </div>
-              <p>Average Rating</p>
-            </div>
-          </div>
-        )}
-
         {!isFullscreen && (
           <div className="reviews__filters">
             <button

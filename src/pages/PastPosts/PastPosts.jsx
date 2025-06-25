@@ -102,15 +102,27 @@ const PastPosts = () => {
 
   const getFilteredPosts = () => {
     const now = new Date();
-    
-    switch (filter) {
-      case 'upcoming':
-        return posts.filter(post => new Date(post.event_time) > now);
-      case 'past':
-        return posts.filter(post => new Date(post.event_time) <= now);
-      default:
-        return posts;
+
+    if (filter === 'upcoming') {
+      // Only upcoming, ascending order
+      return posts
+        .filter(post => new Date(post.event_time) > now)
+        .sort((a, b) => new Date(a.event_time) - new Date(b.event_time));
     }
+    if (filter === 'past') {
+      // Only past, ascending order
+      return posts
+        .filter(post => new Date(post.event_time) <= now)
+        .sort((a, b) => new Date(a.event_time) - new Date(b.event_time));
+    }
+    // 'all': upcoming first (asc), then past (asc)
+    const upcoming = posts
+      .filter(post => new Date(post.event_time) > now)
+      .sort((a, b) => new Date(a.event_time) - new Date(b.event_time));
+    const past = posts
+      .filter(post => new Date(post.event_time) <= now)
+      .sort((a, b) => new Date(a.event_time) - new Date(b.event_time));
+    return [...upcoming, ...past];
   };
 
   const getPostStatus = (eventTime) => {

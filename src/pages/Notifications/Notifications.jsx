@@ -202,17 +202,24 @@ const Notifications = () => {
   };
 
   const getFilteredNotifications = () => {
-    switch (filter) {
-      case 'unread':
-        return notifications.filter(n => !n.is_read);
-      case 'follow':
-      case 'interest':
-      case 'nearby_post':
-      case 'message':
-        return notifications.filter(n => n.type === filter);
-      default:
-        return notifications;
+    if (filter === 'unread') {
+      return notifications.filter(n => !n.is_read && n.type !== 'message');
     }
+    if (filter === 'message') {
+      // Only show unread message notifications
+      return notifications.filter(n => n.type === 'message' && !n.is_read);
+    }
+    if (filter === 'follow') {
+      return notifications.filter(n => n.type === 'follow');
+    }
+    if (filter === 'interest') {
+      return notifications.filter(n => n.type === 'interest');
+    }
+    if (filter === 'nearby_post') {
+      return notifications.filter(n => n.type === 'nearby_post');
+    }
+    // 'all': show all except message notifications that are read
+    return notifications.filter(n => n.type !== 'message' || !n.is_read);
   };
 
   const formatNotificationMessage = (notification) => {
@@ -224,6 +231,7 @@ const Notifications = () => {
 
   const filteredNotifications = getFilteredNotifications();
   const unreadCount = notifications.filter(n => !n.is_read).length;
+  const unreadMessageCount = notifications.filter(n => n.type === 'message' && !n.is_read).length;
 
   if (loading) {
     return (
@@ -289,7 +297,7 @@ const Notifications = () => {
           className={`notifications__filter ${filter === 'message' ? 'notifications__filter--active' : ''}`}
           onClick={() => setFilter('message')}
         >
-          Messages ({notifications.filter(n => n.type === 'message').length})
+          Unread Messages ({unreadMessageCount})
         </button>
         <button
           className={`notifications__filter ${filter === 'nearby_post' ? 'notifications__filter--active' : ''}`}
