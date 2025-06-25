@@ -258,10 +258,10 @@ const CreatePost = () => {
       await axios.post('/posts', postData);
       setSuccessMessage('Post created successfully!');
       
-      // Wait for 4 seconds before navigating
+      // Wait for 0.5 seconds before navigating
       setTimeout(() => {
         navigate('/');
-      }, 4000);
+      }, 500);
     } catch (error) {
       setError(error.response?.data?.message || 'Failed to create post');
     } finally {
@@ -273,7 +273,7 @@ const CreatePost = () => {
     if (successMessage) {
       const timer = setTimeout(() => {
         setSuccessMessage('');
-      }, 4000);
+      }, 500);
       return () => clearTimeout(timer);
     }
   }, [successMessage]);
