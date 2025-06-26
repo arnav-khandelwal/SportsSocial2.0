@@ -1,50 +1,60 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import PostCard from '../../components/PostCard/PostCard';
 import PostFilters from '../../components/PostFilters/PostFilters';
 import './Home.scss';
 
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 600);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  return isMobile;
+};
+
 const Home = () => {
   const { user } = useAuth();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
-    sport: '',
+    sports: [],
+    esports: [],
+    filterType: 'ALL',
     tags: [],
     date: '',
     location: null,
-    radius: -1, // -1 means no location filter
-    isESports: false
+    radius: -1
   });
+
+  const isMobile = useIsMobile();
+
+  // Debounce filter changes
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      fetchPosts();
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [filters]);
 
   useEffect(() => {
     fetchPosts();
-  }, [filters]);
+  }, []);
 
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      const params = {
-        sport: filters.sport,
-        tags: filters.tags,
-        date: filters.date,
-        radius: filters.radius,
-        isESports: filters.isESports
-      };
-
+      const params = { ...filters };
       if (filters.location && filters.radius !== -1) {
-        params.lat = filters.location.coordinates[1]; // latitude
-        params.lng = filters.location.coordinates[0]; // longitude
+        params.lat = filters.location.coordinates[1];
+        params.lng = filters.location.coordinates[0];
       }
-
       const response = await axios.get('/posts', { params });
-
       const filteredPosts = response.data.filter(
         (post) => post.author_id !== user?.id
       );
-
       setPosts(filteredPosts);
     } catch (error) {
       console.error('Failed to fetch posts:', error);
@@ -54,54 +64,32 @@ const Home = () => {
   };
 
   const handleFilterChange = (newFilters) => {
-    setFilters(newFilters);
+    setFilters({
+      ...filters,
+      ...newFilters
+    });
   };
-  
-  const navigate = useNavigate();
 
   const handleInterest = async (postId) => {
     try {
-      // Find the post in our local state to get its details
-      const post = posts.find(p => p.id === postId);
-      if (!post) {
-        throw new Error('Post not found');
-      }
-
-      // Register interest in the post
       const response = await axios.post(`/posts/${postId}/interest`);
-      
-      if (!response.data || !response.data.groupChatId) {
-        throw new Error('No group chat ID returned from server');
-      }
 
-      // Update local state to reflect interest
       setPosts((prevPosts) =>
-        prevPosts.map((p) =>
-          p.id === postId
+        prevPosts.map((post) =>
+          post.id === postId
             ? {
-                ...p,
-                interested_users: [...(p.interested_users || []), { user_id: user.id }]
+                ...post,
+                interested_users: [...(post.interested_users || [])]
               }
-            : p
+            : post
         )
       );
-      
-      // Refresh posts in the background
-      fetchPosts();
 
-      // Navigate to messages page with the group chat open
-      navigate('/messages', {
-        replace: true, // Use replace to prevent going back to this state
-        state: {
-          startConversation: null, // Ensure no direct message is started
-          activeChat: {
-            id: response.data.groupChatId,
-            type: 'group',
-            name: `${post.sport} - ${post.heading}`
-          }
-        }
-      });
+      setTimeout(() => {
+        fetchPosts();
+      }, 500);
 
+      return response.data;
     } catch (error) {
       console.error('Failed to show interest:', error);
       throw error;
@@ -145,6 +133,13 @@ const Home = () => {
         <p className="home__subtitle">{getSubtitle()}</p>
       </div>
 
+      {/* PostFilters at top for mobile, at right for desktop */}
+      {isMobile && (
+        <div className="home__filters home__filters--mobile">
+          <PostFilters filters={filters} onFilterChange={handleFilterChange} is_open={false} />
+        </div>
+      )}
+
       <div className="home__content">
         {/* Posts */}
         <div className="home__posts">
@@ -168,10 +163,12 @@ const Home = () => {
           )}
         </div>
 
-        {/* Filter Sidebar */}
-        <div className="home__filters">
-          <PostFilters filters={filters} onFilterChange={handleFilterChange} />
-        </div>
+        {/* PostFilters at right for desktop/tablet */}
+        {!isMobile && (
+          <div className="home__filters home__filters--desktop">
+            <PostFilters filters={filters} onFilterChange={handleFilterChange} is_open={true} />
+          </div>
+        )}
       </div>
     </div>
   );
