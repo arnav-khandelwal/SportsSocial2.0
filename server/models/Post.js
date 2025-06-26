@@ -357,7 +357,7 @@ export class Post {
       .select()
       .single();
     
-    if (error) throw error;
+    if (error && error.code !== 'PGRST116') throw error;
     return data;
   }
   
@@ -384,7 +384,7 @@ export class Post {
       `)
       .single();
     
-    if (error) throw error;
+    if (error && error.code !== 'PGRST116') throw error;
     return data;
   }
   

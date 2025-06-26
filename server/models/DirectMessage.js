@@ -25,7 +25,7 @@ export class DirectMessage {
         .eq('id', data)
         .single();
       
-      if (fetchError) {
+      if (fetchError && fetchError.code !== 'PGRST116') {
         console.error('Fetch message error:', fetchError);
         throw fetchError;
       }

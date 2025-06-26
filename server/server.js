@@ -92,6 +92,41 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/event-registrations', eventRegistrationsRoutes);
 
+// Global error handling middleware
+app.use((error, req, res, next) => {
+  console.error('Global error handler:', error);
+  
+  // Handle Supabase PGRST116 errors specifically
+  if (error.code === 'PGRST116') {
+    return res.status(404).json({ 
+      message: 'Resource not found',
+      error: 'The requested resource does not exist'
+    });
+  }
+  
+  // Handle other known errors
+  if (error.name === 'ValidationError') {
+    return res.status(400).json({ 
+      message: 'Validation error',
+      error: error.message 
+    });
+  }
+  
+  // Default error response
+  res.status(500).json({ 
+    message: 'Internal server error',
+    error: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+  });
+});
+
+// 404 handler for unmatched routes
+app.use('*', (req, res) => {
+  res.status(404).json({ 
+    message: 'Route not found',
+    path: req.originalUrl 
+  });
+});
+
 // Socket.io connection handling
 io.on('connection', (socket) => {
   handleSocketConnection(socket, io);
@@ -104,8 +139,15 @@ process.on('uncaughtException', (error) => {
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
-  process.exit(1);
+  console.error('❌ Unhandled Rejection at:', promise);
+  console.error('❌ Reason:', reason);
+  
+  // Don't exit in production, just log the error
+  if (process.env.NODE_ENV === 'production') {
+    console.error('🚨 Unhandled rejection in production, continuing...');
+  } else {
+    process.exit(1);
+  }
 });
 
 // Graceful shutdown
