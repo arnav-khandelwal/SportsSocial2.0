@@ -34,7 +34,7 @@ const Settings = () => {
 
   const tabs = [
     { id: 'security', label: 'Security', icon: FaLock },
-    { id: 'notifications', label: 'Notifications', icon: FaBell },
+    // { id: 'notifications', label: 'Notifications', icon: FaBell },
     { id: 'privacy', label: 'Privacy', icon: FaEye },
     { id: 'content', label: 'Content', icon: FaShieldAlt }
   ];
@@ -242,136 +242,136 @@ const Settings = () => {
     </div>
   );
 
-  const renderNotificationsTab = () => (
-    <div className="settings__tab-content">
-      <div className="settings__section">
-        <h3>Push Notifications</h3>
-        <div className="settings__toggle-group">
-          <label className="settings__toggle">
-            <input
-              type="checkbox"
-              checked={settings?.push_enabled || false}
-              onChange={(e) => updateSettings({ push_enabled: e.target.checked })}
-            />
-            <span>Enable Push Notifications</span>
-          </label>
+  // const renderNotificationsTab = () => (
+  //   <div className="settings__tab-content">
+  //     <div className="settings__section">
+  //       <h3>Push Notifications</h3>
+  //       <div className="settings__toggle-group">
+  //         <label className="settings__toggle">
+  //           <input
+  //             type="checkbox"
+  //             checked={settings?.push_enabled || false}
+  //             onChange={(e) => updateSettings({ push_enabled: e.target.checked })}
+  //           />
+  //           <span>Enable Push Notifications</span>
+  //         </label>
           
-          <label className="settings__toggle">
-            <input
-              type="checkbox"
-              checked={settings?.push_messages || false}
-              onChange={(e) => updateSettings({ push_messages: e.target.checked })}
-            />
-            <span>New Messages</span>
-          </label>
+  //         <label className="settings__toggle">
+  //           <input
+  //             type="checkbox"
+  //             checked={settings?.push_messages || false}
+  //             onChange={(e) => updateSettings({ push_messages: e.target.checked })}
+  //           />
+  //           <span>New Messages</span>
+  //         </label>
           
-          <label className="settings__toggle">
-            <input
-              type="checkbox"
-              checked={settings?.push_interactions || false}
-              onChange={(e) => updateSettings({ push_interactions: e.target.checked })}
-            />
-            <span>Post Interactions</span>
-          </label>
+  //         <label className="settings__toggle">
+  //           <input
+  //             type="checkbox"
+  //             checked={settings?.push_interactions || false}
+  //             onChange={(e) => updateSettings({ push_interactions: e.target.checked })}
+  //           />
+  //           <span>Post Interactions</span>
+  //         </label>
           
-          <label className="settings__toggle">
-            <input
-              type="checkbox"
-              checked={settings?.push_reminders || false}
-              onChange={(e) => updateSettings({ push_reminders: e.target.checked })}
-            />
-            <span>Event Reminders</span>
-          </label>
+  //         <label className="settings__toggle">
+  //           <input
+  //             type="checkbox"
+  //             checked={settings?.push_reminders || false}
+  //             onChange={(e) => updateSettings({ push_reminders: e.target.checked })}
+  //           />
+  //           <span>Event Reminders</span>
+  //         </label>
           
-          <label className="settings__toggle">
-            <input
-              type="checkbox"
-              checked={settings?.push_friend_activity || false}
-              onChange={(e) => updateSettings({ push_friend_activity: e.target.checked })}
-            />
-            <span>Friend Activity</span>
-          </label>
+  //         <label className="settings__toggle">
+  //           <input
+  //             type="checkbox"
+  //             checked={settings?.push_friend_activity || false}
+  //             onChange={(e) => updateSettings({ push_friend_activity: e.target.checked })}
+  //           />
+  //           <span>Friend Activity</span>
+  //         </label>
           
-          <label className="settings__toggle">
-            <input
-              type="checkbox"
-              checked={settings?.push_location_based || false}
-              onChange={(e) => updateSettings({ push_location_based: e.target.checked })}
-            />
-            <span>Location-Based Activities</span>
-          </label>
+  //         <label className="settings__toggle">
+  //           <input
+  //             type="checkbox"
+  //             checked={settings?.push_location_based || false}
+  //             onChange={(e) => updateSettings({ push_location_based: e.target.checked })}
+  //           />
+  //           <span>Location-Based Activities</span>
+  //         </label>
           
-          <label className="settings__toggle">
-            <input
-              type="checkbox"
-              checked={settings?.push_mentions || false}
-              onChange={(e) => updateSettings({ push_mentions: e.target.checked })}
-            />
-            <span>Group Chat Mentions</span>
-          </label>
-        </div>
-      </div>
+  //         <label className="settings__toggle">
+  //           <input
+  //             type="checkbox"
+  //             checked={settings?.push_mentions || false}
+  //             onChange={(e) => updateSettings({ push_mentions: e.target.checked })}
+  //           />
+  //           <span>Group Chat Mentions</span>
+  //         </label>
+  //       </div>
+  //     </div>
 
-      <div className="settings__section">
-        <h3>In-App Notifications</h3>
-        <div className="settings__toggle-group">
-          <label className="settings__toggle">
-            <input
-              type="checkbox"
-              checked={settings?.notifications_new_messages || false}
-              onChange={(e) => updateSettings({ notifications_new_messages: e.target.checked })}
-            />
-            <span>New Messages</span>
-          </label>
+  //     <div className="settings__section">
+  //       <h3>In-App Notifications</h3>
+  //       <div className="settings__toggle-group">
+  //         <label className="settings__toggle">
+  //           <input
+  //             type="checkbox"
+  //             checked={settings?.notifications_new_messages || false}
+  //             onChange={(e) => updateSettings({ notifications_new_messages: e.target.checked })}
+  //           />
+  //           <span>New Messages</span>
+  //         </label>
           
-          <label className="settings__toggle">
-            <input
-              type="checkbox"
-              checked={settings?.notifications_post_interactions || false}
-              onChange={(e) => updateSettings({ notifications_post_interactions: e.target.checked })}
-            />
-            <span>Post Interactions</span>
-          </label>
+  //         <label className="settings__toggle">
+  //           <input
+  //             type="checkbox"
+  //             checked={settings?.notifications_post_interactions || false}
+  //             onChange={(e) => updateSettings({ notifications_post_interactions: e.target.checked })}
+  //           />
+  //           <span>Post Interactions</span>
+  //         </label>
           
-          <label className="settings__toggle">
-            <input
-              type="checkbox"
-              checked={settings?.notifications_event_reminders || false}
-              onChange={(e) => updateSettings({ notifications_event_reminders: e.target.checked })}
-            />
-            <span>Event Reminders</span>
-          </label>
+  //         <label className="settings__toggle">
+  //           <input
+  //             type="checkbox"
+  //             checked={settings?.notifications_event_reminders || false}
+  //             onChange={(e) => updateSettings({ notifications_event_reminders: e.target.checked })}
+  //           />
+  //           <span>Event Reminders</span>
+  //         </label>
           
-          <label className="settings__toggle">
-            <input
-              type="checkbox"
-              checked={settings?.notifications_friend_activity || false}
-              onChange={(e) => updateSettings({ notifications_friend_activity: e.target.checked })}
-            />
-            <span>Friend Activity</span>
-          </label>
+  //         <label className="settings__toggle">
+  //           <input
+  //             type="checkbox"
+  //             checked={settings?.notifications_friend_activity || false}
+  //             onChange={(e) => updateSettings({ notifications_friend_activity: e.target.checked })}
+  //           />
+  //           <span>Friend Activity</span>
+  //         </label>
           
-          <label className="settings__toggle">
-            <input
-              type="checkbox"
-              checked={settings?.notifications_location_based || false}
-              onChange={(e) => updateSettings({ notifications_location_based: e.target.checked })}
-            />
-            <span>Location-Based Activities</span>
-          </label>
+  //         <label className="settings__toggle">
+  //           <input
+  //             type="checkbox"
+  //             checked={settings?.notifications_location_based || false}
+  //             onChange={(e) => updateSettings({ notifications_location_based: e.target.checked })}
+  //           />
+  //           <span>Location-Based Activities</span>
+  //         </label>
           
-          <label className="settings__toggle">
-            <input
-              type="checkbox"
-              checked={settings?.notifications_group_mentions || false}
-              onChange={(e) => updateSettings({ notifications_group_mentions: e.target.checked })}
-            />
-            <span>Group Chat Mentions</span>
-          </label>
-        </div>
-      </div>
-    </div>
-  );
+  //         <label className="settings__toggle">
+  //           <input
+  //             type="checkbox"
+  //             checked={settings?.notifications_group_mentions || false}
+  //             onChange={(e) => updateSettings({ notifications_group_mentions: e.target.checked })}
+  //           />
+  //           <span>Group Chat Mentions</span>
+  //         </label>
+  //       </div>
+  //     </div>
+  //   </div>
+  // );
 
   const renderPrivacyTab = () => (
     <div className="settings__tab-content">
@@ -513,7 +513,7 @@ const Settings = () => {
 
         <div className="settings__content">
           {activeTab === 'security' && renderSecurityTab()}
-          {activeTab === 'notifications' && renderNotificationsTab()}
+          {/* {activeTab === 'notifications' && renderNotificationsTab()} */}
           {activeTab === 'privacy' && renderPrivacyTab()}
           {activeTab === 'content' && renderContentTab()}
         </div>

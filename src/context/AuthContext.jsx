@@ -37,16 +37,32 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = async (email, password) => {
+  const login = async (emailOrUserData, password = null, existingToken = null) => {
     try {
-      const response = await axios.post('/auth/login', { email, password });
-      const { token, user } = response.data;
-      
-      localStorage.setItem('token', token);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      setUser(user);
-      
-      return { success: true };
+      if (existingToken) {
+        // Use provided token and user data (from OTP verification)
+        const token = existingToken;
+        const userData = emailOrUserData;
+        
+        localStorage.setItem('token', token);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        setUser(userData);
+        
+        return { success: true };
+      } else {
+        // Regular login flow
+        const response = await axios.post('/auth/login', { 
+          email: emailOrUserData, 
+          password 
+        });
+        const { token, user } = response.data;
+        
+        localStorage.setItem('token', token);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        setUser(user);
+        
+        return { success: true };
+      }
     } catch (error) {
       return { 
         success: false, 

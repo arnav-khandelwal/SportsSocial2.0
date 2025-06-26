@@ -3,6 +3,7 @@ import { UserSettings } from '../models/UserSettings.js';
 import { User } from '../models/User.js';
 import { authenticateToken } from '../middleware/auth.js';
 import bcrypt from 'bcryptjs';
+import { supabase } from '../config/supabase.js';
 
 const router = express.Router();
 

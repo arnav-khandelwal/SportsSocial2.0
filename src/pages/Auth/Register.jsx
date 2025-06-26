@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import OTPVerification from './OTPVerification';
+import axios from 'axios';
 import './Auth.scss';
 
 const Register = () => {
@@ -15,8 +17,10 @@ const Register = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showOTPVerification, setShowOTPVerification] = useState(false);
+  const [emailForVerification, setEmailForVerification] = useState('');
 
-  const { register } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -46,16 +50,51 @@ const Register = () => {
       tags: formData.tags.split(',').map(t => t.trim()).filter(t => t)
     };
 
-    const result = await register(userData);
-    
-    if (result.success) {
-      navigate('/');
-    } else {
-      setError(result.message);
+    try {
+      const response = await axios.post('/auth/send-otp', userData);
+      
+      if (response.data.success) {
+        setEmailForVerification(formData.email);
+        setShowOTPVerification(true);
+      } else {
+        setError(response.data.message || 'Failed to send verification email');
+      }
+    } catch (error) {
+      setError(error.response?.data?.message || 'Registration failed');
     }
 
     setLoading(false);
   };
+
+  const handleOTPVerified = async (verificationData) => {
+    // Store the token and user data
+    localStorage.setItem('token', verificationData.token);
+    
+    // Update auth context
+    await login(verificationData.user, verificationData.token);
+    
+    // Navigate to home page
+    navigate('/');
+  };
+
+  const handleBackToForm = () => {
+    setShowOTPVerification(false);
+    setEmailForVerification('');
+  };
+
+  if (showOTPVerification) {
+    return (
+      <div className="auth">
+        <div className="auth__container">
+          <OTPVerification
+            email={emailForVerification}
+            onVerified={handleOTPVerified}
+            onBack={handleBackToForm}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="auth">
