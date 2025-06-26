@@ -86,7 +86,6 @@ function App() {
   return (
     <AuthProvider>
       <AppRoutes />
-      <BoltBadge />
     </AuthProvider>
   );
 }
