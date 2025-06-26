@@ -79,7 +79,7 @@ const Header = ({ toggleSidebar }) => {
           <FaBars />
         </button>
         <Link to="/" className="header__logo">
-          <img src={logo} alt="Logo" className="header__logo-img" style={{ height: 32, width: 32, marginRight: 10, verticalAlign: 'middle' }} />
+          <img src={logo} alt="Logo" className="header__logo-img" style={{ height: 52, width: 52, marginRight: 10, verticalAlign: 'middle' }} />
           <span className="header__logo-text">Sports Social</span>
         </Link>
       </div>
