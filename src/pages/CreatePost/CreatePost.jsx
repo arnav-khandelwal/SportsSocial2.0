@@ -179,9 +179,9 @@ const CreatePost = () => {
     const { name, value } = e.target;
     
     if (name === 'playersNeeded') {
-      // Only allow positive integers
+      // Only allow integers between 1-20
       const num = parseInt(value);
-      if (value === '' || (!isNaN(num) && num > 0)) {
+      if (value === '' || (!isNaN(num) && num >= 1 && num <= 20)) {
         setFormData(prev => ({
           ...prev,
           [name]: value
@@ -218,14 +218,14 @@ const CreatePost = () => {
 
     // Validate players needed
     if (!formData.playersNeeded) {
-      setError('Please enter the number of players needed');
+      setError('Please enter the number of players needed (1-20)');
       setLoading(false);
       return;
     }
 
     const playersNum = parseInt(formData.playersNeeded);
-    if (isNaN(playersNum) || playersNum <= 0) {
-      setError('Please enter a valid number greater than 0');
+    if (isNaN(playersNum) || playersNum < 1 || playersNum > 20) {
+      setError('Please enter a number between 1 and 20');
       setLoading(false);
       return;
     }
@@ -336,10 +336,12 @@ const CreatePost = () => {
                 name="playersNeeded"
                 value={formData.playersNeeded}
                 onChange={handleChange}
-                placeholder="Enter number of players needed"
+                placeholder="Enter 1-20"
                 required
-                pattern="[1-9][0-9]*"
-                title="Please enter a number greater than 0"
+                pattern="^([1-9]|1[0-9]|20)$"
+                title="Please enter a number between 1 and 20"
+                min="1"
+                max="20"
               />
             </div>
           </div>
