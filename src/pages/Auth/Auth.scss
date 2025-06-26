@@ -11,24 +11,24 @@
 
   &__container {
     background-color: var(--background-card);
-    padding: 48px;
-    border-radius: 20px;
+    padding: 24px;
+    border-radius: 12px;
     box-shadow: var(--shadow-heavy);
     width: 100%;
-    max-width: 480px;
+    max-width: 420px;
     border: 1px solid var(--border-primary);
   }
 
   &__header {
     text-align: center;
-    margin-bottom: 32px;
+    margin-bottom: 20px;
   }
 
   &__title {
-    font-size: 32px;
+    font-size: 28px;
     font-weight: 700;
     color: var(--text-primary);
-    margin: 0 0 8px 0;
+    margin: 0 0 6px 0;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -36,7 +36,7 @@
   }
 
   &__subtitle {
-    font-size: 16px;
+    font-size: 14px;
     color: var(--text-secondary);
     margin: 0;
   }
@@ -44,13 +44,13 @@
   &__form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
   }
 
   &__error {
     background-color: var(--background-tertiary);
     color: var(--error);
-    padding: 12px 16px;
+    padding: 10px 14px;
     border-radius: 8px;
     font-size: 14px;
     border: 1px solid var(--error);
@@ -63,10 +63,10 @@
 
   &__input,
   &__textarea {
-    padding: 16px;
+    padding: 12px;
     border: 2px solid var(--border-primary);
-    border-radius: 12px;
-    font-size: 16px;
+    border-radius: 10px;
+    font-size: 15px;
     font-family: inherit;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     background-color: var(--background-secondary);
@@ -85,16 +85,16 @@
 
   &__textarea {
     resize: vertical;
-    min-height: 80px;
+    min-height: 70px;
   }
 
   &__submit {
-    padding: 16px;
+    padding: 14px;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     color: var(--text-primary);
     border: none;
-    border-radius: 12px;
-    font-size: 16px;
+    border-radius: 10px;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -112,7 +112,7 @@
 
   &__footer {
     text-align: center;
-    margin-top: 24px;
+    margin-top: 18px;
 
     p {
       color: var(--text-secondary);
