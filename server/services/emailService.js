@@ -41,6 +41,8 @@ export const generateOTP = () => {
 
 // Send OTP email
 export const sendOTPEmail = async (email, otp, username) => {
+  const logoUrl = 'https://i.postimg.cc/7GZJmfmq/logo.png';
+  
   const mailOptions = {
     from: {
       name: 'Sports Social',
@@ -51,7 +53,16 @@ export const sendOTPEmail = async (email, otp, username) => {
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
         <div style="background: linear-gradient(135deg, #ff6b35, #f7931e); padding: 30px; border-radius: 10px; text-align: center; margin-bottom: 20px;">
-          <h1 style="color: white; margin: 0; font-size: 28px;">Sports Social</h1>
+          <table style="margin: 0 auto; margin-bottom: 10px;">
+            <tr>
+              <td style="vertical-align: middle; padding-right: 16px;">
+                <img src="${logoUrl}" alt="Sports Social Logo" style="width: 48px; height: 48px; border-radius: 8px; display: block;" />
+              </td>
+              <td style="vertical-align: middle;">
+                <h1 style="color: white; margin: 0; font-size: 32px; font-weight: bold; white-space: nowrap;">Sports Social</h1>
+              </td>
+            </tr>
+          </table>
           <p style="color: white; margin: 10px 0 0 0; font-size: 16px;">Welcome to the community!</p>
         </div>
         
@@ -92,6 +103,8 @@ export const sendOTPEmail = async (email, otp, username) => {
 
 // Send welcome email
 export const sendWelcomeEmail = async (email, username) => {
+  const logoUrl = 'https://i.postimg.cc/7GZJmfmq/logo.png';
+  
   const mailOptions = {
     from: {
       name: 'Sports Social',
@@ -102,8 +115,17 @@ export const sendWelcomeEmail = async (email, username) => {
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
         <div style="background: linear-gradient(135deg, #ff6b35, #f7931e); padding: 40px; border-radius: 10px; text-align: center; margin-bottom: 20px;">
-          <h1 style="color: white; margin: 0; font-size: 32px;">🎉 Welcome to Sports Social!</h1>
-          <p style="color: white; margin: 15px 0 0 0; font-size: 18px;">Your sports journey starts here</p>
+          <table style="margin: 0 auto; margin-bottom: 15px;">
+            <tr>
+              <td style="vertical-align: middle; padding-right: 15px;">
+                <img src="${logoUrl}" alt="Sports Social Logo" style="width: 50px; height: 50px; border-radius: 10px; display: block;" />
+              </td>
+              <td style="vertical-align: middle;">
+                <h1 style="color: white; margin: 0; font-size: 32px; white-space: nowrap;">Welcome to Sports Social!</h1>
+              </td>
+            </tr>
+          </table>
+          <p style="color: white; margin: 15px 0 0 0; font-size: 18px;">🎉 Your sports journey starts here</p>
         </div>
         
         <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
