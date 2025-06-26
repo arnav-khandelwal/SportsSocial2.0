@@ -25,15 +25,19 @@ dotenv.config();
 
 const app = express();
 const server = createServer(app);
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: FRONTEND_URL,
     methods: ["GET", "POST"]
   }
 });
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: FRONTEND_URL,
+  credentials: true
+}));
 app.use(express.json());
 
 // Health check endpoint (works without database)
@@ -41,7 +45,19 @@ app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'OK', 
     message: 'Sports Social API is running',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    port: process.env.PORT || 5001,
+    frontendUrl: FRONTEND_URL
+  });
+});
+
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Sports Social API',
+    version: '1.0.0',
+    health: '/api/health'
   });
 });
 
@@ -81,9 +97,39 @@ io.on('connection', (socket) => {
   handleSocketConnection(socket, io);
 });
 
-const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
+// Global error handling
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught Exception:', error);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+  process.exit(1);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('🛑 SIGTERM received, shutting down gracefully');
+  server.close(() => {
+    console.log('💤 Process terminated');
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('🛑 SIGINT received, shutting down gracefully');
+  server.close(() => {
+    console.log('💤 Process terminated');
+    process.exit(0);
+  });
+});
+
+const PORT = process.env.PORT || 5001;
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📡 Socket.io server ready for connections`);
-  console.log(`🌐 Health check: http://localhost:${PORT}/api/health`);
+  console.log(`🌐 Health check: ${process.env.NODE_ENV === 'production' ? 'https://your-deployed-api.com' : `http://localhost:${PORT}`}/api/health`);
+  console.log(`🔗 Frontend URL: ${FRONTEND_URL}`);
+  console.log(`🏷️  Environment: ${process.env.NODE_ENV || 'development'}`);
 });

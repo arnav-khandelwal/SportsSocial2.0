@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "build": "echo 'No build step required for Node.js server'",
+    "test": "echo 'No tests specified' && exit 0"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.50.0",

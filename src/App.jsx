@@ -29,7 +29,8 @@ import { SocketProvider } from './context/SocketContext';
 import './styles/main.scss';
 
 // Configure axios defaults
-axios.defaults.baseURL = 'http://localhost:5001/api';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5001';
+axios.defaults.baseURL = `${BACKEND_URL}/api`;
 
 function AppRoutes() {
   const { user, loading } = useAuth();
