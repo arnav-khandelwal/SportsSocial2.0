@@ -41,7 +41,7 @@ export const generateOTP = () => {
 
 // Send OTP email
 export const sendOTPEmail = async (email, otp, username) => {
-  const logoUrl = 'https://i.postimg.cc/7GZJmfmq/logo.png';
+  const logoUrl = 'https://i.postimg.cc/yYwNnXk5/newlogo.png';
   
   const mailOptions = {
     from: {
