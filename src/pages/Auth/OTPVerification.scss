@@ -3,6 +3,15 @@
   margin: 0 auto;
   padding: 20px;
 
+  @media (max-width: 480px) {
+    padding: 15px;
+    max-width: 100%;
+  }
+
+  @media (max-width: 320px) {
+    padding: 12px;
+  }
+
   &__header {
     text-align: center;
     margin-bottom: 30px;
@@ -51,9 +60,19 @@
     gap: 12px;
     justify-content: center;
     margin: 20px 0;
+    width: 100%;
 
     @media (max-width: 480px) {
       gap: 8px;
+      margin: 25px 0;
+    }
+
+    @media (max-width: 360px) {
+      gap: 6px;
+    }
+
+    @media (max-width: 320px) {
+      gap: 4px;
     }
   }
 
@@ -68,23 +87,57 @@
     background-color: var(--background-secondary);
     color: var(--text-primary);
     transition: all 0.2s ease;
+    line-height: 1.2;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
 
     @media (max-width: 480px) {
-      width: 40px;
-      height: 40px;
+      width: 42px;
+      height: 42px;
       font-size: 20px;
+      font-weight: 700;
+    }
+
+    @media (max-width: 360px) {
+      width: 36px;
+      height: 36px;
+      font-size: 18px;
+    }
+
+    @media (max-width: 320px) {
+      width: 32px;
+      height: 32px;
+      font-size: 16px;
     }
 
     &:focus {
       outline: none;
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+      box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.2);
       transform: scale(1.05);
     }
 
     &:valid {
       border-color: var(--success);
     }
+
+    /* Ensure text is always visible */
+    &:not(:placeholder-shown) {
+      color: var(--text-primary) !important;
+      font-weight: 700;
+    }
+
+    /* Fix for iOS Safari and mobile browsers */
+    -webkit-appearance: none;
+    appearance: none;
+    -webkit-text-fill-color: var(--text-primary) !important;
+    -webkit-opacity: 1 !important;
+    opacity: 1 !important;
+    
+    /* Ensure proper text rendering */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   &__timer {

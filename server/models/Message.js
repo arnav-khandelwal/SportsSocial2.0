@@ -22,7 +22,7 @@ export class Message {
         `)
         .single();
       
-      if (error) {
+      if (error && error.code !== 'PGRST116') {
         console.error('Some Message create error:', error);
         throw error;
       }
@@ -91,7 +91,7 @@ export class Message {
         .select()
         .single();
       
-      if (error) {
+      if (error && error.code !== 'PGRST116') {
         console.error('Mark as read error:', error);
         throw error;
       }

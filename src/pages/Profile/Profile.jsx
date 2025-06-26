@@ -236,6 +236,22 @@ const Profile = () => {
   const saveField = async (field) => {
     setSaveLoading(true);
     try {
+      // Validate phone number if it's being saved
+      if (field === 'phone_number') {
+        const phoneValue = editValues[field];
+        if (phoneValue && phoneValue.trim()) {
+          // Remove any non-digit characters for validation
+          const digitsOnly = phoneValue.replace(/\D/g, '');
+          if (digitsOnly.length !== 10) {
+            alert('Phone number must be exactly 10 digits');
+            setSaveLoading(false);
+            return;
+          }
+          // Format the phone number as digits only for storage
+          editValues[field] = digitsOnly;
+        }
+      }
+
       if (field === 'bio') {
         // Update user bio directly
         await axios.put('/settings', { bio: editValues[field] });
@@ -374,6 +390,22 @@ const Profile = () => {
     const isEditing = editingField === field;
     const displayValue = value || 'Not set';
 
+    const handleInputChange = (e) => {
+      let inputValue = e.target.value;
+      
+      // Special handling for phone number
+      if (field === 'phone_number') {
+        // Remove any non-digit characters
+        inputValue = inputValue.replace(/\D/g, '');
+        // Limit to 10 digits
+        if (inputValue.length > 10) {
+          inputValue = inputValue.slice(0, 10);
+        }
+      }
+      
+      setEditValues({ ...editValues, [field]: inputValue });
+    };
+
     return (
       <div className="profile__editable-field">
         <div className="profile__field-header">
@@ -411,10 +443,12 @@ const Profile = () => {
               </select>
             ) : (
               <input
-                type={type}
+                type={field === 'phone_number' ? 'tel' : type}
                 value={editValues[field] || ''}
-                onChange={(e) => setEditValues({ ...editValues, [field]: e.target.value })}
+                onChange={handleInputChange}
                 className="profile__field-input"
+                placeholder={field === 'phone_number' ? 'Enter 10-digit phone number' : ''}
+                maxLength={field === 'phone_number' ? 10 : undefined}
               />
             )}
             
@@ -438,7 +472,11 @@ const Profile = () => {
           </div>
         ) : (
           <div className="profile__field-value">
-            {displayValue}
+            {field === 'phone_number' && value ? 
+              // Format phone number for display (XXX) XXX-XXXX
+              value.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3') 
+              : displayValue
+            }
           </div>
         )}
       </div>

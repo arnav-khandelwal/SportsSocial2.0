@@ -49,7 +49,7 @@
 
   &__row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1.5fr 1.5fr 1fr;
     gap: 20px;
 
     @media (max-width: 768px) {
@@ -78,24 +78,49 @@
       font-size: 16px;
       font-family: inherit;
       transition: all 0.2s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
 
       &:focus {
         outline: none;
         border-color: var(--primary);
         box-shadow: 0 0 0 2px var(--primary-light);
       }
+
+      &::placeholder {
+        color: var(--text-secondary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
 
     input[name="playersNeeded"] {
-      width: 120px;
-      max-width: 120px;
-      padding: 8px;
-      font-size: 14px;
+      width: 100%;
+      min-width: 120px;
+      padding: 12px 16px;
+      font-size: 16px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      
+      @media (max-width: 768px) {
+        min-width: 100px;
+      }
+      
+      @media (max-width: 480px) {
+        min-width: 90px;
+        font-size: 15px;
+      }
     }
 
     textarea {
       resize: vertical;
       min-height: 100px;
+      white-space: normal !important;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
     }
 
     select {
@@ -161,43 +186,74 @@
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 12px;
+    }
+
+    .create-post__tag-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--border-primary);
+      border-radius: 8px;
+      font-size: 16px;
+      color: var(--text-primary);
+      background: var(--background-card);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      &:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px var(--primary-light);
+      }
+
+      &::placeholder {
+        color: var(--text-secondary);
+      }
     }
 
     .create-post__tags-list {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      padding: 8px;
+      padding: 12px;
       background: var(--background-card);
       border: 1px solid var(--border-primary);
       border-radius: 8px;
-      min-height: 40px;
+      min-height: 48px;
+      align-items: flex-start;
+      align-content: flex-start;
     }
 
     .create-post__tag {
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 4px 12px;
+      gap: 6px;
+      padding: 6px 12px;
       background: var(--primary);
       color: var(--text-primary);
-      border-radius: 25px;
+      border-radius: 20px;
       font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .create-post__tag-remove {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       background: none;
       border: none;
       color: var(--text-primary);
       cursor: pointer;
-      opacity: 0.7;
+      opacity: 0.8;
       transition: opacity 0.2s ease;
+      flex-shrink: 0;
 
       &:hover {
         opacity: 1;
@@ -205,22 +261,6 @@
 
       &:focus {
         outline: none;
-      }
-    }
-
-    .create-post__tag-input {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid var(--border-primary);
-      border-radius: 8px;
-      font-size: 16px;
-      color: var(--text-primary);
-      background: var(--background-card);
-
-      &:focus {
-        outline: none;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 2px var(--primary-light);
       }
     }
 
@@ -290,64 +330,6 @@
 
     span {
       font-weight: 500;
-    }
-  }
-
-  &__tags-container {
-    position: relative;
-    width: 100%;
-    background: #000000;
-    padding: 8px;
-    border-radius: 4px;
-  }
-
-  &__tags-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 0;
-    margin: 0;
-  }
-
-  &__tag {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 4px 8px;
-    background: #e9ecef;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    color: #495057;
-  }
-
-  &__tag-remove {
-    background: none;
-    border: none;
-    color: #dc3545;
-    cursor: pointer;
-    padding: 0;
-    font-size: 0.8rem;
-  
-    &:hover {
-      color: #c82333;
-    }
-  }
-
-  &__tag-input {
-    flex: 1;
-    padding: 4px 8px;
-    border: none;
-    font-size: 0.9rem;
-    margin-left: 8px;
-    background: #f8f9fa;
-    color: #495057;
-    
-    &:focus {
-      outline: none;
-    }
-    
-    &::placeholder {
-      color: #6c757d;
     }
   }
 

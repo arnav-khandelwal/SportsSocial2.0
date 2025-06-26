@@ -50,10 +50,18 @@
   &__error {
     background-color: var(--background-tertiary);
     color: var(--error);
-    padding: 10px 14px;
+    padding: 12px 16px;
     border-radius: 8px;
     font-size: 14px;
     border: 1px solid var(--error);
+    margin-bottom: 4px;
+    line-height: 1.4;
+    word-wrap: break-word;
+    
+    @media (max-width: 480px) {
+      font-size: 13px;
+      padding: 10px 14px;
+    }
   }
 
   &__field {

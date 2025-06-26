@@ -23,7 +23,7 @@ export class EmailVerification {
           .select()
           .single();
 
-        if (error) throw error;
+        if (error && error.code !== 'PGRST116') throw error;
         return { success: true, data };
       } catch (dbError) {
         console.log('Database table not available, using in-memory storage');
