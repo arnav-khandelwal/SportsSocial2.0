@@ -23,6 +23,20 @@ const Register = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  // Helper function to format field names for better user experience
+  const formatFieldName = (fieldName) => {
+    const fieldMapping = {
+      'username': 'Username',
+      'email': 'Email',
+      'password': 'Password',
+      'confirmPassword': 'Confirm Password',
+      'bio': 'Bio',
+      'sports': 'Sports',
+      'tags': 'Tags'
+    };
+    return fieldMapping[fieldName] || fieldName.charAt(0).toUpperCase() + fieldName.slice(1);
+  };
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -35,8 +49,39 @@ const Register = () => {
     setLoading(true);
     setError('');
 
+    // Client-side validation with specific field messages
+    if (!formData.username.trim()) {
+      setError('Username is required');
+      setLoading(false);
+      return;
+    }
+
+    if (formData.username.length < 3) {
+      setError('Username must be at least 3 characters long');
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.email.trim()) {
+      setError('Email is required');
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.password) {
+      setError('Password is required');
+      setLoading(false);
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      setLoading(false);
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError('Confirm Password does not match Password');
       setLoading(false);
       return;
     }
@@ -51,16 +96,67 @@ const Register = () => {
     };
 
     try {
+      console.log('Attempting registration with data:', { 
+        ...userData, 
+        password: '[HIDDEN]' 
+      });
+
       const response = await axios.post('/auth/send-otp', userData);
       
+      console.log('Registration response:', response.data);
+
       if (response.data.success) {
         setEmailForVerification(formData.email);
         setShowOTPVerification(true);
       } else {
-        setError(response.data.message || 'Failed to send verification email');
+        const errorMessage = response.data.message || response.data.error || 'Failed to send verification email';
+        console.error('Registration failed:', errorMessage);
+        setError(errorMessage);
       }
     } catch (error) {
-      setError(error.response?.data?.message || 'Registration failed');
+      console.error('Registration error:', error);
+      
+      let errorMessage = 'Registration failed';
+      
+      if (error.response?.data) {
+        // Server responded with error data
+        if (error.response.data.message) {
+          errorMessage = error.response.data.message;
+        } else if (error.response.data.error) {
+          errorMessage = error.response.data.error;
+        } else if (error.response.data.errors) {
+          // Handle validation errors array with field names
+          if (Array.isArray(error.response.data.errors)) {
+            const fieldErrors = error.response.data.errors.map(err => {
+              // Try to extract field name and message
+              const field = err.path || err.param || err.field || 'field';
+              const message = err.msg || err.message || err.toString();
+              const formattedField = formatFieldName(field);
+              
+              // If message already contains field name, don't duplicate it
+              if (message.toLowerCase().includes(field.toLowerCase())) {
+                return message;
+              }
+              
+              return `${formattedField}: ${message}`;
+            });
+            errorMessage = fieldErrors.join('; ');
+          } else {
+            errorMessage = 'Validation errors occurred';
+          }
+        } else {
+          errorMessage = `Server error: ${error.response.status} ${error.response.statusText}`;
+        }
+      } else if (error.request) {
+        // Network error
+        errorMessage = 'Network error: Unable to connect to server. Please check your internet connection.';
+      } else if (error.message) {
+        // Other error
+        errorMessage = `Error: ${error.message}`;
+      }
+
+      console.error('Processed error message:', errorMessage);
+      setError(errorMessage);
     }
 
     setLoading(false);
