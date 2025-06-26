@@ -102,8 +102,7 @@
     &--sport {
       background: linear-gradient(135deg, #e6a600, #cc8b00);
       color: #fff;
-      
-      border: 1px solid #4dd0e1;
+      border: 1px solid #dbdbdb;
     }
 
     &--esport {
@@ -112,7 +111,7 @@
       border: 1px solid #7986cb;
 
       img {
-        filter: drop-shadow(0 1px 2px rgba(26, 35, 126, 0.2));
+        filter: drop-shadow(0 1px 2px rgba(26,35,126,0.2));
       }
     }
   }

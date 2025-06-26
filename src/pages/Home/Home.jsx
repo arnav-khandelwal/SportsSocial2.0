@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import PostCard from '../../components/PostCard/PostCard';
@@ -17,6 +18,7 @@ const useIsMobile = () => {
 
 const Home = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
@@ -72,22 +74,48 @@ const Home = () => {
 
   const handleInterest = async (postId) => {
     try {
-      const response = await axios.post(`/posts/${postId}/interest`);
+      // Find the post in our local state to get its details
+      const post = posts.find(p => p.id === postId);
+      if (!post) {
+        throw new Error('Post not found');
+      }
 
+      // Register interest in the post
+      const response = await axios.post(`/posts/${postId}/interest`);
+      
+      if (!response.data || !response.data.groupChatId) {
+        throw new Error('No group chat ID returned from server');
+      }
+
+      // Update local state to reflect interest
       setPosts((prevPosts) =>
-        prevPosts.map((post) =>
-          post.id === postId
+        prevPosts.map((p) =>
+          p.id === postId
             ? {
-                ...post,
-                interested_users: [...(post.interested_users || [])]
+                ...p,
+                interested_users: [...(p.interested_users || []), { user_id: user.id }]
               }
-            : post
+            : p
         )
       );
-
+      
+      // Refresh posts in the background
       setTimeout(() => {
         fetchPosts();
       }, 500);
+
+      // Navigate to messages page with the group chat open
+      navigate('/messages', {
+        replace: true, // Use replace to prevent going back to this state
+        state: {
+          startConversation: null, // Ensure no direct message is started
+          activeChat: {
+            id: response.data.groupChatId,
+            type: 'group',
+            name: `${post.sport} - ${post.heading}`
+          }
+        }
+      });
 
       return response.data;
     } catch (error) {
