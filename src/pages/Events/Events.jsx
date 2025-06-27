@@ -99,8 +99,9 @@ const Events = () => {
           sport: 'Valorant',
           organizer: { id: 'admin', username: 'admin' },
           location_name: 'Online',
-          event_date: '2025-06-28T12:00:00.000Z', // June 28th
-          duration_hours: 72, // 3 days (Jun 28-30)
+          event_date: '2025-07-04T12:00:00.000Z', // July 4th start
+          end_date: '2025-07-06T23:59:59.000Z', // July 6th end
+          duration_hours: 72, // 3 days (Jul 4-6)
           max_participants: null,
           current_participants: 0,
           skill_level: 'all',
@@ -118,8 +119,9 @@ const Events = () => {
           sport: 'Rocket League',
           organizer: { id: 'admin', username: 'admin' },
           location_name: 'Online',
-          event_date: '2025-06-28T14:00:00.000Z', // June 28th
-          duration_hours: 72, // 3 days (Jun 28-30)
+          event_date: '2025-07-04T14:00:00.000Z', // July 4th start
+          end_date: '2025-07-06T23:59:59.000Z', // July 6th end
+          duration_hours: 72, // 3 days (Jul 4-6)
           max_participants: null,
           current_participants: 0,
           skill_level: 'all',
@@ -137,8 +139,9 @@ const Events = () => {
           sport: 'Basketball',
           organizer: { id: 'admin', username: 'admin' },
           location_name: "Lion's Club, 28°37'32.3\"N 77°25'43.2\"E, Indirapuram, Ghaziabad, Uttar Pradesh 201014",
-          event_date: '2025-06-28T17:00:00+05:30', // June 28th 5pm IST
-          duration_hours: 3, // 5-8 PM
+          event_date: '2025-07-07T16:00:00+05:30', // July 8th 4pm IST
+          end_date: '2025-07-07T19:00:00+05:30', // July 7th 7pm IST
+          duration_hours: 3, // 4-7 PM
           max_participants: null,
           current_participants: 0,
           skill_level: 'all',
@@ -355,7 +358,22 @@ const Events = () => {
 
                     <div className="events__detail">
                       <FaCalendarAlt className="events__detail-icon" />
-                      <span>{formatDateTime(event.event_date)}</span>
+                      {event.sport === 'Basketball' ? (
+                        <span>7th July, 4pm to 7pm</span>
+                      ) : event.end_date && event.end_date !== event.event_date ? (
+                        <span>
+                          {new Date(event.event_date).toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric' 
+                          })} - {new Date(event.end_date).toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric', 
+                            year: 'numeric' 
+                          })}
+                        </span>
+                      ) : (
+                        <span>{formatDateTime(event.event_date)}</span>
+                      )}
                     </div>
 
                     <div className="events__detail">
@@ -371,7 +389,7 @@ const Events = () => {
                     {event.cost > 0 && (
                       <div className="events__detail">
                         <FaDollarSign className="events__detail-icon" />
-                        <span>₹{event.cost}</span>
+                        <span>₹{event.cost} (At the venue)</span>
                       </div>
                     )}
 

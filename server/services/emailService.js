@@ -182,3 +182,89 @@ export const sendWelcomeEmail = async (email, username) => {
     return { success: false, error: error.message };
   }
 };
+
+// Send event registration confirmation email
+export const sendEventRegistrationEmail = async (email, name, eventTitle, teamName = null) => {
+  const logoUrl = 'https://i.postimg.cc/7GZJmfmq/logo.png';
+  
+  const mailOptions = {
+    from: {
+      name: 'Sports Social',
+      address: process.env.EMAIL_USER || 'connect.sportssocial@gmail.com'
+    },
+    to: email,
+    subject: `Event Registration Confirmed: ${eventTitle} 🏆`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
+        <div style="background: linear-gradient(135deg, #ff6b35, #f7931e); padding: 40px; border-radius: 10px; text-align: center; margin-bottom: 20px;">
+          <table style="margin: 0 auto; margin-bottom: 15px;">
+            <tr>
+              <td style="vertical-align: middle; padding-right: 15px;">
+                <img src="${logoUrl}" alt="Sports Social Logo" style="width: 50px; height: 50px; border-radius: 10px; display: block;" />
+              </td>
+              <td style="vertical-align: middle;">
+                <h1 style="color: white; margin: 0; font-size: 32px; white-space: nowrap;">Registration Confirmed!</h1>
+              </td>
+            </tr>
+          </table>
+          <p style="color: white; margin: 15px 0 0 0; font-size: 18px;">🎉 You're all set for the event</p>
+        </div>
+        
+        <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+          <h2 style="color: #333; margin-top: 0;">Hey ${name}! 👋</h2>
+          <p style="color: #666; font-size: 16px; line-height: 1.6;">
+            Great news! You have successfully registered for the following event:
+          </p>
+          
+          <div style="background: linear-gradient(135deg, #e3f2fd, #f3e5f5); border-radius: 10px; padding: 20px; margin: 20px 0;">
+            <h3 style="color: #ff6b35; margin: 0 0 15px 0;">📅 Event Details</h3>
+            <div style="color: #666; line-height: 1.8;">
+              <p style="margin: 8px 0;"><strong>Event:</strong> ${eventTitle}</p>
+              ${teamName ? `<p style="margin: 8px 0;"><strong>Team Name:</strong> ${teamName}</p>` : ''}
+              <p style="margin: 8px 0;"><strong>Registered Name:</strong> ${name}</p>
+              <p style="margin: 8px 0;"><strong>Email:</strong> ${email}</p>
+            </div>
+          </div>
+          
+          <div style="background: #f8f9fa; border-left: 4px solid #ff6b35; padding: 15px; margin: 20px 0;">
+            <p style="color: #666; margin: 0; font-size: 14px;">
+              <strong>📋 What's Next?</strong> 
+              Further details about the event, including venue information, schedule, and any additional requirements will be sent to you shortly. Keep an eye on your inbox!
+            </p>
+          </div>
+          
+          <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0;">
+            <p style="color: #856404; margin: 0; font-size: 14px;">
+              <strong>⚠️ Important:</strong> 
+              Please save this email as confirmation of your registration. You may need to present it during the event check-in process.
+            </p>
+          </div>
+          
+          <p style="color: #666; font-size: 14px; line-height: 1.6;">
+            If you have any questions about the event or need to make changes to your registration, please contact our support team as soon as possible.
+          </p>
+          
+          <div style="text-align: center; margin: 30px 0;">
+            <p style="color: #666; font-size: 16px; margin: 0;">Good luck and have fun! 🏃‍♂️💪</p>
+          </div>
+          
+          <div style="border-top: 1px solid #eee; padding-top: 20px; margin-top: 30px; text-align: center;">
+            <p style="color: #999; font-size: 12px; margin: 0;">
+              © 2025 Sports Social. All rights reserved.<br>
+              You're receiving this email because you registered for an event through Sports Social.
+            </p>
+          </div>
+        </div>
+      </div>
+    `
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('Event registration email sent successfully to:', email);
+    return { success: true };
+  } catch (error) {
+    console.error('Error sending event registration email:', error);
+    return { success: false, error: error.message };
+  }
+};

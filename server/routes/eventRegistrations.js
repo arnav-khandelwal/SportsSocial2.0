@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { createClient } from '@supabase/supabase-js';
+import { sendEventRegistrationEmail } from '../services/emailService.js';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -60,7 +61,20 @@ router.post('/', async (req, res) => {
       return res.status(500).json({ error: 'Failed to register for event' });
     }
     
-    return res.status(201).json({ success: true, data: data[0] });
+    // Send confirmation email
+    try {
+      await sendEventRegistrationEmail(email, name, event_title, team_name);
+      console.log('Registration confirmation email sent to:', email);
+    } catch (emailError) {
+      console.error('Failed to send registration confirmation email:', emailError);
+      // Don't fail the registration if email fails, just log it
+    }
+    
+    return res.status(201).json({ 
+      success: true, 
+      data: data[0],
+      message: 'Registration successful! Check your email for confirmation.' 
+    });
     
   } catch (err) {
     console.error('Server error in event registration:', err);

@@ -2,18 +2,20 @@ import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { FaUser, FaEnvelope, FaPhone, FaUsers, FaPaperPlane } from 'react-icons/fa';
 import axios from 'axios';
+import { useAuth } from '../../context/AuthContext';
 import './EventRegister.scss';
 
 const EventRegister = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { eventTitle, eventId } = location.state || {};
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
+    email: user?.email || '',
     phone: '',
     teamName: '',
     additionalInfo: ''
@@ -39,11 +41,12 @@ const EventRegister = () => {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        team_name: formData.teamName,
-        extra: formData.additionalInfo
+        team_name: formData.teamName
       });
       
-      setSubmitted(true);
+      if (response.data.success) {
+        setSubmitted(true);
+      }
     } catch (error) {
       console.error('Registration failed:', error);
       alert('Registration failed. Please try again.');
@@ -80,7 +83,8 @@ const EventRegister = () => {
           <h2>Registration Complete!</h2>
           <p>You have successfully registered for:</p>
           <h3>{eventTitle}</h3>
-          <p>Check your email for confirmation and further details.</p>
+          <p>A confirmation email has been sent to <strong>{user?.email}</strong> with your registration details.</p>
+          <p>Further details about the event will be sent to you shortly. Please keep an eye on your inbox!</p>
           <button className="event-register__back-btn" onClick={handleBack}>
             Back to Events
           </button>
@@ -98,7 +102,7 @@ const EventRegister = () => {
         <form className="event-register__form" onSubmit={handleSubmit}>
           <div className="event-register__form-group">
             <label htmlFor="name" className="event-register__label">
-              <FaUser /> Full Name
+              <FaUser /> Full Name (of leader)
             </label>
             <input
               type="text"
@@ -122,15 +126,16 @@ const EventRegister = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="event-register__input"
+              className="event-register__input event-register__input--readonly"
               placeholder="Enter your email"
-              required
+              readOnly
+              disabled
             />
           </div>
 
           <div className="event-register__form-group">
             <label htmlFor="phone" className="event-register__label">
-              <FaPhone /> Phone Number
+              <FaPhone /> Phone Number (Whatsapp preferred)
             </label>
             <input
               type="tel"
@@ -146,7 +151,7 @@ const EventRegister = () => {
 
           <div className="event-register__form-group">
             <label htmlFor="teamName" className="event-register__label">
-              <FaUsers /> Team Name (if applicable)
+              <FaUsers /> Team Name 
             </label>
             <input
               type="text"
@@ -156,21 +161,6 @@ const EventRegister = () => {
               onChange={handleChange}
               className="event-register__input"
               placeholder="Enter your team name"
-            />
-          </div>
-
-          <div className="event-register__form-group">
-            <label htmlFor="additionalInfo" className="event-register__label">
-              Additional Information
-            </label>
-            <textarea
-              id="additionalInfo"
-              name="additionalInfo"
-              value={formData.additionalInfo}
-              onChange={handleChange}
-              className="event-register__textarea"
-              placeholder="Any special requirements or information"
-              rows={4}
             />
           </div>
 
