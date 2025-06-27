@@ -95,7 +95,7 @@ const Events = () => {
         {
           id: '1',
           title: '5v5 Valorant Tournament',
-          description: 'Compete in a 5v5 Valorant tournament! Online event open for all teams. Registration is free. Cash prize: ₹1000 for the winning team.',
+          description: 'Compete in a 5v5 Valorant tournament! Online event open for all teams. Registration is free. Prize pool: ₹1500 for the winning team.',
           sport: 'Valorant',
           organizer: { id: 'admin', username: 'admin' },
           location_name: 'Online',
@@ -110,12 +110,12 @@ const Events = () => {
           tags: ['online', 'esports', 'valorant', '5v5'],
           created_at: new Date().toISOString(),
           distance: null,
-          prize: '₹1000'
+          prize: '₹1500 prize pool'
         },
         {
           id: '2',
           title: '3v3 Rocket League Tournament',
-          description: 'Join our 3v3 Rocket League online tournament! Free to register. Show your skills and teamwork to win an exciting cash prize of ₹1000.',
+          description: 'Join our 3v3 Rocket League online tournament! Free to register. Show your skills and teamwork to win an exciting prize pool of ₹1500.',
           sport: 'Rocket League',
           organizer: { id: 'admin', username: 'admin' },
           location_name: 'Online',
@@ -130,12 +130,12 @@ const Events = () => {
           tags: ['online', 'esports', 'rocketleague', '3v3'],
           created_at: new Date().toISOString(),
           distance: null,
-          prize: '₹1000'
+          prize: '₹1500 prize pool'
         },
         {
           id: '3',
           title: "3v3 Basketball Tournament at Lion's Club",
-          description: "Join our 3v3 basketball tournament at Lion's Club, Indirapuram! Team registration fee is ₹100. Compete for a cash prize of ₹1000.",
+          description: "Join our 3v3 basketball tournament at Lion's Club, Indirapuram! Team registration fee is ₹100. Compete for a prize pool of ₹1500.",
           sport: 'Basketball',
           organizer: { id: 'admin', username: 'admin' },
           location_name: "Lion's Club, 28°37'32.3\"N 77°25'43.2\"E, Indirapuram, Ghaziabad, Uttar Pradesh 201014",
@@ -150,7 +150,7 @@ const Events = () => {
           tags: ['basketball', 'offline', 'sports', '3v3'],
           created_at: new Date().toISOString(),
           distance: null,
-          prize: '₹1000'
+          prize: '₹1500 prize pool'
         }
       ];
 
