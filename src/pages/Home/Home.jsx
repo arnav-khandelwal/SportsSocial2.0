@@ -145,60 +145,70 @@ const Home = () => {
 
   if (loading) {
     return (
-      <div className="home">
-        <div className="home__loading">
-          <div className="loader"></div>
-          <p>Loading posts...</p>
+      <>
+        <div className="marquee-global">
+          <span>For tournament registrations, go to Events </span>
         </div>
-      </div>
+        <div className="home">
+          <div className="home__loading">
+            <div className="loader"></div>
+            <p>Loading posts...</p>
+          </div>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="home">
-      <div className="home__header">
-        <h1 className="home__title">Sports Feed</h1>
-        <p className="home__subtitle">{getSubtitle()}</p>
+    <>
+      <div className="marquee-global">
+        <span>For tournament registrations, visit our Events page. </span>
       </div>
-
-      {/* PostFilters at top for mobile, at right for desktop */}
-      {isMobile && (
-        <div className="home__filters home__filters--mobile">
-          <PostFilters filters={filters} onFilterChange={handleFilterChange} is_open={false} />
-        </div>
-      )}
-
-      <div className="home__content">
-        {/* Posts */}
-        <div className="home__posts">
-          {posts.length === 0 ? (
-            <div className="home__empty">
-              <h3>No posts found</h3>
-              <p>
-                {filters.location
-                  ? `No events found near ${filters.location.name}. Try expanding your search radius or clearing location filters.`
-                  : 'No posts from other users match your current filters. Try adjusting your search criteria or create a new post!'}
-              </p>
-            </div>
-          ) : (
-            posts.map((post) => (
-              <PostCard
-                key={post.id}
-                post={post}
-                onInterest={handleInterest}
-              />
-            ))
-          )}
+      <div className="home">
+        <div className="home__header">
+          <h1 className="home__title">Sports Feed</h1>
+          <p className="home__subtitle">{getSubtitle()}</p>
         </div>
 
-        {/* PostFilters at right for desktop/tablet */}
-        {!isMobile && (
-          <div className="home__filters home__filters--desktop">
-            <PostFilters filters={filters} onFilterChange={handleFilterChange} is_open={true} />
+        {/* PostFilters at top for mobile, at right for desktop */}
+        {isMobile && (
+          <div className="home__filters home__filters--mobile">
+            <PostFilters filters={filters} onFilterChange={handleFilterChange} is_open={false} />
           </div>
         )}
+
+        <div className="home__content">
+          {/* Posts */}
+          <div className="home__posts">
+            {posts.length === 0 ? (
+              <div className="home__empty">
+                <h3>No posts found</h3>
+                <p>
+                  {filters.location
+                    ? `No events found near ${filters.location.name}. Try expanding your search radius or clearing location filters.`
+                    : 'No posts from other users match your current filters. Try adjusting your search criteria or create a new post!'}
+                </p>
+              </div>
+            ) : (
+              posts.map((post) => (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  onInterest={handleInterest}
+                />
+              ))
+            )}
+          </div>
+
+          {/* PostFilters at right for desktop/tablet */}
+          {!isMobile && (
+            <div className="home__filters home__filters--desktop">
+              <PostFilters filters={filters} onFilterChange={handleFilterChange} is_open={true} />
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
