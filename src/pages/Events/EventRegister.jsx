@@ -16,6 +16,7 @@ const EventRegister = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: user?.email || '',
+    countryCode: '+91',
     phone: '',
     teamName: '',
     additionalInfo: ''
@@ -23,10 +24,24 @@ const EventRegister = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    
+    // Special handling for phone number
+    if (name === 'phone') {
+      // Remove all non-digit characters
+      const digitsOnly = value.replace(/\D/g, '');
+      // Limit to 10 digits
+      const limitedDigits = digitsOnly.slice(0, 10);
+      
+      setFormData(prev => ({
+        ...prev,
+        [name]: limitedDigits
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -40,7 +55,8 @@ const EventRegister = () => {
         event_id: eventId,
         name: formData.name,
         email: formData.email,
-        phone: formData.phone,
+        phone: formData.phone, // Only send the 10-digit number for validation
+        country_code: formData.countryCode, // Send country code separately
         team_name: formData.teamName
       });
       
@@ -137,16 +153,33 @@ const EventRegister = () => {
             <label htmlFor="phone" className="event-register__label">
               <FaPhone /> Phone Number (Whatsapp preferred)
             </label>
-            <input
-              type="tel"
-              id="phone"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              className="event-register__input"
-              placeholder="Enter your phone number"
-              required
-            />
+            <div className="event-register__phone-container">
+              <select
+                name="countryCode"
+                value={formData.countryCode}
+                onChange={handleChange}
+                className="event-register__country-code"
+              >
+                <option value="+91">+91</option>
+                <option value="+1">+1</option>
+                <option value="+44">+44</option>
+                <option value="+61">+61</option>
+                <option value="+81">+81</option>
+              </select>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                className="event-register__input event-register__phone-input"
+                placeholder="Enter 10 digit phone number"
+                maxLength={10}
+                pattern="\d{10}"
+                title="Please enter exactly 10 digits"
+                required
+              />
+            </div>
           </div>
 
           <div className="event-register__form-group">

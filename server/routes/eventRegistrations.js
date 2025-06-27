@@ -34,11 +34,22 @@ const supabase = createClient(supabaseUrl, supabaseKey);
  */
 router.post('/', async (req, res) => {
   try {
-    const { event_id, event_title, name, email, phone, team_name, extra } = req.body;
+    const { event_id, event_title, name, email, phone, country_code, team_name, extra } = req.body;
     
     if (!event_title || !name || !email || !phone) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
+    
+    // Validate phone number: should be only numbers and exactly 10 digits
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(phone)) {
+      return res.status(400).json({ 
+        error: 'Phone number must be exactly 10 digits and contain only numbers' 
+      });
+    }
+    
+    // Concatenate country code with phone number
+    const fullPhoneNumber = (country_code || '+91') + phone;
     
     // Insert into Supabase
     const { data, error } = await supabase
@@ -49,7 +60,7 @@ router.post('/', async (req, res) => {
           event_title,
           name,
           email,
-          phone,
+          phone: fullPhoneNumber,
           team_name,
           extra
         }
