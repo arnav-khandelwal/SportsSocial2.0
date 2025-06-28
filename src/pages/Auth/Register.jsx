@@ -163,14 +163,20 @@ const Register = () => {
   };
 
   const handleOTPVerified = async (verificationData) => {
-    // Store the token and user data
-    localStorage.setItem('token', verificationData.token);
-    
-    // Update auth context
-    await login(verificationData.user, verificationData.token);
-    
-    // Navigate to home page
-    navigate('/');
+    try {
+      // Use the auth context login function with token and user data
+      const result = await login(verificationData.user, null, verificationData.token);
+      
+      if (result.success) {
+        // Navigate to home page after successful login
+        navigate('/');
+      } else {
+        setError('Failed to complete registration. Please try logging in manually.');
+      }
+    } catch (error) {
+      console.error('Auto-login error:', error);
+      setError('Registration completed but auto-login failed. Please login manually.');
+    }
   };
 
   const handleBackToForm = () => {

@@ -114,12 +114,7 @@
 }
 
 .marquee-global {
-  width: 100vw;
-  position: relative;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
+  width: 100%;
   overflow: hidden;
   white-space: nowrap;
   background: var(--primary, #1a237e);
