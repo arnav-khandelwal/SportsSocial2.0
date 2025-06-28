@@ -1,7 +1,6 @@
 import nodemailer from 'nodemailer';
 
-// Debug: Check if environment variables are loaded
-console.log('Email configuration:');
+
 console.log('EMAIL_USER:', process.env.EMAIL_USER ? 'Set' : 'Not set');
 console.log('EMAIL_PASSWORD:', process.env.EMAIL_PASSWORD ? 'Set' : 'Not set');
 
@@ -41,7 +40,7 @@ export const generateOTP = () => {
 
 // Send OTP email
 export const sendOTPEmail = async (email, otp, username) => {
-  const logoUrl = 'https://i.postimg.cc/YqjQWdZn/newlogo.png';
+  const logoUrl = 'https://i.postimg.cc/zfRpL8MD/whitelogo.png';
   
   const mailOptions = {
     from: {
@@ -81,6 +80,18 @@ export const sendOTPEmail = async (email, otp, username) => {
             If you didn't create an account with Sports Social, please ignore this email.
           </p>
           
+          <div style="text-align: center; margin: 30px 0;">
+            <p style="color: #666; font-size: 16px; margin-bottom: 15px; font-weight: 500;">Stay Connected</p>
+            <div style="display: inline-block;">
+              <a href="https://discord.gg/QeC7YyhAmf" style="display: inline-block; margin: 0 10px; padding: 12px 24px; background: #5865F2; color: white; text-decoration: none; border-radius: 25px; font-weight: 500; font-size: 16px;">
+                <span style="font-size: 18px;"></span> Discord
+              </a>
+              <a href="https://www.instagram.com/sportssocial.connect/" style="display: inline-block; margin: 0 10px; padding: 12px 24px; background: linear-gradient(135deg, #f093fb, #f5576c); color: white; text-decoration: none; border-radius: 25px; font-weight: 500; font-size: 16px;">
+                <span style="font-size: 18px;"></span> Instagram
+              </a>
+            </div>
+          </div>
+          
           <div style="border-top: 1px solid #eee; padding-top: 20px; margin-top: 30px;">
             <p style="color: #999; font-size: 12px; margin: 0;">
               © 2025 Sports Social. All rights reserved.
@@ -103,7 +114,7 @@ export const sendOTPEmail = async (email, otp, username) => {
 
 // Send welcome email
 export const sendWelcomeEmail = async (email, username) => {
-  const logoUrl = 'https://i.postimg.cc/YqjQWdZn/newlogo.png';
+  const logoUrl = 'https://i.postimg.cc/zfRpL8MD/whitelogo.png';
   
   const mailOptions = {
     from: {
@@ -162,6 +173,18 @@ export const sendWelcomeEmail = async (email, username) => {
             If you have any questions or need help getting started, feel free to reach out to our support team. We're here to help you make the most of your Sports Social experience!
           </p>
           
+          <div style="text-align: center; margin: 30px 0;">
+            <p style="color: #666; font-size: 16px; margin-bottom: 15px; font-weight: 500;">Stay Connected</p>
+            <div style="display: inline-block;">
+              <a href="https://discord.gg/QeC7YyhAmf" style="display: inline-block; margin: 0 10px; padding: 12px 24px; background: #5865F2; color: white; text-decoration: none; border-radius: 25px; font-weight: 500; font-size: 16px;">
+                <span style="font-size: 18px;"></span> Discord
+              </a>
+              <a href="https://www.instagram.com/sportssocial.connect/" style="display: inline-block; margin: 0 10px; padding: 12px 24px; background: linear-gradient(135deg, #f093fb, #f5576c); color: white; text-decoration: none; border-radius: 25px; font-weight: 500; font-size: 16px;">
+                <span style="font-size: 18px;"></span> Instagram
+              </a>
+            </div>
+          </div>
+          
           <div style="border-top: 1px solid #eee; padding-top: 20px; margin-top: 30px; text-align: center;">
             <p style="color: #999; font-size: 12px; margin: 0;">
               © 2025 Sports Social. All rights reserved.<br>
@@ -185,7 +208,7 @@ export const sendWelcomeEmail = async (email, username) => {
 
 // Send event registration confirmation email
 export const sendEventRegistrationEmail = async (email, name, eventTitle, teamName = null) => {
-  const logoUrl = 'https://i.postimg.cc/YqjQWdZn/newlogo.png';
+  const logoUrl = 'https://i.postimg.cc/zfRpL8MD/whitelogo.png';
   
   const mailOptions = {
     from: {
@@ -246,6 +269,18 @@ export const sendEventRegistrationEmail = async (email, name, eventTitle, teamNa
           
           <div style="text-align: center; margin: 30px 0;">
             <p style="color: #666; font-size: 16px; margin: 0;">Good luck and have fun! 🏃‍♂️💪</p>
+          </div>
+          
+          <div style="text-align: center; margin: 30px 0;">
+            <p style="color: #666; font-size: 16px; margin-bottom: 15px; font-weight: 500;">Stay Connected</p>
+            <div style="display: inline-block;">
+              <a href="https://discord.gg/QeC7YyhAmf" style="display: inline-block; margin: 0 10px; padding: 12px 24px; background: #5865F2; color: white; text-decoration: none; border-radius: 25px; font-weight: 500; font-size: 16px;">
+                <span style="font-size: 18px;"></span> Discord
+              </a>
+              <a href="https://www.instagram.com/sportssocial.connect/" style="display: inline-block; margin: 0 10px; padding: 12px 24px; background: linear-gradient(135deg, #f093fb, #f5576c); color: white; text-decoration: none; border-radius: 25px; font-weight: 500; font-size: 16px;">
+                <span style="font-size: 18px;"></span> Instagram
+              </a>
+            </div>
           </div>
           
           <div style="border-top: 1px solid #eee; padding-top: 20px; margin-top: 30px; text-align: center;">
