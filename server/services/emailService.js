@@ -83,7 +83,7 @@ export const sendOTPEmail = async (email, otp, username) => {
           <div style="text-align: center; margin: 30px 0;">
             <p style="color: #666; font-size: 16px; margin-bottom: 15px; font-weight: 500;">Stay Connected</p>
             <div style="display: inline-block;">
-              <a href="https://discord.gg/QeC7YyhAmf" style="display: inline-block; margin: 0 10px; padding: 12px 24px; background: #5865F2; color: white; text-decoration: none; border-radius: 25px; font-weight: 500; font-size: 16px;">
+              <a href="https://discord.gg/9wFzcndTBX" style="display: inline-block; margin: 0 10px; padding: 12px 24px; background: #5865F2; color: white; text-decoration: none; border-radius: 25px; font-weight: 500; font-size: 16px;">
                 <span style="font-size: 18px;"></span> Discord
               </a>
               <a href="https://www.instagram.com/sportssocial.connect/" style="display: inline-block; margin: 0 10px; padding: 12px 24px; background: linear-gradient(135deg, #f093fb, #f5576c); color: white; text-decoration: none; border-radius: 25px; font-weight: 500; font-size: 16px;">
@@ -176,7 +176,7 @@ export const sendWelcomeEmail = async (email, username) => {
           <div style="text-align: center; margin: 30px 0;">
             <p style="color: #666; font-size: 16px; margin-bottom: 15px; font-weight: 500;">Stay Connected</p>
             <div style="display: inline-block;">
-              <a href="https://discord.gg/QeC7YyhAmf" style="display: inline-block; margin: 0 10px; padding: 12px 24px; background: #5865F2; color: white; text-decoration: none; border-radius: 25px; font-weight: 500; font-size: 16px;">
+              <a href="https://discord.gg/9wFzcndTBX" style="display: inline-block; margin: 0 10px; padding: 12px 24px; background: #5865F2; color: white; text-decoration: none; border-radius: 25px; font-weight: 500; font-size: 16px;">
                 <span style="font-size: 18px;"></span> Discord
               </a>
               <a href="https://www.instagram.com/sportssocial.connect/" style="display: inline-block; margin: 0 10px; padding: 12px 24px; background: linear-gradient(135deg, #f093fb, #f5576c); color: white; text-decoration: none; border-radius: 25px; font-weight: 500; font-size: 16px;">
@@ -274,7 +274,7 @@ export const sendEventRegistrationEmail = async (email, name, eventTitle, teamNa
           <div style="text-align: center; margin: 30px 0;">
             <p style="color: #666; font-size: 16px; margin-bottom: 15px; font-weight: 500;">Stay Connected</p>
             <div style="display: inline-block;">
-              <a href="https://discord.gg/QeC7YyhAmf" style="display: inline-block; margin: 0 10px; padding: 12px 24px; background: #5865F2; color: white; text-decoration: none; border-radius: 25px; font-weight: 500; font-size: 16px;">
+              <a href="https://discord.gg/9wFzcndTBX" style="display: inline-block; margin: 0 10px; padding: 12px 24px; background: #5865F2; color: white; text-decoration: none; border-radius: 25px; font-weight: 500; font-size: 16px;">
                 <span style="font-size: 18px;"></span> Discord
               </a>
               <a href="https://www.instagram.com/sportssocial.connect/" style="display: inline-block; margin: 0 10px; padding: 12px 24px; background: linear-gradient(135deg, #f093fb, #f5576c); color: white; text-decoration: none; border-radius: 25px; font-weight: 500; font-size: 16px;">

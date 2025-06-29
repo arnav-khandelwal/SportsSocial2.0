@@ -18,8 +18,9 @@ import CreateReview from './pages/CreateReview/CreateReview';
 import Events from './pages/Events/Events';
 import EventRegister from './pages/Events/EventRegister';
 import About from './pages/About/About';
+import Privacy from './pages/Privacy/Privacy';
+import Terms from './pages/Terms/Terms';
 import Settings from './pages/Settings/Settings';
-import BoltBadge from './components/BoltBadge/BoltBadge';
 
 // Context
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -50,6 +51,9 @@ function AppRoutes() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/about" element={<About />} />
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </Router>
@@ -73,6 +77,8 @@ function AppRoutes() {
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/events" element={<Events />} />
             <Route path="/about" element={<About />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>

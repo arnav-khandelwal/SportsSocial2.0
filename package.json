@@ -1,8 +1,24 @@
 {
   "name": "sports-social",
-  "private": true,
+  "description": "A social platform for sports enthusiasts to connect, discover events, and build communities",
   "version": "1.0.0",
+  "private": true,
   "type": "module",
+  "author": "Sports Social Team",
+  "homepage": "https://sportssocial.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arnav-khandelwal/SportsSocial2.0"
+  },
+  "keywords": [
+    "sports",
+    "social",
+    "community",
+    "fitness",
+    "events",
+    "react",
+    "athletes"
+  ],
   "scripts": {
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "client": "vite",

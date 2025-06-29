@@ -2,14 +2,24 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/logo.png" />
+    <link rel="icon" type="image/png" href="/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sports Social - Connect Through Sports</title>
-    <meta name="description" content="Connect with sports enthusiasts, find local games, and build your sports community with Sports Social." />
+    <meta name="description" content="Join Sports Social to connect with local athletes, find sports events, and build your sports community. Safe, authentic, and designed for sports enthusiasts." />
+    <meta name="keywords" content="sports, social, athletes, community, events, local sports, fitness, team sports" />
+    <meta name="author" content="Sports Social" />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- Security headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://i.postimg.cc; connect-src 'self' http://localhost:8000 https://sportssocial20-production.up.railway.app https://maps.googleapis.com ws: wss:; script-src 'self' https://maps.googleapis.com;" />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+    
+    <!-- Trusted Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Google Maps script removed; now loaded dynamically in React -->
   </head>
   <body>
     <div id="root"></div>

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import logo from '../../assets/logo/logo.png';
 import './Legal.scss';
 
-const About = () => {
+const AboutUs = () => {
   return (
     <div className="legal">
       <div className="legal__container">
@@ -46,13 +46,6 @@ const About = () => {
           </section>
 
           <section>
-            <h2>How It Started</h2>
-            <p>
-              Sports Social was founded by a team of passionate athletes who recognized the need for a dedicated platform to connect sports enthusiasts. We experienced firsthand the challenges of finding local games, teammates, and sports communities, and decided to create a solution.
-            </p>
-          </section>
-
-          <section>
             <h2>Security & Privacy</h2>
             <p>
               Your safety and privacy are our top priorities. We implement industry-standard security measures to protect your personal information and ensure a safe environment for all users. We never sell your data and only use it to improve your experience on our platform.
@@ -60,7 +53,7 @@ const About = () => {
           </section>
 
           <section>
-             <h2>Contact Us</h2>
+            <h2>Contact Us</h2>
             <p>We'd love to hear from you! Reach out to us:</p>
             <ul>
               <li>All inquiries and support: <a href="mailto:connect.sportssocial@gmail.com">connect.sportssocial@gmail.com</a></li>
@@ -90,11 +83,10 @@ const About = () => {
 
         <div className="legal__footer">
           <Link to="/">← Back to Sports Social</Link>
-          <Link to="/login" className="back-to-login">Back to Login</Link>
         </div>
       </div>
     </div>
   );
 };
 
-export default About;
+export default AboutUs;

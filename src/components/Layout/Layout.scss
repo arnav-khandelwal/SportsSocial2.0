@@ -15,7 +15,7 @@
 
   &__main {
     flex: 1;
-    padding: 2px;
+    padding: 20px;
     overflow-y: auto;
     margin-left: 280px;
     transition: margin-left 0.3s ease;
@@ -25,6 +25,64 @@
     @media (max-width: 768px) {
       margin-left: 0;
       padding: 16px;
+    }
+
+    @media (max-width: 480px) {
+      padding: 12px;
+    }
+  }
+
+  &__footer {
+    margin-top: 2rem;
+    padding: 20px;
+    background-color: var(--background-secondary);
+    border-top: 1px solid var(--border-primary);
+    text-align: center;
+
+    &-content {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    &-links {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+
+      a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+
+        &:hover {
+          color: var(--primary);
+          text-decoration: underline;
+        }
+      }
+
+      span {
+        color: var(--text-muted);
+        font-size: 12px;
+      }
+    }
+
+    &-text {
+      color: var(--text-muted);
+      font-size: 12px;
+      margin: 0;
+    }
+
+    @media (max-width: 768px) {
+      padding: 16px;
+
+      &-links {
+        gap: 8px;
+        font-size: 13px;
+      }
     }
   }
 }

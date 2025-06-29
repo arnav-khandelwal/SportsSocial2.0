@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import logo from '../../assets/logo/logo.png';
 import './Auth.scss';
 
 const Login = () => {
@@ -41,8 +42,12 @@ const Login = () => {
     <div className="auth">
       <div className="auth__container">
         <div className="auth__header">
-          <h1 className="auth__title">Welcome Back</h1>
-          <p className="auth__subtitle">Sign in to Sports Social</p>
+          <div className="auth__logo">
+            <img src={logo} alt="Sports Social Logo" className="auth__logo-image" />
+            <h1 className="auth__title">Sports Social</h1>
+          </div>
+          <h2 className="auth__welcome">Welcome Back</h2>
+          <p className="auth__subtitle">Sign in to your Sports Social account to connect with athletes, find local games, and build your sports community.</p>
         </div>
 
         <form className="auth__form" onSubmit={handleSubmit}>
@@ -81,9 +86,16 @@ const Login = () => {
           <p>
             Don't have an account?{' '}
             <Link to="/register" className="auth__link">
-              Sign up
+              Sign up for free
             </Link>
           </p>
+          <div className="auth__legal">
+            <Link to="/privacy" className="auth__legal-link">Privacy Policy</Link>
+            <span>•</span>
+            <Link to="/terms" className="auth__legal-link">Terms of Service</Link>
+            <span>•</span>
+            <Link to="/about" className="auth__legal-link">About Us</Link>
+          </div>
         </div>
       </div>
     </div>

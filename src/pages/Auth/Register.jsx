@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import OTPVerification from './OTPVerification';
+import logo from '../../assets/logo/logo.png';
 import axios from 'axios';
 import './Auth.scss';
 
@@ -19,6 +20,7 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [showOTPVerification, setShowOTPVerification] = useState(false);
   const [emailForVerification, setEmailForVerification] = useState('');
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
 
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -82,6 +84,12 @@ const Register = () => {
 
     if (formData.password !== formData.confirmPassword) {
       setError('Confirm Password does not match Password');
+      setLoading(false);
+      return;
+    }
+
+    if (!agreeToTerms) {
+      setError('You must agree to the Terms and Conditions to register');
       setLoading(false);
       return;
     }
@@ -202,8 +210,12 @@ const Register = () => {
     <div className="auth">
       <div className="auth__container">
         <div className="auth__header">
-          <h1 className="auth__title">Join Sports Social</h1>
-          <p className="auth__subtitle">Connect with sports enthusiasts</p>
+          <div className="auth__logo">
+            <img src={logo} alt="Sports Social Logo" className="auth__logo-image" />
+            <h1 className="auth__title">Sports Social</h1>
+          </div>
+          <h2 className="auth__welcome">Join Our Community</h2>
+          <p className="auth__subtitle">Create your Sports Social account to connect with athletes, discover local events, and build your sports community.</p>
         </div>
 
         <form className="auth__form" onSubmit={handleSubmit}>
@@ -290,6 +302,27 @@ const Register = () => {
             />
           </div>
 
+          <div className="auth__field auth__field--checkbox">
+            <label className="auth__checkbox-label">
+              <input
+                type="checkbox"
+                checked={agreeToTerms}
+                onChange={(e) => setAgreeToTerms(e.target.checked)}
+                className="auth__checkbox"
+              />
+              <span className="auth__checkbox-text">
+                I have read and agree to the{' '}
+                <Link to="/terms" target="_blank" rel="noopener noreferrer" className="auth__link">
+                  Terms and Conditions
+                </Link>
+                {' '}and{' '}
+                <Link to="/privacy" target="_blank" rel="noopener noreferrer" className="auth__link">
+                  Privacy Policy
+                </Link>
+              </span>
+            </label>
+          </div>
+
           <button type="submit" disabled={loading} className="auth__submit">
             {loading ? 'Creating Account...' : 'Create Account'}
           </button>
@@ -299,9 +332,16 @@ const Register = () => {
           <p>
             Already have an account?{' '}
             <Link to="/login" className="auth__link">
-              Sign in
+              Sign in here
             </Link>
           </p>
+          <div className="auth__legal">
+            <Link to="/privacy" className="auth__legal-link">Privacy Policy</Link>
+            <span>•</span>
+            <Link to="/terms" className="auth__legal-link">Terms of Service</Link>
+            <span>•</span>
+            <Link to="/about" className="auth__legal-link">About Us</Link>
+          </div>
         </div>
       </div>
     </div>

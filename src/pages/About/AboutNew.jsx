@@ -60,12 +60,13 @@ const About = () => {
           </section>
 
           <section>
-             <h2>Contact Us</h2>
+            <h2>Contact Us</h2>
             <p>We'd love to hear from you! Reach out to us:</p>
             <ul>
-              <li>All inquiries and support: <a href="mailto:connect.sportssocial@gmail.com">connect.sportssocial@gmail.com</a></li>
+              <li>General inquiries: <a href="mailto:hello@sportssocial.com">hello@sportssocial.com</a></li>
+              <li>Support: <a href="mailto:support@sportssocial.com">support@sportssocial.com</a></li>
+              <li>Privacy concerns: <a href="mailto:privacy@sportssocial.com">privacy@sportssocial.com</a></li>
               <li>Community Discord: <a href="https://discord.gg/9wFzcndTBX" target="_blank" rel="noopener noreferrer">Join our Discord</a></li>
-              <li>Instagram: <a href="https://instagram.com/sportssocial" target="_blank" rel="noopener noreferrer">@sportssocial</a></li>
             </ul>
           </section>
 
@@ -73,7 +74,7 @@ const About = () => {
             <h2>Stay Connected</h2>
             <p>Follow us for updates, tips, and community highlights:</p>
             <ul>
-              <li>Instagram: <a href="https://instagram.com/sportssocial" target="_blank" rel="noopener noreferrer">@sportssocial</a></li>
+              <li>Instagram: <a href="https://www.instagram.com/sportssocial.connect/" target="_blank" rel="noopener noreferrer">@sportssocial.connect</a></li>
               <li>Discord Community: <a href="https://discord.gg/9wFzcndTBX" target="_blank" rel="noopener noreferrer">Sports Social Community</a></li>
             </ul>
           </section>
@@ -90,7 +91,6 @@ const About = () => {
 
         <div className="legal__footer">
           <Link to="/">← Back to Sports Social</Link>
-          <Link to="/login" className="back-to-login">Back to Login</Link>
         </div>
       </div>
     </div>
