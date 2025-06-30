@@ -15,7 +15,7 @@
 
   &__main {
     flex: 1;
-    padding: 20px;
+    padding: 0;
     overflow-y: auto;
     margin-left: 280px;
     transition: margin-left 0.3s ease;
@@ -24,11 +24,11 @@
 
     @media (max-width: 768px) {
       margin-left: 0;
-      padding: 16px;
+      padding: 0;
     }
 
     @media (max-width: 480px) {
-      padding: 12px;
+      padding: 0;
     }
   }
 
