@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import logo from '../../assets/logo/logo.png';
 import './Auth.scss';
@@ -10,10 +10,21 @@ const Login = () => {
     password: ''
   });
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    // Check for success message from password reset
+    if (location.state?.message && location.state?.type === 'success') {
+      setSuccess(location.state.message);
+      // Clear the state to prevent showing message on refresh
+      navigate('/login', { replace: true });
+    }
+  }, [location.state, navigate]);
 
   const handleChange = (e) => {
     setFormData({
@@ -51,6 +62,7 @@ const Login = () => {
         </div>
 
         <form className="auth__form" onSubmit={handleSubmit}>
+          {success && <div className="auth__success-message">{success}</div>}
           {error && <div className="auth__error">{error}</div>}
 
           <div className="auth__field">
@@ -75,6 +87,12 @@ const Login = () => {
               required
               className="auth__input"
             />
+          </div>
+
+          <div className="auth__forgot">
+            <Link to="/forgot-password" className="auth__forgot-link">
+              Forgot your password?
+            </Link>
           </div>
 
           <button type="submit" disabled={loading} className="auth__submit">

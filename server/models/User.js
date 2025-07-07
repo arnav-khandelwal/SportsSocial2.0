@@ -23,7 +23,7 @@ export class User {
       }])
       .select()
       .single();
-    
+    ``
     if (error) throw error;
     return data;
   }

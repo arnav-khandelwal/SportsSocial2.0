@@ -7,6 +7,9 @@ import Layout from './components/Layout/Layout';
 import BoltBadge from './components/BoltBadge/BoltBadge';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
+import ForgotPassword from './pages/Auth/ForgotPassword';
+import ResetPasswordOTP from './pages/Auth/ResetPasswordOTP';
+import NewPassword from './pages/Auth/NewPassword';
 import Home from './pages/Home/Home';
 import Search from './pages/Search/Search';
 import Messages from './pages/Messages/Messages';
@@ -52,6 +55,9 @@ function AppRoutes() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password-otp" element={<ResetPasswordOTP />} />
+          <Route path="/new-password" element={<NewPassword />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/about" element={<About />} />

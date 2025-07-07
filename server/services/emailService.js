@@ -112,6 +112,160 @@ export const sendOTPEmail = async (email, otp, username) => {
   }
 };
 
+// Send Password Reset OTP email
+export const sendPasswordResetEmail = async (email, otp, username) => {
+  const logoUrl = 'https://i.postimg.cc/zfRpL8MD/whitelogo.png';
+  
+  const mailOptions = {
+    from: {
+      name: 'Sports Social',
+      address: process.env.EMAIL_USER || 'connect.sportssocial@gmail.com'
+    },
+    to: email,
+    subject: 'Reset Your Sports Social Password',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
+        <div style="background: linear-gradient(135deg, #ff6b35, #f7931e); padding: 30px; border-radius: 10px; text-align: center; margin-bottom: 20px;">
+          <table style="margin: 0 auto; margin-bottom: 10px;">
+            <tr>
+              <td style="vertical-align: middle; padding-right: 16px;">
+                <img src="${logoUrl}" alt="Sports Social Logo" style="width: 48px; height: 48px; border-radius: 8px; display: block;" />
+              </td>
+              <td style="vertical-align: middle;">
+                <h1 style="color: white; margin: 0; font-size: 32px; font-weight: bold; white-space: nowrap;">Sports Social</h1>
+              </td>
+            </tr>
+          </table>
+          <p style="color: white; margin: 10px 0 0 0; font-size: 16px;">Password Reset Request</p>
+        </div>
+        
+        <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+          <h2 style="color: #333; margin-top: 0;">Hi ${username}!</h2>
+          <p style="color: #666; font-size: 16px; line-height: 1.6;">
+            We received a request to reset your Sports Social password. Use the verification code below to proceed:
+          </p>
+          
+          <div style="background: #f8f9fa; border: 2px dashed #ff6b35; border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0;">
+            <h3 style="color: #ff6b35; margin: 0; font-size: 32px; letter-spacing: 5px; font-weight: bold;">${otp}</h3>
+            <p style="color: #666; margin: 10px 0 0 0; font-size: 14px;">This code is valid for 10 minutes</p>
+          </div>
+          
+          <div style="background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(255, 152, 0, 0.1)); border: 1px solid rgba(255, 107, 53, 0.2); border-radius: 8px; padding: 20px; margin: 20px 0;">
+            <p style="color: #ff6b35; font-weight: 600; margin: 0 0 8px 0; font-size: 16px;">🔒 Security Notice</p>
+            <p style="color: #666; margin: 0; font-size: 14px; line-height: 1.5;">
+              If you didn't request a password reset, please ignore this email and your password will remain unchanged. 
+              For security, consider changing your password if you suspect unauthorized access.
+            </p>
+          </div>
+          
+          <div style="text-align: center; margin: 30px 0;">
+            <p style="color: #666; font-size: 16px; margin-bottom: 15px; font-weight: 500;">Need Help?</p>
+            <div style="display: inline-block;">
+              <a href="https://sportssocial.netlify.app/" style="display: inline-block; margin: 0 10px; padding: 12px 24px; background: linear-gradient(135deg, #ff6b35, #f7931e); color: white; text-decoration: none; border-radius: 25px; font-weight: 500; font-size: 16px;">
+                Visit Website
+              </a>
+              <a href="https://discord.gg/9wFzcndTBX" style="display: inline-block; margin: 0 10px; padding: 12px 24px; background: #5865F2; color: white; text-decoration: none; border-radius: 25px; font-weight: 500; font-size: 16px;">
+                Get Support
+              </a>
+            </div>
+          </div>
+          
+          <div style="border-top: 1px solid #eee; padding-top: 20px; margin-top: 30px;">
+            <p style="color: #999; font-size: 12px; margin: 0;">
+              © 2025 Sports Social. All rights reserved.<br>
+              This password reset was requested from your account. If this wasn't you, please contact support immediately.
+            </p>
+          </div>
+        </div>
+      </div>
+    `
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    return { success: true };
+  } catch (error) {
+    console.error('Password reset email error:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+// Send Password Reset Confirmation email
+export const sendPasswordResetConfirmationEmail = async (email, username) => {
+  const logoUrl = 'https://i.postimg.cc/zfRpL8MD/whitelogo.png';
+  
+  const mailOptions = {
+    from: {
+      name: 'Sports Social',
+      address: process.env.EMAIL_USER || 'connect.sportssocial@gmail.com'
+    },
+    to: email,
+    subject: 'Password Reset Successful - Sports Social',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
+        <div style="background: linear-gradient(135deg, #4CAF50, #45a049); padding: 30px; border-radius: 10px; text-align: center; margin-bottom: 20px;">
+          <table style="margin: 0 auto; margin-bottom: 10px;">
+            <tr>
+              <td style="vertical-align: middle; padding-right: 16px;">
+                <img src="${logoUrl}" alt="Sports Social Logo" style="width: 48px; height: 48px; border-radius: 8px; display: block;" />
+              </td>
+              <td style="vertical-align: middle;">
+                <h1 style="color: white; margin: 0; font-size: 32px; font-weight: bold; white-space: nowrap;">Sports Social</h1>
+              </td>
+            </tr>
+          </table>
+          <p style="color: white; margin: 10px 0 0 0; font-size: 16px;">Password Reset Successful</p>
+        </div>
+        
+        <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+          <h2 style="color: #333; margin-top: 0;">Hi ${username}!</h2>
+          <p style="color: #666; font-size: 16px; line-height: 1.6;">
+            Your Sports Social password has been successfully reset. You can now log in with your new password.
+          </p>
+          
+          <div style="background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(69, 160, 73, 0.1)); border: 1px solid rgba(76, 175, 80, 0.2); border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0;">
+            <p style="color: #4CAF50; font-weight: 600; margin: 0 0 8px 0; font-size: 18px;">✅ Password Updated</p>
+            <p style="color: #666; margin: 0; font-size: 14px;">
+              Your account is now secure with your new password.
+            </p>
+          </div>
+          
+          <div style="background: #f8f9fa; border-left: 4px solid #ff6b35; padding: 20px; margin: 20px 0;">
+            <p style="color: #ff6b35; font-weight: 600; margin: 0 0 8px 0; font-size: 16px;">🔐 Security Tips</p>
+            <ul style="color: #666; margin: 8px 0 0 0; padding-left: 20px; font-size: 14px; line-height: 1.5;">
+              <li>Keep your password private and don't share it</li>
+              <li>Use a unique password for Sports Social</li>
+              <li>Log out from shared devices</li>
+              <li>Contact us if you notice any suspicious activity</li>
+            </ul>
+          </div>
+          
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="https://sportssocial.netlify.app/login" style="display: inline-block; padding: 14px 28px; background: linear-gradient(135deg, #ff6b35, #f7931e); color: white; text-decoration: none; border-radius: 25px; font-weight: 600; font-size: 16px;">
+              Login to Your Account
+            </a>
+          </div>
+          
+          <div style="border-top: 1px solid #eee; padding-top: 20px; margin-top: 30px;">
+            <p style="color: #999; font-size: 12px; margin: 0;">
+              © 2025 Sports Social. All rights reserved.<br>
+              If you didn't reset your password, please contact our support team immediately.
+            </p>
+          </div>
+        </div>
+      </div>
+    `
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    return { success: true };
+  } catch (error) {
+    console.error('Password reset confirmation email error:', error);
+    return { success: false, error: error.message };
+  }
+};
+
 // Send welcome email
 export const sendWelcomeEmail = async (email, username) => {
   const logoUrl = 'https://i.postimg.cc/zfRpL8MD/whitelogo.png';

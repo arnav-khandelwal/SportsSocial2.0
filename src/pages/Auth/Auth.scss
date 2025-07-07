@@ -71,6 +71,23 @@
     gap: 12px;
   }
 
+  &__success-message {
+    background-color: rgba(76, 175, 80, 0.1);
+    color: var(--success);
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    margin-bottom: 16px;
+    line-height: 1.4;
+    word-wrap: break-word;
+    
+    @media (max-width: 480px) {
+      font-size: 13px;
+      padding: 10px 14px;
+    }
+  }
+
   &__error {
     background-color: var(--background-tertiary);
     color: var(--error);
@@ -220,5 +237,160 @@
     &:hover {
       text-decoration: underline;
     }
+  }
+
+  // Forgot password specific styles
+  &__forgot {
+    text-align: right;
+    margin: 8px 0 16px 0;
+  }
+
+  &__forgot-link {
+    color: var(--primary);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  // Success state styles
+  &__success {
+    text-align: center;
+    padding: 32px 0;
+    
+    &-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    
+    p {
+      color: var(--text-secondary);
+      font-size: 16px;
+    }
+  }
+
+  // Link button style
+  &__link--button {
+    background: none;
+    border: none;
+    color: var(--primary);
+    text-decoration: none;
+    font-size: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  // Password field with toggle
+  &__password-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    
+    input {
+      width: 100%;
+      padding-right: 40px; // Make room for toggle button
+    }
+  }
+
+  &__password-toggle {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: var(--text-secondary);
+    padding: 4px;
+    
+    &:hover {
+      color: var(--text-primary);
+    }
+  }
+
+  // Password strength indicator
+  &__password-strength {
+    margin-top: 8px;
+  }
+
+  &__password-bar {
+    width: 100%;
+    height: 4px;
+    background-color: var(--border-primary);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+
+  &__password-fill {
+    height: 100%;
+    transition: width 0.3s ease, background-color 0.3s ease;
+    
+    &--1 {
+      background-color: #f44336; // red
+    }
+    
+    &--2 {
+      background-color: #ff9800; // orange
+    }
+    
+    &--3 {
+      background-color: #ffc107; // yellow
+    }
+    
+    &--4 {
+      background-color: #4caf50; // green
+    }
+  }
+
+  &__password-text {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  // Password requirements
+  &__password-requirements {
+    background-color: var(--background-tertiary);
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px 0;
+    
+    h4 {
+      margin: 0 0 8px 0;
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+    
+    ul {
+      margin: 0;
+      padding-left: 16px;
+      
+      li {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin: 4px 0;
+        
+        &.valid {
+          color: var(--success);
+        }
+      }
+    }
+  }
+
+  // Field error
+  &__field-error {
+    color: var(--error);
+    font-size: 12px;
+    margin-top: 4px;
+    font-weight: 500;
   }
 }
