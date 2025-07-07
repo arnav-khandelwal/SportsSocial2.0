@@ -21,6 +21,8 @@ const Register = () => {
   const [showOTPVerification, setShowOTPVerification] = useState(false);
   const [emailForVerification, setEmailForVerification] = useState('');
   const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -44,6 +46,18 @@ const Register = () => {
       ...formData,
       [e.target.name]: e.target.value
     });
+    setError(''); // Clear error when user types
+  };
+
+  const getPasswordStrength = () => {
+    const password = formData.password;
+    if (password.length === 0) return { strength: 0, text: '' };
+    if (password.length < 6) return { strength: 1, text: 'Too short' };
+    if (password.length < 8) return { strength: 2, text: 'Fair' };
+    if (password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)) {
+      return { strength: 4, text: 'Strong' };
+    }
+    return { strength: 3, text: 'Good' };
   };
 
   const handleSubmit = async (e) => {
@@ -246,28 +260,79 @@ const Register = () => {
           </div>
 
           <div className="auth__field">
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="auth__input"
-            />
+            <div className="auth__password-field">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                className="auth__input"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="auth__password-toggle"
+              >
+                {showPassword ? '👁️' : '👁️‍🗨️'}
+              </button>
+            </div>
+            
+            {formData.password && (
+              <div className="auth__password-strength">
+                <div className="auth__password-bar">
+                  <div 
+                    className={`auth__password-fill auth__password-fill--${getPasswordStrength().strength}`}
+                    style={{ width: `${(getPasswordStrength().strength / 4) * 100}%` }}
+                  ></div>
+                </div>
+                <span className="auth__password-text">{getPasswordStrength().text}</span>
+              </div>
+            )}
           </div>
 
           <div className="auth__field">
-            <input
-              type="password"
-              name="confirmPassword"
-              placeholder="Confirm Password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              required
-              className="auth__input"
-            />
+            <div className="auth__password-field">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                name="confirmPassword"
+                placeholder="Confirm Password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
+                className="auth__input"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="auth__password-toggle"
+              >
+                {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
+              </button>
+            </div>
+            
+            {formData.confirmPassword && formData.password !== formData.confirmPassword && (
+              <div className="auth__field-error">Passwords do not match</div>
+            )}
           </div>
+
+          {formData.password && (
+            <div className="auth__password-requirements">
+              <h4>Password Requirements:</h4>
+              <ul>
+                <li className={formData.password.length >= 6 ? 'valid' : ''}>
+                  At least 6 characters long
+                </li>
+                <li className={formData.password.match(/[A-Z]/) ? 'valid' : ''}>
+                  One uppercase letter (recommended)
+                </li>
+                <li className={formData.password.match(/[0-9]/) ? 'valid' : ''}>
+                  One number (recommended)
+                </li>
+              </ul>
+            </div>
+          )}
 
           <div className="auth__field">
             <textarea
