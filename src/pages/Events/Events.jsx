@@ -23,7 +23,7 @@ import './Events.scss';
 // Import game icons
 import valorantIcon from '../../assets/icons/valorant.png';
 import rocketLeagueIcon from '../../assets/icons/rocketleague.png';
-import pubgIcon from '../../assets/icons/bgmi.png';
+import BGMIIcon from '../../assets/icons/bgmi.png';
 
 const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
@@ -56,7 +56,7 @@ const Events = () => {
     'Football', 'Basketball', 'Tennis', 'Soccer', 'Baseball', 
     'Volleyball', 'Swimming', 'Running', 'Cycling', 'Golf',
     'Hockey', 'Cricket', 'Rugby', 'Badminton', 'Table Tennis',
-    'Valorant', 'Rocket League', 'PUBG'
+    'Valorant', 'Rocket League', 'BGMI'
   ];
 
   const skillLevels = [
@@ -117,9 +117,9 @@ const Events = () => {
         },
         {
           id: '5',
-          title: 'PUBG Squad Battle Royale',
-          description: 'Join our PUBG Squad Battle Royale tournament! Registration ends on 19th July. Entry fees: ₹50 per person. Team size: 2-4 players. Register now, pay later on 18th July before matches begin. Prize pool: ₹1500!',
-          sport: 'PUBG',
+          title: 'BGMI Squad Battle Royale',
+          description: 'Join our BGMI Squad Battle Royale tournament! Registration ends on 19th July. Entry fees: ₹50 per person. Team size: 2-4 players. Register now, pay later on 18th July before matches begin. Prize pool: ₹1500!',
+          sport: 'BGMI',
           organizer: { id: 'admin', username: 'admin' },
           location_name: 'Online',
           event_date: '2025-07-20T12:00:00.000Z', // July 20th
@@ -132,7 +132,7 @@ const Events = () => {
           cost: 50,
           registration_deadline: '2025-07-19T23:59:59.000Z',
           payment_deadline: '2025-07-18T23:59:59.000Z',
-          tags: ['online', 'esports', 'pubg', 'squad', 'battleroyale'],
+          tags: ['online', 'esports', 'BGMI', 'squad', 'battleroyale'],
           created_at: new Date().toISOString(),
           distance: null,
           prize: '₹1500 prize pool'
@@ -285,8 +285,8 @@ const Events = () => {
                         {event.sport === 'Rocket League' && (
                           <img src={rocketLeagueIcon} alt="Rocket League" className="events__sport-icon" />
                         )}
-                        {event.sport === 'PUBG' && (
-                          <img src={pubgIcon} alt="PUBG" className="events__sport-icon" />
+                        {event.sport === 'BGMI' && (
+                          <img src={BGMIIcon} alt="BGMI" className="events__sport-icon" />
                         )}
                         {event.sport === 'Basketball' && (
                           <span role="img" aria-label="Basketball" style={{fontSize: '20px', marginRight: '6px'}}>🏀</span>
