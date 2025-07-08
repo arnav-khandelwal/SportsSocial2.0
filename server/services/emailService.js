@@ -40,7 +40,7 @@ export const generateOTP = () => {
 
 // Send OTP email
 export const sendOTPEmail = async (email, otp, username) => {
-  const logoUrl = 'https://i.postimg.cc/zfRpL8MD/whitelogo.png';
+  const logoUrl = 'https://ibb.co/7DNgBFz';
   
   const mailOptions = {
     from: {
@@ -114,7 +114,7 @@ export const sendOTPEmail = async (email, otp, username) => {
 
 // Send Password Reset OTP email
 export const sendPasswordResetEmail = async (email, otp, username) => {
-  const logoUrl = 'https://i.postimg.cc/zfRpL8MD/whitelogo.png';
+  const logoUrl = 'https://ibb.co/7DNgBFz';
   
   const mailOptions = {
     from: {
@@ -192,7 +192,7 @@ export const sendPasswordResetEmail = async (email, otp, username) => {
 
 // Send Password Reset Confirmation email
 export const sendPasswordResetConfirmationEmail = async (email, username) => {
-  const logoUrl = 'https://i.postimg.cc/zfRpL8MD/whitelogo.png';
+  const logoUrl = 'https://ibb.co/7DNgBFz';
   
   const mailOptions = {
     from: {
@@ -268,7 +268,7 @@ export const sendPasswordResetConfirmationEmail = async (email, username) => {
 
 // Send welcome email
 export const sendWelcomeEmail = async (email, username) => {
-  const logoUrl = 'https://i.postimg.cc/zfRpL8MD/whitelogo.png';
+  const logoUrl = 'https://ibb.co/7DNgBFz';
   
   const mailOptions = {
     from: {
@@ -362,7 +362,7 @@ export const sendWelcomeEmail = async (email, username) => {
 
 // Send event registration confirmation email
 export const sendEventRegistrationEmail = async (email, name, eventTitle, teamName = null) => {
-  const logoUrl = 'https://i.postimg.cc/zfRpL8MD/whitelogo.png';
+  const logoUrl = 'https://ibb.co/7DNgBFz';
   
   const mailOptions = {
     from: {

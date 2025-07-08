@@ -23,6 +23,7 @@ import './Events.scss';
 // Import game icons
 import valorantIcon from '../../assets/icons/valorant.png';
 import rocketLeagueIcon from '../../assets/icons/rocketleague.png';
+import pubgIcon from '../../assets/icons/bgmi.png';
 
 const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
@@ -55,7 +56,7 @@ const Events = () => {
     'Football', 'Basketball', 'Tennis', 'Soccer', 'Baseball', 
     'Volleyball', 'Swimming', 'Running', 'Cycling', 'Golf',
     'Hockey', 'Cricket', 'Rugby', 'Badminton', 'Table Tennis',
-    'Valorant', 'Rocket League'
+    'Valorant', 'Rocket League', 'PUBG'
   ];
 
   const skillLevels = [
@@ -90,64 +91,48 @@ const Events = () => {
         params.lng = filters.location.coordinates[0];
       }
       
-      // Mock data for the three specified events
+      // Mock data for the new events
       const mockEvents = [
         {
-          id: '1',
-          title: '5v5 Valorant Tournament',
-          description: 'Compete in a 5v5 Valorant tournament! Online event open for all teams. Registration is free. Prize pool: ₹1500 for the winning team.',
-          sport: 'Valorant',
-          organizer: { id: 'admin', username: 'admin' },
-          location_name: 'Online',
-          event_date: '2025-07-04T12:00:00.000Z', // July 4th start
-          end_date: '2025-07-05T23:59:59.000Z', // July 6th end
-          duration_hours: 72, // 3 days (Jul 4-6)
-          max_participants: null,
-          current_participants: 0,
-          skill_level: 'all',
-          equipment_provided: false,
-          cost: 0,
-          tags: ['online', 'esports', 'valorant', '5v5'],
-          created_at: new Date().toISOString(),
-          distance: null,
-          prize: '₹1500 prize pool'
-        },
-        {
-          id: '2',
-          title: '3v3 Rocket League Tournament',
-          description: 'Join our 3v3 Rocket League online tournament! Free to register. Show your skills and teamwork to win an exciting prize pool of ₹1500.',
+          id: '4',
+          title: 'Rocket League 3v3 Tournament',
+          description: 'Join our 3v3 Rocket League tournament! Registration ends on 11th July. Entry fees: ₹150 per team. Register now, pay later on 11th July before matches begin after being added to WhatsApp groups. Prize pool: ₹1500!',
           sport: 'Rocket League',
           organizer: { id: 'admin', username: 'admin' },
           location_name: 'Online',
-          event_date: '2025-07-04T14:00:00.000Z', // July 4th start
-          end_date: '2025-07-05T23:59:59.000Z', // July 6th end
-          duration_hours: 72, // 3 days (Jul 4-6)
+          event_date: '2025-07-12T12:00:00.000Z', // July 12th start
+          end_date: '2025-07-14T23:59:59.000Z', // July 14th end
+          duration_hours: 72, // 3 days (Jul 12-14)
           max_participants: null,
           current_participants: 0,
           skill_level: 'all',
           equipment_provided: false,
-          cost: 0,
-          tags: ['online', 'esports', 'rocketleague', '3v3'],
+          cost: 150,
+          registration_deadline: '2025-07-11T23:59:59.000Z',
+          payment_deadline: '2025-07-11T23:59:59.000Z',
+          tags: ['online', 'esports', 'rocketleague', '3v3', 'tournament'],
           created_at: new Date().toISOString(),
           distance: null,
           prize: '₹1500 prize pool'
         },
         {
-          id: '3',
-          title: "3v3 Basketball Tournament at Lion's Club",
-          description: "Join our 3v3 basketball tournament at Lion's Club, Indirapuram! Team registration fee is ₹100. Compete for a prize pool of ₹1500.",
-          sport: 'Basketball',
+          id: '5',
+          title: 'PUBG Squad Battle Royale',
+          description: 'Join our PUBG Squad Battle Royale tournament! Registration ends on 19th July. Entry fees: ₹50 per person. Team size: 2-4 players. Register now, pay later on 18th July before matches begin. Prize pool: ₹1500!',
+          sport: 'PUBG',
           organizer: { id: 'admin', username: 'admin' },
-          location_name: "Lion's Club, 28°37'32.3\"N 77°25'43.2\"E, Indirapuram, Ghaziabad, Uttar Pradesh 201014",
-          event_date: '2025-07-06T16:00:00+05:30', // July 8th 4pm IST
-          end_date: '2025-07-06T19:00:00+05:30', // July 7th 7pm IST
-          duration_hours: 3, // 4-7 PM
+          location_name: 'Online',
+          event_date: '2025-07-20T12:00:00.000Z', // July 20th
+          end_date: '2025-07-20T23:59:59.000Z', // July 20th end
+          duration_hours: 12, // 1 day event
           max_participants: null,
           current_participants: 0,
           skill_level: 'all',
-          equipment_provided: true,
-          cost: 100,
-          tags: ['basketball', 'offline', 'sports', '3v3'],
+          equipment_provided: false,
+          cost: 50,
+          registration_deadline: '2025-07-19T23:59:59.000Z',
+          payment_deadline: '2025-07-18T23:59:59.000Z',
+          tags: ['online', 'esports', 'pubg', 'squad', 'battleroyale'],
           created_at: new Date().toISOString(),
           distance: null,
           prize: '₹1500 prize pool'
@@ -300,6 +285,9 @@ const Events = () => {
                         {event.sport === 'Rocket League' && (
                           <img src={rocketLeagueIcon} alt="Rocket League" className="events__sport-icon" />
                         )}
+                        {event.sport === 'PUBG' && (
+                          <img src={pubgIcon} alt="PUBG" className="events__sport-icon" />
+                        )}
                         {event.sport === 'Basketball' && (
                           <span role="img" aria-label="Basketball" style={{fontSize: '20px', marginRight: '6px'}}>🏀</span>
                         )}
@@ -358,8 +346,10 @@ const Events = () => {
 
                     <div className="events__detail">
                       <FaCalendarAlt className="events__detail-icon" />
-                      {event.sport === 'Basketball' ? (
-                        <span>6th July, 4pm to 7pm</span>
+                      {event.id === '4' ? (
+                        <span>12th - 14th July 2025</span>
+                      ) : event.id === '5' ? (
+                        <span>20th July 2025</span>
                       ) : event.end_date && event.end_date !== event.event_date ? (
                         <span>
                           {new Date(event.event_date).toLocaleDateString('en-US', { 
@@ -383,13 +373,34 @@ const Events = () => {
 
                     <div className="events__detail">
                       <FaUsers className="events__detail-icon" />
-                      <span>Open participation</span>
+                      {event.id === '4' ? (
+                        <span>3v3 Team Format</span>
+                      ) : event.id === '5' ? (
+                        <span>Squad (2-4 players)</span>
+                      ) : (
+                        <span>Open participation</span>
+                      )}
                     </div>
+
+                    {(event.id === '4' || event.id === '5') && (
+                      <div className="events__detail events__detail--highlight">
+                        <FaClock className="events__detail-icon" />
+                        <span>
+                          Registration ends: {event.id === '4' ? '11th July' : '19th July'}
+                        </span>
+                      </div>
+                    )}
 
                     {event.cost > 0 && (
                       <div className="events__detail">
                         <FaDollarSign className="events__detail-icon" />
-                        <span>₹{event.cost} (At the venue)</span>
+                        {event.id === '4' ? (
+                          <span>₹150 per team (Pay on 11th July)</span>
+                        ) : event.id === '5' ? (
+                          <span>₹50 per person (Pay on 18th July)</span>
+                        ) : (
+                          <span>₹{event.cost}</span>
+                        )}
                       </div>
                     )}
 
