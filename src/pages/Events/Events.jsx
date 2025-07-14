@@ -94,28 +94,6 @@ const Events = () => {
       // Mock data for the new events
       const mockEvents = [
         {
-          id: '4',
-          title: 'Rocket League 3v3 Tournament',
-          description: 'Join our 3v3 Rocket League tournament! Registration ends on 11th July. Entry fees: ₹150 per team. Register now, pay later on 11th July before matches begin after being added to WhatsApp groups. Prize pool: ₹1500!',
-          sport: 'Rocket League',
-          organizer: { id: 'admin', username: 'admin' },
-          location_name: 'Online',
-          event_date: '2025-07-12T12:00:00.000Z', // July 12th start
-          end_date: '2025-07-14T23:59:59.000Z', // July 14th end
-          duration_hours: 72, // 3 days (Jul 12-14)
-          max_participants: null,
-          current_participants: 0,
-          skill_level: 'all',
-          equipment_provided: false,
-          cost: 150,
-          registration_deadline: '2025-07-11T23:59:59.000Z',
-          payment_deadline: '2025-07-11T23:59:59.000Z',
-          tags: ['online', 'esports', 'rocketleague', '3v3', 'tournament'],
-          created_at: new Date().toISOString(),
-          distance: null,
-          prize: '₹1500 prize pool'
-        },
-        {
           id: '5',
           title: 'BGMI Squad Battle Royale',
           description: 'Join our BGMI Squad Battle Royale tournament! Registration ends on 19th July. Entry fees: ₹50 per person. Team size: 2-4 players. Register now, pay later on 18th July before matches begin. Prize pool: ₹1500!',
