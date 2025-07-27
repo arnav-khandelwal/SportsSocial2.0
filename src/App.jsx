@@ -4,7 +4,6 @@ import axios from 'axios';
 
 // Components
 import Layout from './components/Layout/Layout';
-import BoltBadge from './components/BoltBadge/BoltBadge';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import ForgotPassword from './pages/Auth/ForgotPassword';
@@ -64,7 +63,6 @@ function AppRoutes() {
           <Route path="/about" element={<About />} />
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
-        <BoltBadge />
       </Router>
     );
   }
@@ -91,7 +89,6 @@ function AppRoutes() {
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </Layout>
-        <BoltBadge />
       </Router>
     </SocketProvider>
   );
