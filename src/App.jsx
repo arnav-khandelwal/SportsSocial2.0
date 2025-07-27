@@ -58,6 +58,7 @@ function AppRoutes() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password-otp" element={<ResetPasswordOTP />} />
           <Route path="/new-password" element={<NewPassword />} />
+          <Route path="/events" element={<Events />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/about" element={<About />} />
@@ -83,7 +84,6 @@ function AppRoutes() {
             <Route path="/past-posts" element={<PastPosts />} />
             <Route path="/events/register" element={<EventRegister />} />
             <Route path="/notifications" element={<Notifications />} />
-            <Route path="/events" element={<Events />} />
             <Route path="/about" element={<About />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
