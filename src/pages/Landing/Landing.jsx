@@ -39,11 +39,42 @@ function Landing() {
             </div>
           </div>
           <div className="hero-image">
-            <div className="sports-icons">
-              <img src="/src/assets/icons/valorant.png" alt="Gaming" className="sport-icon" />
-              <img src="/src/assets/icons/NBA2K.png" alt="Basketball" className="sport-icon" />
-              <img src="/src/assets/icons/EAFC.png" alt="Football" className="sport-icon" />
-              <img src="/src/assets/icons/rocketleague.png" alt="Rocket League" className="sport-icon" />
+            <div className="sports-showcase">
+              <h3 className="showcase-title">Popular Sports & Games</h3>
+              <div className="sports-grid">
+                <div className="sport-card">
+                  <img src="/src/assets/icons/valorant.png" alt="Valorant" className="sport-icon" />
+                  <span className="sport-name">Valorant</span>
+                </div>
+                <div className="sport-card">
+                  <img src="/src/assets/icons/NBA2K.png" alt="NBA 2K" className="sport-icon" />
+                  <span className="sport-name">NBA 2K</span>
+                </div>
+                <div className="sport-card">
+                  <img src="/src/assets/icons/EAFC.png" alt="EA FC" className="sport-icon" />
+                  <span className="sport-name">EA FC</span>
+                </div>
+                <div className="sport-card">
+                  <img src="/src/assets/icons/rocketleague.png" alt="Rocket League" className="sport-icon" />
+                  <span className="sport-name">Rocket League</span>
+                </div>
+                <div className="sport-card">
+                  <img src="/src/assets/icons/CallOfDuty.png" alt="Call of Duty" className="sport-icon" />
+                  <span className="sport-name">Call of Duty</span>
+                </div>
+                <div className="sport-card">
+                  <img src="/src/assets/icons/leagueoflegends.png" alt="League of Legends" className="sport-icon" />
+                  <span className="sport-name">League of Legends</span>
+                </div>
+                <div className="sport-card">
+                  <img src="/src/assets/icons/apexlegends.png" alt="Apex Legends" className="sport-icon" />
+                  <span className="sport-name">Apex Legends</span>
+                </div>
+                <div className="sport-card">
+                  <img src="/src/assets/icons/minecraft.png" alt="Minecraft" className="sport-icon" />
+                  <span className="sport-name">Minecraft</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -74,6 +105,87 @@ function Landing() {
               <h3>Reviews</h3>
               <p>Rate and review sports events, venues, and equipment.</p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Sports Gallery Section */}
+      <section className="sports-gallery-section">
+        <div className="sports-gallery-container">
+          <h2 className="section-title">Join Communities Across All Sports</h2>
+          <p className="section-subtitle">From esports to traditional sports, find your tribe and compete at every level</p>
+          
+          <div className="sports-categories">
+            <div className="category-group">
+              <h3 className="category-title">🎮 Esports & Gaming</h3>
+              <div className="sports-row">
+                <div className="sport-item">
+                  <img src="/src/assets/icons/valorant.png" alt="Valorant" />
+                  <span>Valorant</span>
+                </div>
+                <div className="sport-item">
+                  <img src="/src/assets/icons/leagueoflegends.png" alt="League of Legends" />
+                  <span>League of Legends</span>
+                </div>
+                <div className="sport-item">
+                  <img src="/src/assets/icons/CallOfDuty.png" alt="Call of Duty" />
+                  <span>Call of Duty</span>
+                </div>
+                <div className="sport-item">
+                  <img src="/src/assets/icons/apexlegends.png" alt="Apex Legends" />
+                  <span>Apex Legends</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="category-group">
+              <h3 className="category-title">⚽ Sports Simulation</h3>
+              <div className="sports-row">
+                <div className="sport-item">
+                  <img src="/src/assets/icons/EAFC.png" alt="EA FC" />
+                  <span>EA FC</span>
+                </div>
+                <div className="sport-item">
+                  <img src="/src/assets/icons/NBA2K.png" alt="NBA 2K" />
+                  <span>NBA 2K</span>
+                </div>
+                <div className="sport-item">
+                  <img src="/src/assets/icons/rocketleague.png" alt="Rocket League" />
+                  <span>Rocket League</span>
+                </div>
+                <div className="sport-item">
+                  <img src="/src/assets/icons/minecraft.png" alt="Minecraft" />
+                  <span>Minecraft</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="category-group">
+              <h3 className="category-title">📱 Mobile Gaming</h3>
+              <div className="sports-row">
+                <div className="sport-item">
+                  <img src="/src/assets/icons/bgmi.png" alt="BGMI" />
+                  <span>BGMI</span>
+                </div>
+                <div className="sport-item placeholder">
+                  <div className="placeholder-icon">🏀</div>
+                  <span>Basketball</span>
+                </div>
+                <div className="sport-item placeholder">
+                  <div className="placeholder-icon">⚽</div>
+                  <span>Football</span>
+                </div>
+                <div className="sport-item placeholder">
+                  <div className="placeholder-icon">🏈</div>
+                  <span>American Football</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="sports-cta">
+            <p>Don't see your sport? Join us and help build new communities!</p>
+            <Link to="/register" className="btn btn-secondary">Explore All Sports</Link>
           </div>
         </div>
       </section>
