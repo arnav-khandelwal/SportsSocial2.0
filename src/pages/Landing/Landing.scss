@@ -78,6 +78,9 @@
 // Hero Section
 .hero-section {
   padding: 140px var(--spacing-lg) 80px;
+  min-height: 100vh; // Make hero section full height
+  display: flex; // Use flexbox for centering
+  align-items: center; // Center content vertically
   
   .hero-container {
     max-width: 1200px;
@@ -86,6 +89,7 @@
     grid-template-columns: 1fr 1fr;
     gap: var(--spacing-xxl);
     align-items: center;
+    width: 100%;
   }
   
   .hero-content {
@@ -181,6 +185,7 @@
           cursor: pointer;
           will-change: transform; // Optimize for animations
           opacity: 1; // Ensure visibility
+          transform: scale(1); // Ensure proper scale
           
           &:hover {
             border-color: var(--primary);
@@ -192,6 +197,8 @@
             height: 60px;
             margin-bottom: var(--spacing-sm);
             border-radius: var(--radius-sm);
+            opacity: 1; // Ensure icon visibility
+            display: block; // Ensure proper display
           }
           
           .sport-name {
@@ -579,6 +586,11 @@
     }
   }
   
+  .hero-section {
+    padding: 100px var(--spacing-md) 40px !important;
+    min-height: 100vh !important;
+  }
+  
   .hero-container {
     grid-template-columns: 1fr !important;
     gap: var(--spacing-xl) !important;
@@ -621,6 +633,33 @@
   }
 }
 
+// Additional responsive breakpoints
+@media (max-width: 480px) {
+  .hero-section {
+    padding: 80px var(--spacing-sm) 30px !important;
+  }
+  
+  .hero-title {
+    font-size: 2rem !important;
+  }
+  
+  .hero-description {
+    font-size: 1rem !important;
+  }
+  
+  .sports-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: var(--spacing-sm) !important;
+  }
+}
+
+@media (max-height: 600px) {
+  .hero-section {
+    min-height: 90vh !important;
+    padding: 80px var(--spacing-lg) 40px !important;
+  }
+}
+
 // Ensure visibility when animations are disabled
 @media (prefers-reduced-motion: reduce) {
   .sport-card,
@@ -628,6 +667,21 @@
   .feature-card {
     opacity: 1 !important;
     transform: none !important;
+  }
+  
+  .sport-icon {
+    opacity: 1 !important;
+    display: block !important;
+  }
+}
+
+// Fallback styles for JavaScript disabled
+.no-js {
+  .sport-card,
+  .sport-item,
+  .feature-card {
+    opacity: 1 !important;
+    transform: scale(1) !important;
   }
 }
 

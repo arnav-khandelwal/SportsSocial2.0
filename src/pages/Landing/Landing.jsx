@@ -42,10 +42,10 @@ function Landing() {
     if (!isLoaded) return;
     
     const ctx = gsap.context(() => {
-      // Set initial states to prevent flashing
+      // Set initial states only for nav and hero content, not sports grid
       gsap.set(navRef.current, { y: -100, opacity: 0 });
       gsap.set(heroContentRef.current.children, { y: 50, opacity: 0 });
-      gsap.set(sportsGridRef.current.children, { scale: 0, opacity: 0 });
+      // Don't set initial state for sports grid - let them be visible
 
       // Initial page load animations
       const tl = gsap.timeline({ delay: 0.1 });
@@ -67,10 +67,10 @@ function Landing() {
         ease: "power3.out"
       }, "-=0.5")
       
-      // Animate sports grid cards
-      .to(sportsGridRef.current.children, {
-        scale: 1,
-        opacity: 1,
+      // Animate sports grid cards from their current state
+      .from(sportsGridRef.current.children, {
+        scale: 0.8,
+        opacity: 0.3,
         duration: 0.6,
         stagger: 0.1,
         ease: "back.out(1.7)"
@@ -157,14 +157,15 @@ function Landing() {
         }
       });
 
-      // Hover animations for interactive elements
+      // Hover animations for interactive elements (simplified)
       const sportCards = document.querySelectorAll('.sport-card, .sport-item');
       sportCards.forEach(card => {
         card.addEventListener('mouseenter', () => {
           gsap.to(card, {
             scale: 1.05,
             duration: 0.3,
-            ease: "power2.out"
+            ease: "power2.out",
+            overwrite: true // Prevent conflicts
           });
         });
         
@@ -172,7 +173,8 @@ function Landing() {
           gsap.to(card, {
             scale: 1,
             duration: 0.3,
-            ease: "power2.out"
+            ease: "power2.out",
+            overwrite: true // Prevent conflicts
           });
         });
       });
