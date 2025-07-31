@@ -70,10 +70,18 @@ function Landing() {
       // Animate sports grid cards from their current state
       .from(sportsGridRef.current.children, {
         scale: 0.8,
-        opacity: 0.3,
+        opacity: 0,
         duration: 0.6,
         stagger: 0.1,
-        ease: "back.out(1.7)"
+        ease: "back.out(1.7)",
+        onComplete: () => {
+          // Ensure cards are at full opacity and normal scale after animation
+          gsap.set(sportsGridRef.current.children, { 
+            scale: 1, 
+            opacity: 1,
+            clearProps: "transform,opacity" 
+          });
+        }
       }, "-=0.3");
 
       // Scroll-triggered animations with refresh capability
@@ -582,15 +590,15 @@ function Landing() {
         }
       });
 
-      // Add floating animation for some elements
+      // Add subtle floating animation for sport icons only (not cards)
       gsap.to(".sport-icon", {
-        y: "random(-5, 5)",
-        duration: "random(2, 4)",
+        y: "random(-3, 3)",
+        duration: "random(3, 5)",
         ease: "sine.inOut",
         yoyo: true,
         repeat: -1,
         stagger: {
-          amount: 2,
+          amount: 3,
           from: "random"
         }
       });
@@ -621,18 +629,16 @@ function Landing() {
         card.addEventListener('mouseenter', () => {
           gsap.to(card, {
             scale: 1.05,
-            rotationY: 5,
-            z: 50,
             duration: 0.3,
             ease: "power2.out",
             overwrite: true
           });
           
-          // Add glow effect to sport icon
+          // Add subtle glow effect to sport icon
           const icon = card.querySelector('.sport-icon, img');
           if (icon) {
             gsap.to(icon, {
-              filter: "brightness(1.2) drop-shadow(0 0 10px rgba(255, 255, 255, 0.3))",
+              filter: "brightness(1.1) drop-shadow(0 0 8px rgba(255, 255, 255, 0.2))",
               duration: 0.3,
               ease: "power2.out"
             });
@@ -642,8 +648,6 @@ function Landing() {
         card.addEventListener('mouseleave', () => {
           gsap.to(card, {
             scale: 1,
-            rotationY: 0,
-            z: 0,
             duration: 0.3,
             ease: "power2.out",
             overwrite: true
