@@ -1,8 +1,19 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './Landing.scss';
+
+// Import sport icons
+import valorantIcon from '../../assets/icons/valorant.png';
+import nba2kIcon from '../../assets/icons/NBA2K.png';
+import eafcIcon from '../../assets/icons/EAFC.png';
+import rocketLeagueIcon from '../../assets/icons/rocketleague.png';
+import codIcon from '../../assets/icons/CallOfDuty.png';
+import lolIcon from '../../assets/icons/leagueoflegends.png';
+import apexIcon from '../../assets/icons/apexlegends.png';
+import minecraftIcon from '../../assets/icons/minecraft.png';
+import bgmiIcon from '../../assets/icons/bgmi.png';
 
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger);
@@ -16,33 +27,50 @@ function Landing() {
   const sportsGalleryRef = useRef(null);
   const aboutRef = useRef(null);
   const ctaRef = useRef(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
+    // Ensure page is loaded before starting animations
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    
     const ctx = gsap.context(() => {
+      // Set initial states to prevent flashing
+      gsap.set(navRef.current, { y: -100, opacity: 0 });
+      gsap.set(heroContentRef.current.children, { y: 50, opacity: 0 });
+      gsap.set(sportsGridRef.current.children, { scale: 0, opacity: 0 });
+
       // Initial page load animations
-      const tl = gsap.timeline();
+      const tl = gsap.timeline({ delay: 0.1 });
 
       // Animate navigation bar
-      tl.from(navRef.current, {
-        y: -100,
-        opacity: 0,
+      tl.to(navRef.current, {
+        y: 0,
+        opacity: 1,
         duration: 1,
         ease: "power3.out"
       })
       
       // Animate hero content
-      .from(heroContentRef.current.children, {
-        y: 50,
-        opacity: 0,
+      .to(heroContentRef.current.children, {
+        y: 0,
+        opacity: 1,
         duration: 0.8,
         stagger: 0.2,
         ease: "power3.out"
       }, "-=0.5")
       
       // Animate sports grid cards
-      .from(sportsGridRef.current.children, {
-        scale: 0,
-        opacity: 0,
+      .to(sportsGridRef.current.children, {
+        scale: 1,
+        opacity: 1,
         duration: 0.6,
         stagger: 0.1,
         ease: "back.out(1.7)"
@@ -188,28 +216,28 @@ function Landing() {
         });
       });
 
-      // Parallax effect for hero section
+      // Parallax effect for hero section (simplified)
       ScrollTrigger.create({
         trigger: heroRef.current,
         start: "top top",
         end: "bottom top",
-        scrub: 1,
+        scrub: true,
         onUpdate: (self) => {
-          gsap.to(heroContentRef.current, {
-            y: self.progress * 50,
-            duration: 0.3
-          });
-          gsap.to(sportsGridRef.current, {
-            y: self.progress * -30,
-            duration: 0.3
-          });
+          if (heroContentRef.current && sportsGridRef.current) {
+            gsap.set(heroContentRef.current, {
+              y: self.progress * 30
+            });
+            gsap.set(sportsGridRef.current, {
+              y: self.progress * -20
+            });
+          }
         }
       });
 
     });
 
     return () => ctx.revert(); // Cleanup
-  }, []);
+  }, [isLoaded]);
 
   return (
     <div className="landing-page">
@@ -231,7 +259,7 @@ function Landing() {
       </nav>
 
       {/* Hero Section */}
-      <section className="hero-section" ref={heroRef}>
+      <section className="hero-section  " ref={heroRef}>
         <div className="hero-container">
           <div className="hero-content" ref={heroContentRef}>
             <h1 className="hero-title">
@@ -251,35 +279,35 @@ function Landing() {
               <h3 className="showcase-title">Popular Sports & Games</h3>
               <div className="sports-grid" ref={sportsGridRef}>
                 <div className="sport-card">
-                  <img src="/src/assets/icons/valorant.png" alt="Valorant" className="sport-icon" />
+                  <img src={valorantIcon} alt="Valorant" className="sport-icon" />
                   <span className="sport-name">Valorant</span>
                 </div>
                 <div className="sport-card">
-                  <img src="/src/assets/icons/NBA2K.png" alt="NBA 2K" className="sport-icon" />
+                  <img src={nba2kIcon} alt="NBA 2K" className="sport-icon" />
                   <span className="sport-name">NBA 2K</span>
                 </div>
                 <div className="sport-card">
-                  <img src="/src/assets/icons/EAFC.png" alt="EA FC" className="sport-icon" />
+                  <img src={eafcIcon} alt="EA FC" className="sport-icon" />
                   <span className="sport-name">EA FC</span>
                 </div>
                 <div className="sport-card">
-                  <img src="/src/assets/icons/rocketleague.png" alt="Rocket League" className="sport-icon" />
+                  <img src={rocketLeagueIcon} alt="Rocket League" className="sport-icon" />
                   <span className="sport-name">Rocket League</span>
                 </div>
                 <div className="sport-card">
-                  <img src="/src/assets/icons/CallOfDuty.png" alt="Call of Duty" className="sport-icon" />
+                  <img src={codIcon} alt="Call of Duty" className="sport-icon" />
                   <span className="sport-name">Call of Duty</span>
                 </div>
                 <div className="sport-card">
-                  <img src="/src/assets/icons/leagueoflegends.png" alt="League of Legends" className="sport-icon" />
+                  <img src={lolIcon} alt="League of Legends" className="sport-icon" />
                   <span className="sport-name">League of Legends</span>
                 </div>
                 <div className="sport-card">
-                  <img src="/src/assets/icons/apexlegends.png" alt="Apex Legends" className="sport-icon" />
+                  <img src={apexIcon} alt="Apex Legends" className="sport-icon" />
                   <span className="sport-name">Apex Legends</span>
                 </div>
                 <div className="sport-card">
-                  <img src="/src/assets/icons/minecraft.png" alt="Minecraft" className="sport-icon" />
+                  <img src={minecraftIcon} alt="Minecraft" className="sport-icon" />
                   <span className="sport-name">Minecraft</span>
                 </div>
               </div>
@@ -328,19 +356,19 @@ function Landing() {
               <h3 className="category-title">🎮 Esports & Gaming</h3>
               <div className="sports-row">
                 <div className="sport-item">
-                  <img src="/src/assets/icons/valorant.png" alt="Valorant" />
+                  <img src={valorantIcon} alt="Valorant" />
                   <span>Valorant</span>
                 </div>
                 <div className="sport-item">
-                  <img src="/src/assets/icons/leagueoflegends.png" alt="League of Legends" />
+                  <img src={lolIcon} alt="League of Legends" />
                   <span>League of Legends</span>
                 </div>
                 <div className="sport-item">
-                  <img src="/src/assets/icons/CallOfDuty.png" alt="Call of Duty" />
+                  <img src={codIcon} alt="Call of Duty" />
                   <span>Call of Duty</span>
                 </div>
                 <div className="sport-item">
-                  <img src="/src/assets/icons/apexlegends.png" alt="Apex Legends" />
+                  <img src={apexIcon} alt="Apex Legends" />
                   <span>Apex Legends</span>
                 </div>
               </div>
@@ -350,19 +378,19 @@ function Landing() {
               <h3 className="category-title">⚽ Sports Simulation</h3>
               <div className="sports-row">
                 <div className="sport-item">
-                  <img src="/src/assets/icons/EAFC.png" alt="EA FC" />
+                  <img src={eafcIcon} alt="EA FC" />
                   <span>EA FC</span>
                 </div>
                 <div className="sport-item">
-                  <img src="/src/assets/icons/NBA2K.png" alt="NBA 2K" />
+                  <img src={nba2kIcon} alt="NBA 2K" />
                   <span>NBA 2K</span>
                 </div>
                 <div className="sport-item">
-                  <img src="/src/assets/icons/rocketleague.png" alt="Rocket League" />
+                  <img src={rocketLeagueIcon} alt="Rocket League" />
                   <span>Rocket League</span>
                 </div>
                 <div className="sport-item">
-                  <img src="/src/assets/icons/minecraft.png" alt="Minecraft" />
+                  <img src={minecraftIcon} alt="Minecraft" />
                   <span>Minecraft</span>
                 </div>
               </div>
@@ -372,7 +400,7 @@ function Landing() {
               <h3 className="category-title">📱 Mobile Gaming</h3>
               <div className="sports-row">
                 <div className="sport-item">
-                  <img src="/src/assets/icons/bgmi.png" alt="BGMI" />
+                  <img src={bgmiIcon} alt="BGMI" />
                   <span>BGMI</span>
                 </div>
                 <div className="sport-item placeholder">

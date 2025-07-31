@@ -115,26 +115,28 @@
       display: flex;
       gap: var(--spacing-md);
       
-        .btn {
-          padding: var(--spacing-md) var(--spacing-xl);
-          border-radius: var(--radius-md);
-          text-decoration: none;
-          font-weight: 600;
-          font-size: 1.1rem;
-          transition: all 0.3s ease;
-          border: none;
-          cursor: pointer;
-          will-change: transform; // Optimize for animations
+      .btn {
+        padding: var(--spacing-md) var(--spacing-xl);
+        border-radius: var(--radius-md);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        will-change: transform; // Optimize for animations
+        
+        &.btn-primary {
+          background: var(--primary);
+          color: white;
           
-          &.btn-primary {
-            background: var(--primary);
-            color: white;
-            
-            &:hover {
-              background: var(--primary-dark);
-              box-shadow: var(--shadow-medium);
-            }
-          }        &.btn-secondary {
+          &:hover {
+            background: var(--primary-dark);
+            box-shadow: var(--shadow-medium);
+          }
+        }
+        
+        &.btn-secondary {
           background: transparent;
           color: var(--text-primary);
           border: 2px solid var(--border-secondary);
@@ -167,6 +169,7 @@
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: var(--spacing-md);
+        min-height: 200px; // Ensure minimum height
         
         .sport-card {
           background: var(--background-card);
@@ -177,6 +180,7 @@
           transition: all 0.3s ease;
           cursor: pointer;
           will-change: transform; // Optimize for animations
+          opacity: 1; // Ensure visibility
           
           &:hover {
             border-color: var(--primary);
@@ -591,6 +595,7 @@
   
   .sports-grid {
     grid-template-columns: repeat(2, 1fr) !important;
+    min-height: 150px !important;
   }
   
   .sports-row {
@@ -613,6 +618,16 @@
   .footer-links {
     flex-direction: column !important;
     gap: var(--spacing-md) !important;
+  }
+}
+
+// Ensure visibility when animations are disabled
+@media (prefers-reduced-motion: reduce) {
+  .sport-card,
+  .sport-item,
+  .feature-card {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 
