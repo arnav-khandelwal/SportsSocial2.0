@@ -1,12 +1,220 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './Landing.scss';
 
+// Register GSAP plugins
+gsap.registerPlugin(ScrollTrigger);
+
 function Landing() {
+  const navRef = useRef(null);
+  const heroRef = useRef(null);
+  const heroContentRef = useRef(null);
+  const sportsGridRef = useRef(null);
+  const featuresRef = useRef(null);
+  const sportsGalleryRef = useRef(null);
+  const aboutRef = useRef(null);
+  const ctaRef = useRef(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Initial page load animations
+      const tl = gsap.timeline();
+
+      // Animate navigation bar
+      tl.from(navRef.current, {
+        y: -100,
+        opacity: 0,
+        duration: 1,
+        ease: "power3.out"
+      })
+      
+      // Animate hero content
+      .from(heroContentRef.current.children, {
+        y: 50,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.2,
+        ease: "power3.out"
+      }, "-=0.5")
+      
+      // Animate sports grid cards
+      .from(sportsGridRef.current.children, {
+        scale: 0,
+        opacity: 0,
+        duration: 0.6,
+        stagger: 0.1,
+        ease: "back.out(1.7)"
+      }, "-=0.3");
+
+      // Scroll-triggered animations
+      ScrollTrigger.batch(".feature-card", {
+        onEnter: (elements) => {
+          gsap.from(elements, {
+            y: 100,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.15,
+            ease: "power3.out"
+          });
+        },
+        start: "top 85%"
+      });
+
+      ScrollTrigger.batch(".sport-item", {
+        onEnter: (elements) => {
+          gsap.from(elements, {
+            scale: 0,
+            opacity: 0,
+            duration: 0.6,
+            stagger: 0.1,
+            ease: "back.out(1.7)"
+          });
+        },
+        start: "top 85%"
+      });
+
+      ScrollTrigger.batch(".stat-item", {
+        onEnter: (elements) => {
+          gsap.from(elements, {
+            y: 50,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.1,
+            ease: "power3.out"
+          });
+        },
+        start: "top 85%"
+      });
+
+      ScrollTrigger.batch(".mission-card", {
+        onEnter: (elements) => {
+          gsap.from(elements, {
+            x: 100,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.2,
+            ease: "power3.out"
+          });
+        },
+        start: "top 85%"
+      });
+
+      // Section title animations
+      ScrollTrigger.batch(".section-title", {
+        onEnter: (elements) => {
+          gsap.from(elements, {
+            y: 30,
+            opacity: 0,
+            duration: 0.8,
+            ease: "power3.out"
+          });
+        },
+        start: "top 90%"
+      });
+
+      // CTA section animation
+      ScrollTrigger.create({
+        trigger: ctaRef.current,
+        start: "top 80%",
+        onEnter: () => {
+          gsap.from(ctaRef.current.children, {
+            y: 50,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.2,
+            ease: "power3.out"
+          });
+        }
+      });
+
+      // Hover animations for interactive elements
+      const sportCards = document.querySelectorAll('.sport-card, .sport-item');
+      sportCards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+          gsap.to(card, {
+            scale: 1.05,
+            duration: 0.3,
+            ease: "power2.out"
+          });
+        });
+        
+        card.addEventListener('mouseleave', () => {
+          gsap.to(card, {
+            scale: 1,
+            duration: 0.3,
+            ease: "power2.out"
+          });
+        });
+      });
+
+      const featureCards = document.querySelectorAll('.feature-card');
+      featureCards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+          gsap.to(card, {
+            y: -10,
+            duration: 0.3,
+            ease: "power2.out"
+          });
+        });
+        
+        card.addEventListener('mouseleave', () => {
+          gsap.to(card, {
+            y: 0,
+            duration: 0.3,
+            ease: "power2.out"
+          });
+        });
+      });
+
+      // Button hover animations
+      const buttons = document.querySelectorAll('.btn');
+      buttons.forEach(btn => {
+        btn.addEventListener('mouseenter', () => {
+          gsap.to(btn, {
+            scale: 1.05,
+            duration: 0.3,
+            ease: "power2.out"
+          });
+        });
+        
+        btn.addEventListener('mouseleave', () => {
+          gsap.to(btn, {
+            scale: 1,
+            duration: 0.3,
+            ease: "power2.out"
+          });
+        });
+      });
+
+      // Parallax effect for hero section
+      ScrollTrigger.create({
+        trigger: heroRef.current,
+        start: "top top",
+        end: "bottom top",
+        scrub: 1,
+        onUpdate: (self) => {
+          gsap.to(heroContentRef.current, {
+            y: self.progress * 50,
+            duration: 0.3
+          });
+          gsap.to(sportsGridRef.current, {
+            y: self.progress * -30,
+            duration: 0.3
+          });
+        }
+      });
+
+    });
+
+    return () => ctx.revert(); // Cleanup
+  }, []);
+
   return (
     <div className="landing-page">
       {/* Top Navigation Bar */}
-      <nav className="landing-nav">
+      <nav className="landing-nav" ref={navRef}>
         <div className="nav-container">
           <div className="nav-logo">
             <img src="/logo.png" alt="Sports Social" className="logo-img" />
@@ -23,9 +231,9 @@ function Landing() {
       </nav>
 
       {/* Hero Section */}
-      <section className="hero-section">
+      <section className="hero-section" ref={heroRef}>
         <div className="hero-container">
-          <div className="hero-content">
+          <div className="hero-content" ref={heroContentRef}>
             <h1 className="hero-title">
               Connect with <span className="highlight">Sports Enthusiasts</span> Worldwide
             </h1>
@@ -41,7 +249,7 @@ function Landing() {
           <div className="hero-image">
             <div className="sports-showcase">
               <h3 className="showcase-title">Popular Sports & Games</h3>
-              <div className="sports-grid">
+              <div className="sports-grid" ref={sportsGridRef}>
                 <div className="sport-card">
                   <img src="/src/assets/icons/valorant.png" alt="Valorant" className="sport-icon" />
                   <span className="sport-name">Valorant</span>
@@ -81,7 +289,7 @@ function Landing() {
       </section>
 
       {/* Features Section */}
-      <section className="features-section">
+      <section className="features-section" ref={featuresRef}>
         <div className="features-container">
           <h2 className="section-title">Why Choose Sports Social?</h2>
           <div className="features-grid">
@@ -110,7 +318,7 @@ function Landing() {
       </section>
 
       {/* Sports Gallery Section */}
-      <section className="sports-gallery-section">
+      <section className="sports-gallery-section" ref={sportsGalleryRef}>
         <div className="sports-gallery-container">
           <h2 className="section-title">Join Communities Across All Sports</h2>
           <p className="section-subtitle">From esports to traditional sports, find your tribe and compete at every level</p>
@@ -191,7 +399,7 @@ function Landing() {
       </section>
 
       {/* About Us Section */}
-      <section className="about-section">
+      <section className="about-section" ref={aboutRef}>
         <div className="about-container">
           <div className="about-content">
             <div className="about-text">
@@ -243,7 +451,7 @@ function Landing() {
 
       {/* CTA Section */}
       <section className="cta-section">
-        <div className="cta-container">
+        <div className="cta-container" ref={ctaRef}>
           <h2>Ready to Join the Community?</h2>
           <p>Start your sports social journey today</p>
           <Link to="/register" className="btn btn-primary btn-large">Sign Up Now</Link>
