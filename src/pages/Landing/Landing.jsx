@@ -76,106 +76,587 @@ function Landing() {
         ease: "back.out(1.7)"
       }, "-=0.3");
 
-      // Scroll-triggered animations
+      // Scroll-triggered animations with refresh capability
       ScrollTrigger.batch(".feature-card", {
         onEnter: (elements) => {
-          gsap.from(elements, {
-            y: 100,
-            opacity: 0,
-            duration: 0.8,
-            stagger: 0.15,
-            ease: "power3.out"
+          gsap.fromTo(elements, 
+            {
+              y: 100,
+              opacity: 0,
+              scale: 0.8
+            },
+            {
+              y: 0,
+              opacity: 1,
+              scale: 1,
+              duration: 0.8,
+              stagger: 0.15,
+              ease: "power3.out"
+            }
+          );
+        },
+        onLeave: (elements) => {
+          gsap.to(elements, {
+            y: -50,
+            opacity: 0.3,
+            duration: 0.3
           });
         },
-        start: "top 85%"
+        onEnterBack: (elements) => {
+          gsap.to(elements, {
+            y: 0,
+            opacity: 1,
+            duration: 0.5,
+            stagger: 0.1
+          });
+        },
+        start: "top 85%",
+        end: "bottom 15%"
       });
 
       ScrollTrigger.batch(".sport-item", {
         onEnter: (elements) => {
-          gsap.from(elements, {
-            scale: 0,
-            opacity: 0,
-            duration: 0.6,
-            stagger: 0.1,
-            ease: "back.out(1.7)"
+          gsap.fromTo(elements,
+            {
+              scale: 0,
+              opacity: 0,
+              rotation: -180
+            },
+            {
+              scale: 1,
+              opacity: 1,
+              rotation: 0,
+              duration: 0.6,
+              stagger: 0.1,
+              ease: "back.out(1.7)"
+            }
+          );
+        },
+        onLeave: (elements) => {
+          gsap.to(elements, {
+            scale: 0.8,
+            opacity: 0.5,
+            duration: 0.3
           });
         },
-        start: "top 85%"
+        onEnterBack: (elements) => {
+          gsap.to(elements, {
+            scale: 1,
+            opacity: 1,
+            duration: 0.4,
+            stagger: 0.05
+          });
+        },
+        start: "top 85%",
+        end: "bottom 15%"
       });
 
       ScrollTrigger.batch(".stat-item", {
         onEnter: (elements) => {
-          gsap.from(elements, {
-            y: 50,
-            opacity: 0,
-            duration: 0.8,
-            stagger: 0.1,
-            ease: "power3.out"
+          gsap.fromTo(elements,
+            {
+              y: 50,
+              opacity: 0,
+              scale: 0.5
+            },
+            {
+              y: 0,
+              opacity: 1,
+              scale: 1,
+              duration: 0.8,
+              stagger: 0.1,
+              ease: "power3.out"
+            }
+          );
+          
+          // Animate the numbers counting up
+          elements.forEach(element => {
+            const numberElement = element.querySelector('h3');
+            if (numberElement) {
+              const finalText = numberElement.textContent;
+              const hasPlus = finalText.includes('+');
+              const hasSlash = finalText.includes('/');
+              let finalNumber = parseInt(finalText.replace(/[^0-9]/g, ''));
+              
+              if (finalNumber) {
+                gsap.fromTo(numberElement, 
+                  { textContent: 0 },
+                  {
+                    textContent: finalNumber,
+                    duration: 2,
+                    ease: "power2.out",
+                    snap: { textContent: 1 },
+                    onUpdate: function() {
+                      const current = Math.ceil(this.targets()[0].textContent);
+                      if (hasPlus) {
+                        numberElement.textContent = current + 'K+';
+                      } else if (hasSlash) {
+                        numberElement.textContent = current + '/7';
+                      } else {
+                        numberElement.textContent = current + '+';
+                      }
+                    }
+                  }
+                );
+              }
+            }
           });
         },
-        start: "top 85%"
+        onLeave: (elements) => {
+          gsap.to(elements, {
+            y: -30,
+            opacity: 0.4,
+            duration: 0.3
+          });
+        },
+        onEnterBack: (elements) => {
+          gsap.to(elements, {
+            y: 0,
+            opacity: 1,
+            duration: 0.5,
+            stagger: 0.05
+          });
+        },
+        start: "top 85%",
+        end: "bottom 15%"
       });
 
       ScrollTrigger.batch(".mission-card", {
         onEnter: (elements) => {
-          gsap.from(elements, {
-            x: 100,
-            opacity: 0,
-            duration: 0.8,
-            stagger: 0.2,
-            ease: "power3.out"
+          gsap.fromTo(elements,
+            {
+              x: 100,
+              opacity: 0,
+              rotationY: 45
+            },
+            {
+              x: 0,
+              opacity: 1,
+              rotationY: 0,
+              duration: 0.8,
+              stagger: 0.2,
+              ease: "power3.out"
+            }
+          );
+        },
+        onLeave: (elements) => {
+          gsap.to(elements, {
+            x: 50,
+            opacity: 0.3,
+            duration: 0.3
           });
+        },
+        onEnterBack: (elements) => {
+          gsap.to(elements, {
+            x: 0,
+            opacity: 1,
+            duration: 0.5,
+            stagger: 0.1
+          });
+        },
+        start: "top 85%",
+        end: "bottom 15%"
+      });
+
+      // Enhanced section title animations
+      ScrollTrigger.batch(".section-title", {
+        onEnter: (elements) => {
+          gsap.fromTo(elements,
+            {
+              y: 30,
+              opacity: 0,
+              scale: 0.8
+            },
+            {
+              y: 0,
+              opacity: 1,
+              scale: 1,
+              duration: 0.8,
+              ease: "power3.out"
+            }
+          );
+        },
+        onLeave: (elements) => {
+          gsap.to(elements, {
+            y: -20,
+            opacity: 0.5,
+            duration: 0.3
+          });
+        },
+        onEnterBack: (elements) => {
+          gsap.to(elements, {
+            y: 0,
+            opacity: 1,
+            duration: 0.5
+          });
+        },
+        start: "top 90%",
+        end: "bottom 10%"
+      });
+
+      // Section subtitle animations
+      ScrollTrigger.batch(".section-subtitle", {
+        onEnter: (elements) => {
+          gsap.fromTo(elements,
+            {
+              y: 20,
+              opacity: 0
+            },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.6,
+              delay: 0.2,
+              ease: "power2.out"
+            }
+          );
+        },
+        start: "top 90%"
+      });
+
+      // Category title animations
+      ScrollTrigger.batch(".category-title", {
+        onEnter: (elements) => {
+          gsap.fromTo(elements,
+            {
+              x: -50,
+              opacity: 0
+            },
+            {
+              x: 0,
+              opacity: 1,
+              duration: 0.6,
+              ease: "power2.out"
+            }
+          );
+        },
+        start: "top 90%"
+      });
+
+      // About description animation
+      ScrollTrigger.batch(".about-description", {
+        onEnter: (elements) => {
+          gsap.fromTo(elements,
+            {
+              y: 30,
+              opacity: 0
+            },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.8,
+              ease: "power2.out"
+            }
+          );
         },
         start: "top 85%"
       });
 
-      // Section title animations
-      ScrollTrigger.batch(".section-title", {
+      // Enhanced CTA section animation
+      ScrollTrigger.create({
+        trigger: ctaRef.current,
+        start: "top 80%",
+        end: "bottom 20%",
+        onEnter: () => {
+          gsap.fromTo(ctaRef.current.children,
+            {
+              y: 50,
+              opacity: 0,
+              scale: 0.8
+            },
+            {
+              y: 0,
+              opacity: 1,
+              scale: 1,
+              duration: 0.8,
+              stagger: 0.2,
+              ease: "power3.out"
+            }
+          );
+        },
+        onLeave: () => {
+          gsap.to(ctaRef.current.children, {
+            y: -30,
+            opacity: 0.5,
+            duration: 0.3
+          });
+        },
+        onEnterBack: () => {
+          gsap.to(ctaRef.current.children, {
+            y: 0,
+            opacity: 1,
+            duration: 0.5,
+            stagger: 0.1
+          });
+        }
+      });
+
+      // Sports CTA animation
+      ScrollTrigger.batch(".sports-cta", {
         onEnter: (elements) => {
-          gsap.from(elements, {
-            y: 30,
-            opacity: 0,
-            duration: 0.8,
-            ease: "power3.out"
+          gsap.fromTo(elements,
+            {
+              y: 40,
+              opacity: 0,
+              scale: 0.9
+            },
+            {
+              y: 0,
+              opacity: 1,
+              scale: 1,
+              duration: 0.8,
+              ease: "power3.out"
+            }
+          );
+        },
+        start: "top 85%"
+      });
+
+      // Sports showcase animation in hero
+      ScrollTrigger.batch(".sports-showcase", {
+        onEnter: (elements) => {
+          gsap.fromTo(elements,
+            {
+              x: 100,
+              opacity: 0,
+              rotationY: 15
+            },
+            {
+              x: 0,
+              opacity: 1,
+              rotationY: 0,
+              duration: 1,
+              ease: "power3.out"
+            }
+          );
+        },
+        start: "top 90%"
+      });
+
+      // Category groups staggered animation
+      ScrollTrigger.batch(".category-group", {
+        onEnter: (elements) => {
+          gsap.fromTo(elements,
+            {
+              y: 80,
+              opacity: 0,
+              scale: 0.9
+            },
+            {
+              y: 0,
+              opacity: 1,
+              scale: 1,
+              duration: 0.8,
+              stagger: 0.3,
+              ease: "power3.out"
+            }
+          );
+        },
+        onLeave: (elements) => {
+          gsap.to(elements, {
+            y: -40,
+            opacity: 0.4,
+            duration: 0.3
+          });
+        },
+        onEnterBack: (elements) => {
+          gsap.to(elements, {
+            y: 0,
+            opacity: 1,
+            duration: 0.6,
+            stagger: 0.1
+          });
+        },
+        start: "top 80%",
+        end: "bottom 20%"
+      });
+
+      // Sports rows within categories
+      ScrollTrigger.batch(".sports-row", {
+        onEnter: (elements) => {
+          const sportItems = elements.flatMap(row => Array.from(row.children));
+          gsap.fromTo(sportItems,
+            {
+              scale: 0,
+              opacity: 0,
+              y: 30
+            },
+            {
+              scale: 1,
+              opacity: 1,
+              y: 0,
+              duration: 0.5,
+              stagger: 0.1,
+              ease: "back.out(1.2)",
+              delay: 0.2
+            }
+          );
+        },
+        start: "top 85%"
+      });
+
+      // Hero buttons animation
+      ScrollTrigger.batch(".hero-buttons", {
+        onEnter: (elements) => {
+          gsap.fromTo(elements[0].children,
+            {
+              y: 30,
+              opacity: 0,
+              scale: 0.8
+            },
+            {
+              y: 0,
+              opacity: 1,
+              scale: 1,
+              duration: 0.6,
+              stagger: 0.1,
+              ease: "back.out(1.2)",
+              delay: 0.5
+            }
+          );
+        },
+        start: "top center"
+      });
+
+      // About stats animation with enhanced counter
+      ScrollTrigger.batch(".about-stats", {
+        onEnter: (elements) => {
+          gsap.fromTo(elements,
+            {
+              y: 50,
+              opacity: 0
+            },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.8,
+              ease: "power3.out"
+            }
+          );
+        },
+        start: "top 85%"
+      });
+
+      // Footer animation
+      ScrollTrigger.batch(".landing-footer", {
+        onEnter: (elements) => {
+          gsap.fromTo(elements,
+            {
+              y: 30,
+              opacity: 0
+            },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.8,
+              ease: "power2.out"
+            }
+          );
+        },
+        start: "top 95%"
+      });
+
+      // Navigation animation enhancement
+      ScrollTrigger.create({
+        trigger: "body",
+        start: "top top",
+        end: "bottom bottom",
+        onUpdate: (self) => {
+          if (self.direction === -1) {
+            // Scrolling up - show nav with slide down
+            gsap.to(navRef.current, {
+              y: 0,
+              opacity: 1,
+              duration: 0.3,
+              ease: "power2.out"
+            });
+          } else if (self.progress > 0.1) {
+            // Scrolling down - slightly hide nav
+            gsap.to(navRef.current, {
+              y: -10,
+              opacity: 0.95,
+              duration: 0.3,
+              ease: "power2.out"
+            });
+          }
+        }
+      });
+
+      // Add floating animation for some elements
+      gsap.to(".sport-icon", {
+        y: "random(-5, 5)",
+        duration: "random(2, 4)",
+        ease: "sine.inOut",
+        yoyo: true,
+        repeat: -1,
+        stagger: {
+          amount: 2,
+          from: "random"
+        }
+      });
+
+      // Showcase title typing effect
+      ScrollTrigger.batch(".showcase-title", {
+        onEnter: (elements) => {
+          elements.forEach(element => {
+            const text = element.textContent;
+            element.textContent = '';
+            gsap.to(element, {
+              duration: text.length * 0.05,
+              ease: "none",
+              onUpdate: function() {
+                const progress = this.progress();
+                const currentLength = Math.floor(progress * text.length);
+                element.textContent = text.substring(0, currentLength);
+              }
+            });
           });
         },
         start: "top 90%"
       });
 
-      // CTA section animation
-      ScrollTrigger.create({
-        trigger: ctaRef.current,
-        start: "top 80%",
-        onEnter: () => {
-          gsap.from(ctaRef.current.children, {
-            y: 50,
-            opacity: 0,
-            duration: 0.8,
-            stagger: 0.2,
-            ease: "power3.out"
-          });
-        }
-      });
-
-      // Hover animations for interactive elements (simplified)
+      // Enhanced hover animations for interactive elements
       const sportCards = document.querySelectorAll('.sport-card, .sport-item');
       sportCards.forEach(card => {
         card.addEventListener('mouseenter', () => {
           gsap.to(card, {
             scale: 1.05,
+            rotationY: 5,
+            z: 50,
             duration: 0.3,
             ease: "power2.out",
-            overwrite: true // Prevent conflicts
+            overwrite: true
           });
+          
+          // Add glow effect to sport icon
+          const icon = card.querySelector('.sport-icon, img');
+          if (icon) {
+            gsap.to(icon, {
+              filter: "brightness(1.2) drop-shadow(0 0 10px rgba(255, 255, 255, 0.3))",
+              duration: 0.3,
+              ease: "power2.out"
+            });
+          }
         });
         
         card.addEventListener('mouseleave', () => {
           gsap.to(card, {
             scale: 1,
+            rotationY: 0,
+            z: 0,
             duration: 0.3,
             ease: "power2.out",
-            overwrite: true // Prevent conflicts
+            overwrite: true
           });
+          
+          const icon = card.querySelector('.sport-icon, img');
+          if (icon) {
+            gsap.to(icon, {
+              filter: "brightness(1) drop-shadow(0 0 0px rgba(255, 255, 255, 0))",
+              duration: 0.3,
+              ease: "power2.out"
+            });
+          }
         });
       });
 
@@ -183,27 +664,56 @@ function Landing() {
       featureCards.forEach(card => {
         card.addEventListener('mouseenter', () => {
           gsap.to(card, {
-            y: -10,
-            duration: 0.3,
+            y: -15,
+            scale: 1.02,
+            rotationX: 5,
+            boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)",
+            duration: 0.4,
             ease: "power2.out"
           });
+          
+          // Animate feature icon
+          const icon = card.querySelector('.feature-icon');
+          if (icon) {
+            gsap.to(icon, {
+              scale: 1.2,
+              rotation: 10,
+              duration: 0.3,
+              ease: "back.out(1.5)"
+            });
+          }
         });
         
         card.addEventListener('mouseleave', () => {
           gsap.to(card, {
             y: 0,
-            duration: 0.3,
+            scale: 1,
+            rotationX: 0,
+            boxShadow: "0 5px 15px rgba(0, 0, 0, 0.08)",
+            duration: 0.4,
             ease: "power2.out"
           });
+          
+          const icon = card.querySelector('.feature-icon');
+          if (icon) {
+            gsap.to(icon, {
+              scale: 1,
+              rotation: 0,
+              duration: 0.3,
+              ease: "power2.out"
+            });
+          }
         });
       });
 
-      // Button hover animations
+      // Enhanced button hover animations
       const buttons = document.querySelectorAll('.btn');
       buttons.forEach(btn => {
         btn.addEventListener('mouseenter', () => {
           gsap.to(btn, {
             scale: 1.05,
+            y: -2,
+            boxShadow: "0 10px 25px rgba(0, 0, 0, 0.15)",
             duration: 0.3,
             ease: "power2.out"
           });
@@ -212,9 +722,77 @@ function Landing() {
         btn.addEventListener('mouseleave', () => {
           gsap.to(btn, {
             scale: 1,
+            y: 0,
+            boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
             duration: 0.3,
             ease: "power2.out"
           });
+        });
+      });
+
+      // Mission cards enhanced hover
+      const missionCards = document.querySelectorAll('.mission-card');
+      missionCards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+          gsap.to(card, {
+            scale: 1.03,
+            rotationY: -5,
+            z: 30,
+            duration: 0.4,
+            ease: "power2.out"
+          });
+        });
+        
+        card.addEventListener('mouseleave', () => {
+          gsap.to(card, {
+            scale: 1,
+            rotationY: 0,
+            z: 0,
+            duration: 0.4,
+            ease: "power2.out"
+          });
+        });
+      });
+
+      // Stat items hover animation
+      const statItems = document.querySelectorAll('.stat-item');
+      statItems.forEach(item => {
+        item.addEventListener('mouseenter', () => {
+          gsap.to(item, {
+            scale: 1.1,
+            y: -5,
+            duration: 0.3,
+            ease: "back.out(1.5)"
+          });
+          
+          const number = item.querySelector('h3');
+          if (number) {
+            gsap.to(number, {
+              scale: 1.2,
+              color: "#00ff88",
+              duration: 0.3,
+              ease: "power2.out"
+            });
+          }
+        });
+        
+        item.addEventListener('mouseleave', () => {
+          gsap.to(item, {
+            scale: 1,
+            y: 0,
+            duration: 0.3,
+            ease: "power2.out"
+          });
+          
+          const number = item.querySelector('h3');
+          if (number) {
+            gsap.to(number, {
+              scale: 1,
+              color: "",
+              duration: 0.3,
+              ease: "power2.out"
+            });
+          }
         });
       });
 
