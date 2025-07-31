@@ -167,6 +167,8 @@
         font-size: 1.2rem;
         color: var(--text-secondary);
         margin-bottom: var(--spacing-lg);
+        opacity: 1; // Ensure visibility
+        font-weight: 500;
       }
       
       .sports-grid {
@@ -195,10 +197,11 @@
           .sport-icon {
             width: 60px;
             height: 60px;
-            margin-bottom: var(--spacing-sm);
+            margin: 0 auto var(--spacing-sm);
             border-radius: var(--radius-sm);
             opacity: 1; // Ensure icon visibility
             display: block; // Ensure proper display
+            object-fit: contain; // Maintain aspect ratio
           }
           
           .sport-name {

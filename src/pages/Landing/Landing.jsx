@@ -45,6 +45,7 @@ function Landing() {
       // Set initial states only for nav and hero content, not sports grid
       gsap.set(navRef.current, { y: -100, opacity: 0 });
       gsap.set(heroContentRef.current.children, { y: 50, opacity: 0 });
+      gsap.set(".showcase-title", { y: 20, opacity: 0 });
       // Don't set initial state for sports grid - let them be visible
 
       // Initial page load animations
@@ -67,13 +68,21 @@ function Landing() {
         ease: "power3.out"
       }, "-=0.5")
       
+      // Animate showcase title alongside hero content
+      .to(".showcase-title", {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        ease: "power2.out"
+      }, "-=0.6")
+      
       // Animate sports grid cards from their current state
       .from(sportsGridRef.current.children, {
         scale: 0.8,
         opacity: 0,
         duration: 0.6,
         stagger: 0.1,
-        ease: "back.out(1.7)",
+        ease: "back.out(0.6)",
         onComplete: () => {
           // Ensure cards are at full opacity and normal scale after animation
           gsap.set(sportsGridRef.current.children, { 
@@ -82,7 +91,7 @@ function Landing() {
             clearProps: "transform,opacity" 
           });
         }
-      }, "-=0.3");
+      }, "-=1.4");
 
       // Scroll-triggered animations with refresh capability
       ScrollTrigger.batch(".feature-card", {
@@ -601,26 +610,6 @@ function Landing() {
           amount: 3,
           from: "random"
         }
-      });
-
-      // Showcase title typing effect
-      ScrollTrigger.batch(".showcase-title", {
-        onEnter: (elements) => {
-          elements.forEach(element => {
-            const text = element.textContent;
-            element.textContent = '';
-            gsap.to(element, {
-              duration: text.length * 0.05,
-              ease: "none",
-              onUpdate: function() {
-                const progress = this.progress();
-                const currentLength = Math.floor(progress * text.length);
-                element.textContent = text.substring(0, currentLength);
-              }
-            });
-          });
-        },
-        start: "top 90%"
       });
 
       // Enhanced hover animations for interactive elements
