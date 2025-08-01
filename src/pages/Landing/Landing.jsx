@@ -825,7 +825,7 @@ function Landing() {
           <div className="nav-links">
             <Link to="/events" className="nav-link">Events</Link>
             <Link to="/register" className="nav-link">Get Started</Link>
-            <a href="#" className="nav-link">Download App</a>
+            <Link to="/download" className="nav-link">Download App</Link>
             <Link to="/login" className="nav-link sign-in-btn">Sign In</Link>
           </div>
         </div>

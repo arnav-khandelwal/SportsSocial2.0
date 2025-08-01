@@ -25,6 +25,7 @@ import About from './pages/About/About';
 import Privacy from './pages/Privacy/Privacy';
 import Terms from './pages/Terms/Terms';
 import Settings from './pages/Settings/Settings';
+import Download from './pages/Download/Download';
 
 // Context
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -63,6 +64,7 @@ function AppRoutes() {
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/about" element={<About />} />
+          <Route path="/download" element={<Download />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Router>
