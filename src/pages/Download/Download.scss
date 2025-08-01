@@ -2,7 +2,7 @@
 
 .download-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+  background: var(--background-primary);
   color: var(--text-primary);
   overflow-x: hidden;
 }
@@ -13,9 +13,9 @@
   top: 0;
   left: 0;
   right: 0;
-  background: rgba(10, 10, 10, 0.95);
+  background: var(--background-secondary);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--border-primary);
   z-index: 1000;
   padding: 1rem 0;
 
@@ -43,10 +43,7 @@
     .logo-text {
       font-size: 1.25rem;
       font-weight: 700;
-      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--primary);
     }
   }
 
@@ -64,16 +61,16 @@
       border-radius: 8px;
 
       &:hover {
-        color: var(--primary-color);
-        background: rgba(255, 255, 255, 0.05);
+        color: var(--primary);
+        background: var(--background-hover);
       }
 
       &.sign-in-btn {
-        background: var(--primary-color);
+        background: var(--primary);
         color: white;
 
         &:hover {
-          background: var(--primary-hover);
+          background: var(--primary-dark);
           transform: translateY(-2px);
         }
       }
@@ -85,7 +82,7 @@
 .download-hero {
   padding: 120px 2rem 80px;
   text-align: center;
-  background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, rgba(74, 144, 226, 0.1) 100%);
+  background: var(--background-secondary);
 
   .hero-container {
     max-width: 800px;
@@ -96,11 +93,12 @@
     font-size: clamp(2.5rem, 5vw, 4rem);
     font-weight: 800;
     margin-bottom: 1.5rem;
-    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--text-primary);
     line-height: 1.2;
+    
+    span {
+      color: var(--primary);
+    }
   }
 
   .hero-subtitle {
@@ -117,11 +115,11 @@
     flex-wrap: wrap;
 
     .badge {
-      background: rgba(255, 255, 255, 0.1);
+      background: var(--background-tertiary);
       padding: 0.5rem 1rem;
       border-radius: 25px;
       font-size: 0.9rem;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid var(--border-primary);
       backdrop-filter: blur(10px);
     }
   }
@@ -130,7 +128,7 @@
 /* App Features Section */
 .app-features-section {
   padding: 80px 2rem;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--background-primary);
 
   .features-container {
     max-width: 1200px;
@@ -152,17 +150,17 @@
   }
 
   .app-feature {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--background-card);
     padding: 2rem;
     border-radius: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-primary);
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;
 
     &:hover {
       transform: translateY(-5px);
-      background: rgba(255, 255, 255, 0.08);
-      border-color: var(--primary-color);
+      background: var(--background-hover);
+      border-color: var(--primary);
     }
 
     .feature-icon {
@@ -218,16 +216,16 @@
     text-align: center;
 
     .phone-frame {
-      background: linear-gradient(145deg, #2a2a3e, #1a1a2e);
+      background: var(--background-tertiary);
       border-radius: 25px;
       padding: 1rem;
-      border: 2px solid rgba(255, 255, 255, 0.1);
+      border: 2px solid var(--border-primary);
       margin-bottom: 1.5rem;
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+      box-shadow: var(--shadow-heavy);
     }
 
     .screenshot-placeholder {
-      background: #000;
+      background: var(--background-primary);
       border-radius: 20px;
       height: 400px;
       overflow: hidden;
@@ -241,15 +239,13 @@
       flex-direction: column;
     }
 
-    .mock-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-
-      .mock-title {
+      .mock-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--border-primary);      .mock-title {
         color: var(--text-primary);
         font-weight: 600;
       }
@@ -275,7 +271,7 @@
       align-items: center;
       gap: 0.75rem;
       padding: 0.75rem;
-      background: rgba(255, 255, 255, 0.05);
+      background: var(--background-tertiary);
       border-radius: 10px;
     }
 
@@ -283,7 +279,7 @@
     .mock-event-image {
       width: 40px;
       height: 40px;
-      background: var(--primary-color);
+      background: var(--primary);
       border-radius: 50%;
       flex-shrink: 0;
     }
@@ -303,7 +299,7 @@
 
     .mock-line {
       height: 8px;
-      background: rgba(255, 255, 255, 0.3);
+      background: var(--text-tertiary);
       border-radius: 4px;
 
       &.short {
@@ -327,7 +323,7 @@
 /* Download Links Section */
 .download-links-section {
   padding: 80px 2rem;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--background-secondary);
 
   .download-container {
     max-width: 800px;
@@ -361,8 +357,8 @@
     align-items: center;
     gap: 1rem;
     padding: 1rem 1.5rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(255, 255, 255, 0.1);
+    background: var(--background-card);
+    border: 2px solid var(--border-primary);
     border-radius: 15px;
     color: var(--text-primary);
     text-decoration: none;
@@ -372,8 +368,8 @@
     min-width: 200px;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: var(--primary-color);
+      background: var(--background-hover);
+      border-color: var(--primary);
       transform: translateY(-2px);
     }
 
@@ -417,15 +413,15 @@
     }
 
     &.web-btn .btn-icon {
-      color: var(--primary-color);
+      color: var(--primary);
     }
   }
 
   .download-info {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--background-card);
     padding: 2rem;
     border-radius: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-primary);
 
     p {
       color: var(--text-secondary);
@@ -441,12 +437,12 @@
     }
 
     .info-badge {
-      background: rgba(0, 255, 136, 0.1);
-      color: var(--primary-color);
+      background: var(--background-tertiary);
+      color: var(--primary);
       padding: 0.5rem 1rem;
       border-radius: 20px;
       font-size: 0.9rem;
-      border: 1px solid rgba(0, 255, 136, 0.3);
+      border: 1px solid var(--primary);
     }
   }
 }
@@ -475,17 +471,17 @@
   }
 
   .faq-item {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--background-card);
     padding: 2rem;
     border-radius: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-primary);
     backdrop-filter: blur(10px);
 
     h3 {
       font-size: 1.125rem;
       font-weight: 600;
       margin-bottom: 1rem;
-      color: var(--primary-color);
+      color: var(--primary);
     }
 
     p {
@@ -498,7 +494,7 @@
 /* CTA Section */
 .download-cta-section {
   padding: 80px 2rem;
-  background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, rgba(74, 144, 226, 0.1) 100%);
+  background: var(--background-tertiary);
   text-align: center;
 
   .cta-container {
@@ -534,22 +530,22 @@
     transition: all 0.3s ease;
 
     &.btn-primary {
-      background: var(--primary-color);
+      background: var(--primary);
       color: white;
 
       &:hover {
-        background: var(--primary-hover);
+        background: var(--primary-dark);
         transform: translateY(-2px);
       }
     }
 
     &.btn-secondary {
       background: transparent;
-      color: var(--primary-color);
-      border: 2px solid var(--primary-color);
+      color: var(--primary);
+      border: 2px solid var(--primary);
 
       &:hover {
-        background: var(--primary-color);
+        background: var(--primary);
         color: white;
         transform: translateY(-2px);
       }
@@ -560,8 +556,8 @@
 /* Footer */
 .download-footer {
   padding: 3rem 2rem 2rem;
-  background: rgba(0, 0, 0, 0.3);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--background-primary);
+  border-top: 1px solid var(--border-primary);
 
   .footer-container {
     max-width: 1200px;
@@ -582,7 +578,7 @@
       transition: color 0.3s ease;
 
       &:hover {
-        color: var(--primary-color);
+        color: var(--primary);
       }
     }
   }

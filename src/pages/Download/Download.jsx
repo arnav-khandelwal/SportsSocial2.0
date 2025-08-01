@@ -213,7 +213,7 @@ function Download() {
       {/* Hero Section */}
       <section className="download-hero" ref={heroRef}>
         <div className="hero-container">
-          <h1 className="hero-title">Download Sports Social</h1>
+          <h1 className="hero-title">Download <span>Sports Social</span></h1>
           <p className="hero-subtitle">
             Take your sports community with you wherever you go. Connect, compete, 
             and celebrate with fellow athletes on mobile.
