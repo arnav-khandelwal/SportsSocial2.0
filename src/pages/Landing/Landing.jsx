@@ -926,15 +926,11 @@ function Landing() {
           
           <div className="sports-categories">
             <div className="category-group">
-              <h3 className="category-title">🎮 Esports & Gaming</h3>
+              <h3 className="category-title">🎮 FPS & Battle Royale</h3>
               <div className="sports-row">
                 <div className="sport-item">
                   <img src={valorantIcon} alt="Valorant" />
                   <span>Valorant</span>
-                </div>
-                <div className="sport-item">
-                  <img src={lolIcon} alt="League of Legends" />
-                  <span>League of Legends</span>
                 </div>
                 <div className="sport-item">
                   <img src={codIcon} alt="Call of Duty" />
@@ -943,6 +939,10 @@ function Landing() {
                 <div className="sport-item">
                   <img src={apexIcon} alt="Apex Legends" />
                   <span>Apex Legends</span>
+                </div>
+                <div className="sport-item">
+                  <img src={bgmiIcon} alt="BGMI" />
+                  <span>BGMI</span>
                 </div>
               </div>
             </div>
@@ -962,19 +962,45 @@ function Landing() {
                   <img src={rocketLeagueIcon} alt="Rocket League" />
                   <span>Rocket League</span>
                 </div>
-                <div className="sport-item">
-                  <img src={minecraftIcon} alt="Minecraft" />
-                  <span>Minecraft</span>
+                <div className="sport-item placeholder">
+                  <div className="placeholder-icon">🏈</div>
+                  <span>Madden NFL</span>
                 </div>
               </div>
             </div>
             
             <div className="category-group">
-              <h3 className="category-title">📱 Mobile Gaming</h3>
+              <h3 className="category-title">🎯 Strategy & MOBA</h3>
               <div className="sports-row">
                 <div className="sport-item">
-                  <img src={bgmiIcon} alt="BGMI" />
-                  <span>BGMI</span>
+                  <img src={lolIcon} alt="League of Legends" />
+                  <span>League of Legends</span>
+                </div>
+                <div className="sport-item">
+                  <img src={minecraftIcon} alt="Minecraft" />
+                  <span>Minecraft</span>
+                </div>
+                <div className="sport-item placeholder">
+                  <div className="placeholder-icon">♟️</div>
+                  <span>Chess</span>
+                </div>
+                <div className="sport-item placeholder">
+                  <div className="placeholder-icon">🃏</div>
+                  <span>Poker</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="category-group">
+              <h3 className="category-title">🏃‍♂️ Physical Sports & Fitness</h3>
+              <div className="sports-row">
+                <div className="sport-item placeholder">
+                  <div className="placeholder-icon">🏃‍♂️</div>
+                  <span>Running</span>
+                </div>
+                <div className="sport-item placeholder">
+                  <div className="placeholder-icon">💪</div>
+                  <span>Gym & Fitness</span>
                 </div>
                 <div className="sport-item placeholder">
                   <div className="placeholder-icon">🏀</div>
@@ -983,10 +1009,6 @@ function Landing() {
                 <div className="sport-item placeholder">
                   <div className="placeholder-icon">⚽</div>
                   <span>Football</span>
-                </div>
-                <div className="sport-item placeholder">
-                  <div className="placeholder-icon">🏈</div>
-                  <span>American Football</span>
                 </div>
               </div>
             </div>
