@@ -83,10 +83,15 @@
   padding: 120px 2rem 80px;
   text-align: center;
   background: var(--background-secondary);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   .hero-container {
     max-width: 800px;
     margin: 0 auto;
+    width: 100%;
   }
 
   .hero-title {
@@ -608,6 +613,10 @@
 
   .download-hero {
     padding: 100px 1rem 60px;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     .hero-badges {
       justify-content: center;
